@@ -1,0 +1,85 @@
+<template>
+  <div class="apex-navbar apex-navbar-{{theme}}" style="height:{{height}}px">
+    <div class="left" data-type="left" onclick="clickHandler">
+      <text class="text" if="{{ leftText }}">{{ leftText }}</text>
+    </div>
+    <div class="title">
+      <block if="{{ title }}">
+        <text>{{ title }}</text>
+      </block>
+      <block if="{{ !title }}">
+        <slot></slot>
+      </block>
+    </div>
+    <div class="right" data-type="right" onclick="clickHandler">
+      <text class="text" if="{{ rightText }}">{{ rightText }}</text>
+    </div>
+  </div>
+</template>
+<style lang="less">
+  @import '../styles/base.less';
+
+  .apex-navbar {
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+    text {
+      color: #FFFFFF;
+    }
+    &-light {
+      background-color: #FFFFFF;
+      text {
+        color: @text-color;
+      }
+    }
+    &-dark {
+      background-color: @title-color;
+    }
+    &-royal {
+      background-color: @warning-color;
+    }
+    &-positive {
+      background-color: @success-color;
+    }
+    &-calm {
+      background-color: @primary-color;
+    }
+  }
+</style>
+<script>
+    export default {
+        props: {
+            theme: {
+                type: String,
+                default: 'light' //  light、positive、calm、royal、dark
+            },
+            title: {
+                type: String,
+                default: ''
+            },
+            leftText: {
+                type: String,
+                default: ''
+            },
+            rightText: {
+                type: String,
+                default: ''
+            },
+            height: {
+                default: 100
+            },
+            bgColor: {
+                type: String,
+                default: ''
+            },
+            fixed: {
+                default: false
+            }
+        },
+        clickHandler(e) {
+            const {type} = e.target.dataset;
+            console.log('navbar', e.target.dataset.type);
+            this.$emit('tap', {type});
+        },
+    }
+</script>

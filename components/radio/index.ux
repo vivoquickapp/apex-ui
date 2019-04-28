@@ -1,0 +1,109 @@
+<template>
+  <div class="apex-radio apex-radio-{{position}}" onclick="clickHandler">
+    <div class="apex-radio-checked {{my_checked?'apex-radio-active':''}}"
+         style="background-color: {{(my_checked||disabled)?my_color:''}}">
+      <div class="apex-radio-icon {{disabled?'apex-radio-disabled':''}}" show="{{my_checked}}"></div>
+    </div>
+    <div class="apex-radio-content">
+      <text>{{value}}</text>
+    </div>
+  </div>
+</template>
+
+<style lang="less">
+  @import "../styles/base.less";
+
+  .apex-radio {
+    padding: 20px;
+    background-color: #FFFFFF;
+    height: 86px;
+
+    &-checked {
+      height: @checkbox-size;
+      width: @checkbox-size;
+      justify-content: center;
+      border-radius: @checkbox-size;
+      border: 2px solid @border-color-base;
+      margin-right: 10px;
+    }
+
+    &-icon {
+      width: @checkbox-size / 2;
+      height: @checkbox-size / 3.6;
+      border-style: solid;
+      border-width: 0 0 2px 2px;
+      transform: rotate(-45deg);
+      margin-top: @checkbox-size / 3;
+      border-color: #FFFFFF;
+    }
+
+    &-active {
+      border-color: transparent;
+    }
+
+    &-disabled {
+      border-color: @border-color-base;
+    }
+
+    &-right {
+      flex-direction: row-reverse;
+      justify-content: space-between;
+    }
+  }
+
+</style>
+
+<script>
+    export default {
+        data() {
+            return {
+                my_checked: this.checked,
+                my_position: this.position,
+                my_color: this.color
+            };
+        },
+        props: {
+            checked: {
+                default: false
+            },
+            disabled: {
+                default: false
+            },
+            position: {
+                default: 'left' // left right
+            },
+            value: {
+                default: ''
+            },
+            color: {
+                default: '#2d8cf0'
+            },
+            group: {
+                default: ''
+            }
+        },
+        onInit() {
+            this.$watch('disabled', 'handleDisabled');
+            this.$watch('checked', 'changeChecked');
+        },
+        changeChecked() {
+          this.my_checked = this.checked;
+        },
+        changeCurrent(current) {
+            this.my_checked = current;
+        },
+        clickHandler() {
+            if (this.disabled) return;
+            const item = {current: !this.checked, value: this.value};
+            const parent = this.$parent().$child(this.group);
+            parent ? parent.emitEvent(item) : this.$emit('change', item);
+        },
+        handleDisabled(e) {
+            if (e) {
+                this.my_color = '#bbbec4'
+            } else {
+                this.my_color = this.color
+            }
+        }
+    };
+</script>

@@ -1,0 +1,105 @@
+<template>
+  <div class="apex-input {{ error ? 'apex-input-error' : '' }} {{ mode === 'wrapped' ? 'apex-input-wrapped' : '' }}">
+    <text class="apex-input-title" if="{{!!title}}" class="title">{{title}}</text>
+    <input id="input" class="apex-input-content {{right === 'true' ? 'apex-input-right': ''}}" type="{{type}}" maxlength="{{maxlength}}" placeholder="{{placeholder}}"
+           value="{{my_value}}" if="{{disabled !== 'true'}}"
+           onchange="handleInputChange" onfocus="handleInputFocus"/>
+    <text class="apex-input-content {{right === 'true' ? 'apex-input-right': ''}}" if="{{disabled === 'true'}}">{{my_value}}</text>
+  </div>
+</template>
+<style lang="less">
+  @import "../styles/base";
+
+  .apex-input {
+    flex-direction: row;
+    background-color: #FFFFFF;
+    padding: 20px;
+    &-title {
+      font-size: @size-font-base;
+      margin-right: 20px;
+    }
+    &-content {
+      flex-grow: 1;
+      font-size: @size-font-base;
+    }
+    &-wrapped {
+      margin: 10px 15px;
+      background-color: #fff;
+      border: 1px solid @border-color-base;
+      border-radius: 8px;
+    }
+    &-right {
+      text-align: right;
+    }
+    &-error {
+      border: 1px solid @error-color;
+      input {
+        color: @error-color;
+      }
+    }
+  }
+</style>
+<script>
+    export default {
+        props: {
+            title: {
+                default: ''
+            },
+            type: {
+                default: 'text' // number password text
+            },
+            value: {
+                default: ''
+            },
+            disabled: {
+                default: 'false'
+            },
+            placeholder: {
+                default: ''
+            },
+            autofocus: {
+                default: false
+            },
+            right: {
+                default: false
+            },
+            mode: {
+                default: 'normal' // normal wrapped
+            },
+            error: {
+                default: false
+            },
+            maxlength: {
+                default: -1
+            }
+        },
+
+        data() {
+            return {
+                my_value: this.value
+            }
+        },
+
+        onReady() {
+            const focus = this.autofocus.toString() === 'true';
+            if (!focus) return; // 解决拉不起输入法的问题
+            this.$element("input").focus({focus: focus});
+        },
+
+        handleInputChange(event) {
+            const {detail = {}} = event;
+            const {value = ''} = detail;
+            this._data.my_value = value;
+
+            this.$emit('change', event);
+        },
+
+        handleInputFocus(event) {
+            this.$emit('focus', event);
+        },
+
+        handleInputBlur(event) {
+            this.$emit('blur', event);
+        }
+    }
+</script>

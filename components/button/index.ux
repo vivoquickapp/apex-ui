@@ -1,0 +1,169 @@
+<import name="my-icon" src="../icon/index"></import>
+<template>
+  <div
+      class="btn-{{type}} btn-{{size}} btn-{{shape}} {{ disabled ? 'btn-disabled' : ''}} {{ inline ? 'inline' : ''}} {{ loading ? 'btn-loading' : '' }} btn"
+      onclick="clickHandler">
+    <progress class="btn-loading-inner" type="circular" if="loading">></progress>
+    <text class="content">
+      <slot></slot>
+    </text>
+    <my-icon if="icon" type="{{icon}}" color="{{type==='ghost'?'#495060':'#ffffff'}}" size="40"></my-icon>
+  </div>
+</template>
+<script>
+  export default {
+    props: {
+      type: {
+        default: 'primary' // default, primary, ghost, info, success, warning, error
+      },
+      inline: {
+        default: false
+      },
+      loading: {
+        default: false
+      },
+      disabled: {
+        default: false
+      },
+      size: {
+        default: 'default' // large, default, small
+      },
+      shape: {
+        default: 'square' // circle, square, round
+      },
+      icon: {
+        default: ''
+      },
+      bgColor: {
+        default: ''
+      }
+    },
+    clickHandler(e) {
+      this.$emit('tap', e)
+    }
+  }
+</script>
+<style lang="less">
+  @import '../styles/base.less';
+
+  .button-size(@padding; @font-size;) {
+    padding: @padding;
+    font-size: @font-size;
+  }
+
+  .btn-color(@color) {
+    .content {
+      color: #fff;
+    }
+    background-color: @color;
+  }
+
+  .btn-primary() {
+    .btn-color(@primary-color);
+  }
+
+  .btn-ghost() {
+    .btn-color(#fff);
+    .content {
+      color: @text-color;
+    }
+  }
+
+  .inline {
+    align-self: baseline;
+  }
+
+  .btn {
+    border-radius: 6px;
+    margin: 10px;
+    padding: 0 20px;
+    justify-content: center;
+    height: @btn-circle-size;
+    line-height: @btn-circle-size;
+    border-style: solid;
+    border-width: 1px;
+    border-color: @border-color-base;
+
+    .btn-color(@btn-default-bg);
+
+    .content {
+      color: @text-color
+    }
+    &-hover {
+      opacity: 0.9;
+    }
+
+    &-long {
+      border-radius: 0;
+      margin: 0;
+    }
+
+    &-large {
+      height: @btn-circle-size-large;
+      line-height: @btn-circle-size-large;
+    }
+
+    &-small {
+      height: @btn-circle-size-small;
+      line-height: @btn-circle-size-small;
+    }
+
+    &-primary {
+      .btn-primary;
+    }
+
+    &-ghost {
+      .btn-ghost;
+    }
+
+    &-success {
+      .btn-color(@success-color);
+    }
+
+    &-warning {
+      .btn-color(@warning-color);
+    }
+
+    &-error {
+      .btn-color(@error-color);
+    }
+
+    &-info {
+      .btn-color(@info-color);
+    }
+
+    &-circle {
+      width: @btn-circle-size;
+      height: @btn-circle-size;
+      border-radius: @btn-circle-size;;
+    }
+
+    &-round {
+      border-radius: @btn-circle-size;
+    }
+
+    &-loading {
+      opacity: 0.6;
+    }
+
+    &-loading-inner {
+      width: 36px;
+      height: 36px;
+      align-self: center;
+      margin-right: 28px;
+      color: #FFFFFF;
+      stroke-width: 4px;
+    }
+
+    &-disabled {
+      .content {
+        color: @btn-disable-color;
+      }
+      background-color: @btn-disable-bg;
+    }
+  }
+
+  .btn:active {
+    opacity: 0.6;
+  }
+</style>

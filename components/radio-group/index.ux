@@ -1,0 +1,42 @@
+<template>
+  <div id="radio-group" class="apex-radio-group">
+    <slot></slot>
+  </div>
+</template>
+
+<style lang="less">
+  @import "../styles/base.less";
+
+  .apex-radio-group {
+    flex-direction: column;
+  }
+
+</style>
+
+<script>
+    export default {
+        data() {
+            return {};
+        },
+        props: {
+            current: {
+                default: ''
+            },
+        },
+        onInit() {
+            this.$watch('current', 'changeCurrent');
+        },
+        changeCurrent(val = this.current) {
+            let items = this.$child('radio-group')._slot.childNodes[0].childNodes;
+            const len = items.length;
+            if (len > 0) {
+                items.forEach(item => {
+                    item._vm.changeCurrent(val === item._vm.value);
+                });
+            }
+        },
+        emitEvent(params) {
+            this.$emit('change', params);
+        }
+    };
+</script>

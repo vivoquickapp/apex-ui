@@ -1,0 +1,78 @@
+<template>
+  <div class="apex-class apex-avatar apex-avatar-{{ shape }} apex-avatar-{{ size }} {{ src ? 'apex-avatar-image' : '' }}">
+    <image src="{{ src }}" if="{{ src !== '' }}"></image>
+    <text class="apex-avatar-string" else>
+      <slot></slot>
+    </text>
+  </div>
+</template>
+<style lang="less">
+  @import "../styles/base.less";
+
+  .apex-avatar {
+    background-color: @avatar-bg;
+    color: @avatar-color;
+    justify-content: center;
+    border: 1px solid @border-color-base;
+
+    .avatar-size(@avatar-size-base, @avatar-font-size-base);
+
+    &-large {
+      .avatar-size(@avatar-size-lg, @avatar-font-size-lg);
+    }
+
+    &-small {
+      .avatar-size(@avatar-size-sm, @avatar-font-size-sm);
+    }
+
+    &-image {
+      background-color: transparent;
+    }
+
+    &-square {
+      border-radius: @avatar-border-radius;
+      image {
+        border-radius: @avatar-border-radius;
+      }
+    }
+
+    & > image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .avatar-size(@size, @font-size) {
+    text {
+      color: #FFFFFF;
+      lines: 1;
+      text-align: center;
+      font-size: @font-size;
+    }
+    image {
+      border-radius: @size / 2;
+    }
+    width: @size;
+    height: @size;
+    line-height: @size;
+    border-radius: @size / 2;
+  }
+</style>
+<script>
+    export default {
+        props: {
+            shape: {
+                type: String,
+                default: 'circle'          // circle || square
+            },
+            size: {
+                type: String,
+                default: 'default'          // small || large || default
+            },
+            src: {
+                type: String,
+                default: ''
+            }
+        }
+    }
+</script>

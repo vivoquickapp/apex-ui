@@ -1,0 +1,91 @@
+<template>
+  <div class="{{tabbar.length !== 0 ? 'wrap' : ''}}">
+    <slot content="content"></slot>
+    <div class="tab-bar" if="{{tabbar.length !== 0}}">
+      <div class="shadow"></div>
+      <div class="tab tab-recommend">
+        <div for="{{tab in tabbar}}" data-path="{{tab.pagePath}}" onclick="changePage">
+          <image src="{{tab.iconPath}}" if="{{tab.iconPath}}"></image>
+          <text class="{{tab.active?'selected':''}}">{{tab.text}}</text>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="less">
+  @import '../styles/base.less';
+
+  .wrap {
+    padding-bottom: (108 * @base-ratio)+0px;
+  }
+
+  .tab-bar {
+    .shadow {
+      position: fixed;
+      bottom: (108 * @base-ratio)+0px;
+      height: (9 * @base-ratio)+0px;
+      width: 100%;
+      background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.09));
+    }
+
+    .tab {
+      background-color: rgba(255, 255, 255, 0.98);
+      position: fixed;
+      bottom: 0;
+      flex-direction: row;
+      height: (108 * @base-ratio)+0px;
+      width: 100%;
+      justify-content: space-around;
+
+      div {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      image {
+        width: (58 * @base-ratio)+0px;
+        height: (58 * @base-ratio)+0px;
+      }
+
+      text {
+        font-size: 30px;
+      }
+    }
+
+    .selected {
+      color: #0091ff;
+    }
+
+    .tab-recommend {
+      left: 0;
+    }
+
+    .tab-mine {
+      right: 0;
+    }
+  }
+</style>
+
+<script>
+    import router from "@system.router";
+
+    export default {
+        data() {
+            return {
+                isRecommendPage: true,
+            }
+        },
+        props: {
+            tabbar: {
+                default: []
+            }
+        },
+        changePage(e) {
+            router.replace({
+                uri: e.target.path
+            })
+        }
+    }
+</script>

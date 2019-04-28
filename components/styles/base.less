@@ -1,0 +1,104 @@
+@base-ratio: 1; // your designWidth / 750
+// Color
+@primary-color: #2d8cf0;
+@info-color: #2db7f5;
+@success-color: #19be6b;
+@warning-color: #ff9900;
+@error-color: #ed3f14;
+@link-color: #2D8cF0;
+@link-hover-color: tint(@link-color, 20%);
+@link-active-color: shade(@link-color, 5%);
+@selected-color: fade(@primary-color, 90%);
+@tooltip-color: #fff;
+@subsidiary-color: #80848f;
+@rate-star-color: #f5a623;
+
+@title-color: #1c2438;
+@text-color: #495060;
+
+@background-color-base: #f7f7f7; // base
+
+// Border color
+@border-color-base: #dddee1; // outside
+@border-color-split: #e9eaec; // inside
+
+// Size
+@size-grid-icon: 40px;
+@size-font-base: 30px;
+@size-font-small: 24px;
+
+// Button
+@btn-font-weight: normal;
+@btn-padding-base: 6px 15px;
+@btn-padding-large: 6px 15px 7px 15px;
+@btn-padding-small: 2px 7px;
+@btn-font-size: 12px;
+@btn-font-size-large: 14px;
+@btn-border-radius: 4px;
+@btn-border-radius-small: 3px;
+@btn-group-border: shade(@primary-color, 5%);
+
+@btn-disable-color: #bbbec4;
+@btn-disable-bg: @background-color-base;
+@btn-disable-border: @border-color-base;
+
+@btn-default-color: @text-color;
+@btn-default-bg: @background-color-base;
+@btn-default-border: @border-color-base;
+
+@btn-primary-color: #fff;
+@btn-primary-bg: @primary-color;
+
+@btn-ghost-color: @text-color;
+@btn-ghost-bg: transparent;
+@btn-ghost-border: @border-color-base;
+
+@btn-circle-size-large: 96px;
+@btn-circle-size: 88px;
+@btn-circle-size-small: 80px;
+
+// Animation
+@animation-time: .3s;
+@transition-time: .2s;
+@ease-in-out: ease-in-out;
+
+//Switch组件
+@themeColor: #2d8cf0;
+@SwitchWidth: 100;
+@SwitchHeight: 48;
+@SwitchPadding: 4;
+@SwitchCircleSize: 40;
+@SwitchCircleTranslateX: @SwitchWidth - @SwitchCircleSize - @SwitchPadding * 2 + 0px;
+@SwitchCircleColor: #FFFFFF;
+@SwitchOnColor: @themeColor; //使用全局变量,也可以自己定义.
+@SwitchOffColor: #D8D8D8;
+@SwitchDisabledOnColor: #CFF1F5;
+@SwitchDisabledOffColor: #F3F3F3;
+
+//CheckBox组件
+@checkbox-size: 46px;
+
+// Avatar
+@avatar-bg: #ccc;
+@avatar-color: #fff;
+@avatar-size-base: 100px;
+@avatar-size-lg: 120px;
+@avatar-size-sm: 80px;
+@avatar-font-size-base: 50px;
+@avatar-font-size-lg: 60px;
+@avatar-font-size-sm: 40px;
+@avatar-border-radius: @border-radius-small;
+@border-radius-small: 4px;
+
+// Z-index
+@zindex-spin: 8;
+@zindex-affix: 10;
+@zindex-back-top: 10;
+@zindex-select: 900;
+@zindex-modal: 1000;
+@zindex-message: 1010;
+@zindex-notification: 1010;
+@zindex-tooltip: 1060;
+@zindex-transfer: 1060;
+@zindex-loading-bar: 2000;
+@zindex-spin-fullscreen: 2010;

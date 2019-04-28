@@ -1,0 +1,45 @@
+<template>
+  <div id="checkbox-group" class="apex-checkbox-group">
+    <slot></slot>
+  </div>
+</template>
+
+<style lang="less">
+  @import "../styles/base.less";
+
+  .apex-checkbox-group {
+    flex-direction: column;
+  }
+
+</style>
+
+<script>
+    export default {
+        data() {
+            return {};
+        },
+        props: {
+            current: {
+                default: []
+            },
+        },
+        onInit() {
+            this.$watch('current', 'changeCurrent');
+        },
+        onReady() {
+            this.changeCurrent();
+        },
+        changeCurrent(val = this.current) {
+            let items = this.$child('checkbox-group')._slot.childNodes[0].childNodes;
+            const len = items.length;
+            if (len > 0) {
+                items.forEach(item => {
+                    item._vm.changeCurrent(val.indexOf(item._vm.value) !== -1);
+                });
+            }
+        },
+        emitEvent(params) {
+            this.$emit('change', params);
+        }
+    };
+</script>

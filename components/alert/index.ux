@@ -1,0 +1,119 @@
+<import name="my-icon" src="../icon/index.ux"></import>
+<template>
+  <div class="{{!closed ? 'wrap' : ''}}">
+    <div if="{{!closed}}"
+        class="apex-alert {{'apex-alert-'+type}} {{showIcon?'apex-alert-with-icon':''}} {{desc?'apex-alert-with-desc':''}}">
+      <div if="{{ showIcon }}" class="apex-alert-icon">
+        <my-icon color="#ffffff" type="info-o" if="{{ type === 'info' }}" size="{{desc?48:32}}"></my-icon>
+        <my-icon color="#ffffff" type="check-c-o" if="{{ type === 'success' }}"
+                 size="{{desc?48:32}}"></my-icon>
+        <my-icon color="#ffffff" type="warning" if="{{ type === 'warning' }}" size="{{desc?48:32}}"></my-icon>
+        <my-icon color="#ffffff" type="close-c-o" if="{{ type === 'error' }}" size="{{desc?48:32}}"></my-icon>
+      </div>
+      <div class="content">
+        <text>{{title}}</text>
+        <div class="apex-alert-desc">
+          <text>{{desc}}</text>
+        </div>
+      </div>
+      <div class="apex-alert-close" if="{{ my_closable }}" onclick="handleClose">
+        <my-icon color="#ffffff" type="close" size="38"></my-icon>
+      </div>
+    </div>
+  </div>
+</template>
+<style lang="less">
+  @import '../styles/base.less';
+
+  .bg-color(@color) {
+    color: #fff;
+    background-color: @color;
+  }
+
+  .wrap {
+    align-self: baseline;
+    padding: 10px;
+    text {
+      color: #FFFFFF;
+    }
+  }
+
+  .apex-alert {
+    width: 100%;
+    padding: 16px;
+    font-size: @size-font-base;
+    border-radius: 2px;
+    justify-content: space-between;
+    .content {
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    &-with-icon {
+      padding: 8px 48px 8px 38px;
+    }
+    &-info {
+      .bg-color(@info-color);
+    }
+    &-success {
+      .bg-color(@success-color);
+    }
+    &-warning {
+      .bg-color(@warning-color);
+    }
+    &-error {
+      .bg-color(@error-color);
+    }
+    &-icon {
+      margin: 0 16px;
+    }
+    &-desc text {
+      font-size: @size-font-small;
+    }
+    &-with-icon {
+      padding: 16px;
+    }
+    &-close {
+      font-size: @size-font-small;
+    }
+  }
+</style>
+<script>
+    export default {
+        props: {
+            type: {
+                type: String,
+                default: 'info' // info success warning error
+            },
+            closable: {
+                default: false
+            },
+            showIcon: {
+                default: false
+            },
+            title: {
+                type: String,
+                default: ''
+            },
+            desc: {
+                type: String,
+                default: ''
+            }
+        },
+        data() {
+            return {
+                my_closable: this.closable,
+                closed: false
+            }
+        },
+        onInit() {
+            this.$watch('closable', "closableChange");
+        },
+        closableChange() {
+            this.my_closable = this.closable;
+        },
+        handleClose() {
+            this.closed = !this.closed;
+            this.$emit('close');
+        }
+    }
+</script>

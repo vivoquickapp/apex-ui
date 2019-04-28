@@ -1,0 +1,123 @@
+<template>
+  <div class="apex-class">
+    <div class=" apex-message  {{ visible ? 'apex-message-show' : 'apex-message-hide' }}"
+         style="background-color:{{!!bgColor ? bgColor : typeColor[type]}}" if="{{visible}}">
+      <text>{{ content }}</text>
+    </div>
+  </div>
+</template>
+<style lang="less">
+  @import "../styles/base.less";
+
+  .apex-class {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .apex-message {
+    width: 100%;
+    justify-content: center;
+    background-color: @primary-color;
+    z-index: @zindex-message;
+    height: 60px;
+    opacity: 1;
+
+    text {
+      color: #fff;
+      text-align: center;
+      font-size: @size-font-small;
+      lines: 1;
+      padding: 0 20px;
+      text-overflow: ellipsis;
+    }
+
+    &-show {
+      animation-name: show;
+      animation-duration: 500ms;
+    }
+    &-hide {
+      animation-name: hide;
+      animation-duration: 500ms;
+    }
+  }
+
+  @keyframes show {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: 60px;
+      opacity: 1;
+    }
+  }
+
+  @keyframes hide {
+    from {
+      height: 60px;
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+</style>
+<script>
+    const defaultData = {
+        visible: false,
+        content: '',
+        duration: 2,
+        type: 'default', // default || success || warning || error
+        bgColor: '',
+    };
+    let timmer = null;
+
+    export default {
+        data() {
+            return {
+                visible: false,
+                content: '',
+                duration: 2,
+                type: 'default', // default || success || warning || error
+                bgColor: '',
+                typeColor: {
+                    default: '#2d8cf0',
+                    success: '#19be6b',
+                    warning: '#ff9900',
+                    error: '#ed3f14',
+                }
+            }
+        },
+
+        showMessage(options) {
+            const {type = 'default', duration = 2, bgColor = ''} = options;
+            Object.assign(this._data, {
+                ...options,
+                type: type,
+                duration: duration,
+                visible: true,
+            });
+            console.log(this.bgColor);
+            this.bgColor = bgColor;
+            const d = this.duration * 1000;
+
+            if (timmer) clearTimeout(timmer);
+            if (d !== 0) {
+                timmer = setTimeout(() => {
+                    this.hideMessage();
+                    timmer = null;
+                }, d);
+            }
+        },
+
+        hideMessage() {
+            Object.assign(this._data, {
+                ...defaultData
+            });
+        }
+    }
+</script>

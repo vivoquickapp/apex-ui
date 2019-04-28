@@ -1,0 +1,90 @@
+<template>
+  <div class="rating">
+    <text class="font-icon" style="{{(currentValue > $idx - 1) ? rateActiveStyle() : rateStyle()}}" for="{{star}}"
+          onclick="handleClick($idx)">{{icon}}
+    </text>
+  </div>
+</template>
+
+<style lang="less">
+  .rating {
+    flex-direction: row;
+  }
+
+  @font-face {
+    font-family: iconfont;
+    src: url('../icon/iconfonts.ttf');
+  }
+
+  .font-icon {
+    font-family: iconfont;
+    text-align: center;
+  }
+</style>
+
+<script>
+    export default {
+        props: {
+            count: {
+                default: 5
+            },
+            icon: {
+                default: '&#xe912'
+            },
+            starColor: {
+                default: '#e8e8e8'
+            },
+            activeColor: {
+                default: '#fdba3b'
+            },
+            size: {
+                default: 50
+            },
+            margin: {
+                default: 4
+            },
+            value: {
+                default: 0
+            },
+            disabled: {
+                default: false
+            }
+        },
+        data() {
+            return {
+                star: [],
+                currentValue: this.value - 1
+            }
+        },
+        onInit() {
+            this.star = Array.from({length: this.count}, () => '')
+        },
+        rateActiveStyle() {
+            return {
+                fontSize: this.size + 'px',
+                color: this.activeColor,
+                marginLeft: this.margin + 'px',
+                marginRight: this.margin + 'px',
+            };
+        },
+        rateStyle() {
+            return {
+                fontSize: this.size + 'px',
+                color: this.starColor,
+                marginLeft: this.margin + 'px',
+                marginRight: this.margin + 'px'
+            };
+        },
+        handleClick(i) {
+            if (this.disabled) {
+                return false;
+            }
+            if (this.currentValue === i) {
+                this.currentValue = i - 1;
+            } else {
+                this.currentValue = i;
+            }
+            this.$emit('change', i + 1);
+        }
+    }
+</script>

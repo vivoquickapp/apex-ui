@@ -1,0 +1,286 @@
+<template>
+<div>
+    <div class="tag tag--hover {{ 'tag--'+ color }}">
+        <text class="{{ 'tag--' + color + '-text' }}">
+            <slot></slot>
+        </text>
+        <div class="tag__icon" if="{{ closable }}"></div>
+    </div>
+    <div style="flex:1"></div>
+</div>
+</template>
+
+<style lang="less">
+@import "../styles/base.less";
+
+.tag {
+  font-size: 14px;
+  margin: 10px;
+  color: rgba(0, 0, 0, 0.65);
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid #d9d9d9;
+  background-color: #fafafa;
+  font-size: 12px;
+  transition: all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+  opacity: 1;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &--hover {
+    opacity: 0.85;
+  }
+
+  &--pink {
+    background-color: #fff0f6;
+    border-color: #ffadd2;
+    &-text {
+      color: #eb2f96;
+    }
+  }
+
+  &--pink-inverse {
+    background-color: #eb2f96;
+    border-color: #eb2f96;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--magenta {
+    background-color: #fff0f6;
+    border-color: #ffadd2;
+    &-text {
+      color: #eb2f96;
+    }
+  }
+
+  &--magenta-inverse {
+    background-color: #eb2f96;
+    border-color: #eb2f96;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--red {
+    background-color: #fff1f0;
+    border-color: #ffa39e;
+    &-text {
+      color: #f5222d;
+    }
+  }
+
+  &--red-inverse {
+    background-color: #f5222d;
+    border-color: #f5222d;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--volcano {
+    background-color: #fff2e8;
+    border-color: #ffbb96;
+    &-text {
+      color: #fa541c;
+    }
+  }
+
+  &--volcano-inverse {
+    background-color: #fa541c;
+    border-color: #fa541c;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--orange {
+    background-color: #fff7e6;
+    border-color: #ffd591;
+    &-text {
+      color: #fa8c16;
+    }
+  }
+
+  &--orange-inverse {
+    background-color: #fa8c16;
+    border-color: #fa8c16;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--yellow {
+    background-color: #feffe6;
+    border-color: #fffb8f;
+    &-text {
+      color: #fadb14;
+    }
+  }
+
+  &--yellow-inverse {
+    background-color: #fadb14;
+    border-color: #fadb14;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--gold {
+    background-color: #fffbe6;
+    border-color: #ffe58f;
+    &-text {
+      color: #faad14;
+    }
+  }
+
+  &--gold-inverse {
+    background-color: #faad14;
+    border-color: #faad14;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--cyan {
+    background-color: #e6fffb;
+    border-color: #87e8de;
+    &-text {
+      color: #13c2c2;
+    }
+  }
+
+  &--cyan-inverse {
+    background-color: #13c2c2;
+    border-color: #13c2c2;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--lime {
+    background-color: #fcffe6;
+    border-color: #eaff8f;
+    &-text {
+      color: #a0d911;
+    }
+  }
+
+  &--lime-inverse {
+    background-color: #a0d911;
+    border-color: #a0d911;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--green {
+    background-color: #f6ffed;
+    border-color: #b7eb8f;
+    &-text {
+      color: #52c41a;
+    }
+  }
+
+  &--green-inverse {
+    background-color: #52c41a;
+    border-color: #52c41a;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--blue {
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+    &-text {
+      color: #1890ff;
+    }
+  }
+
+  &--blue-inverse {
+    background-color: #1890ff;
+    border-color: #1890ff;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--geekblue {
+    background-color: #f0f5ff;
+    border-color: #adc6ff;
+    &-text {
+      color: #2f54eb;
+    }
+  }
+
+  &--geekblue-inverse {
+    background-color: #2f54eb;
+    border-color: #2f54eb;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &--purple {
+    background-color: #f9f0ff;
+    border-color: #d3adf7;
+    &-text {
+      color: #722ed1;
+    }
+  }
+
+  &--purple-inverse {
+    background-color: #722ed1;
+    border-color: #722ed1;
+    &-text {
+      color: #fff;
+    }
+  }
+
+  &__icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 7px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: contain;
+    background-image: url('data:image/svg+xml;charset=utf-8,<svg class="icon" width="32px" height="32.00px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path fill="#595959" d="M557.312 513.248l265.28-263.904c12.544-12.48 12.608-32.704 0.128-45.248-12.512-12.576-32.704-12.608-45.248-0.128L512.128 467.904l-263.04-263.84c-12.448-12.48-32.704-12.544-45.248-0.064-12.512 12.48-12.544 32.736-0.064 45.28l262.976 263.776L201.6 776.8c-12.544 12.48-12.608 32.704-0.128 45.248a31.937 31.937 0 0 0 22.688 9.44c8.16 0 16.32-3.104 22.56-9.312l265.216-263.808 265.44 266.24c6.24 6.272 14.432 9.408 22.656 9.408a31.94 31.94 0 0 0 22.592-9.344c12.512-12.48 12.544-32.704 0.064-45.248L557.312 513.248z"  /></svg>');
+  }
+}
+</style>
+
+<script>
+/**
+ * 判断是否预设的颜色值
+ * @param {String} color 颜色值
+ */
+const isPresetColor = (color) => {
+    if (!color) {
+        return false
+    }
+    return (/^(pink|red|yellow|orange|cyan|green|blue|purple|geekblue|magenta|volcano|gold|lime)(-inverse)?$/.test(color))
+}
+export default {
+    data() {
+        return {
+            tagStyle: ''
+        }
+    },
+    props: {
+        color: {
+            type: String,
+            default: ''
+        },
+        closable: {
+            type: Boolean,
+            default: false
+        },
+    },
+    onInit() {
+        this.tagStyle = !isPresetColor(this.color) ? `background-color: ${this.color}` : ''
+    },
+}
+</script>
