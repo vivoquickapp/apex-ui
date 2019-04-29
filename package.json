@@ -2,16 +2,11 @@
   "name": "apex-ui",
   "version": "1.0.0",
   "description": "apex-ui quickapp compoennts ui suits",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "quickapp",
     "ui",
     "apex"
   ],
-  "author": "",
   "license": "MIT",
   "devDependencies": {
     "less": "^3.9.0",
