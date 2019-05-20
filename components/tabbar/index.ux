@@ -84,7 +84,7 @@
         },
         changePage(e) {
             router.replace({
-                uri: e.target.path
+                uri: e.target.dataset.path
             })
         }
     }
