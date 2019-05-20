@@ -1,10 +1,10 @@
 <template>
-  <div class="apex-radio apex-radio-{{position}}" onclick="clickHandler">
-    <div class="apex-radio-checked {{my_checked?'apex-radio-active':''}}"
+  <div class="apex-checkbox apex-checkbox-{{position}}" onclick="clickHandler">
+    <div class="apex-checkbox-checked {{my_checked?'apex-checkbox-active':''}} apex-checkbox-{{shape}}"
          style="background-color: {{(my_checked||disabled)?my_color:''}}">
-      <div class="apex-radio-icon {{disabled?'apex-radio-disabled':''}}" show="{{my_checked}}"></div>
+      <div class="apex-checkbox-icon {{disabled?'apex-checkbox-disabled':''}}" show="{{my_checked}}"></div>
     </div>
-    <div class="apex-radio-content">
+    <div class="apex-checkbox-content">
       <text>{{value}}</text>
     </div>
   </div>
@@ -13,7 +13,7 @@
 <style lang="less">
   @import "../styles/base.less";
 
-  .apex-radio {
+  .apex-checkbox {
     padding: 20px;
     background-color: #FFFFFF;
     height: 86px;
@@ -49,6 +49,10 @@
       flex-direction: row-reverse;
       justify-content: space-between;
     }
+
+    &-square {
+      border-radius: 5px;
+    }
   }
 
 </style>
@@ -68,6 +72,9 @@
             },
             disabled: {
                 default: false
+            },
+            shape: {
+                default: 'circle'  // circle square
             },
             position: {
                 default: 'left' // left right
