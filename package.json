@@ -1,7 +1,8 @@
 {
   "name": "apex-ui",
   "version": "1.0.0",
-  "description": "apex-ui quickapp compoennts ui suits",
+  "description": "apex-ui quickapp components ui suits",
+  "author": "vivo",
   "keywords": [
     "quickapp",
     "ui",
