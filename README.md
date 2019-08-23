@@ -1,4 +1,7 @@
 # Apex-UI组件库
+
+* [English version](./README_EN.md)
+
 欢迎使用调试器扫描以下二维码体验。如果调试器扫码不成功，可以用浏览器扫码下载到本地后安装查看。
 
 <img width="200" src="https://github.com/vivoquickapp/apex-ui-docs/blob/master/docs/assets/qrcode.png?raw=true">
