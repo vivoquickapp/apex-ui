@@ -1,16 +1,20 @@
 <template>
   <div class="apex-card {{ full ? 'apex-card-full' : '' }}">
-    <div class="apex-card-header" if="{{ thumb || title || extra }}">
-      <div class="apex-card-content" if="{{ thumb || title }}">
-        <image class="apex-card-thumb" src="{{ thumb }}" if="{{ thumb }}"></image>
-        <text>{{ title }}</text>
-      </div>
-      <text class="apex-card-extra" if="{{ extra }}">{{ extra }}</text>
+    <div class="apex-card-header" if="{{ thumb || title || extrat || useHeaderSlot}}">
+      <slot name="title">
+        <div class="apex-card-content" if="{{ thumb || title }}">
+          <image class="apex-card-thumb" src="{{ thumb }}" if="{{ thumb }}"></image>
+          <text>{{ title }}</text>
+        </div>
+      </slot>
+      <slot name="extra">
+        <text class="apex-card-extra" if="{{ extra }}">{{ extra }}</text>
+      </slot>
     </div>
     <div class="apex-card-body">
       <slot></slot>
     </div>
-    <div class="apex-card-footer">
+    <div class="apex-card-footer" if="{{ footer }}">
       <text>{{ footer }}</text>
     </div>
   </div>
@@ -100,6 +104,9 @@
             footer: {
                 type: String,
                 default: ''
+            },
+            useHeaderSlot: {
+                default: false,
             }
         }
     }
