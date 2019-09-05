@@ -27,11 +27,13 @@
             this.$watch('current', 'changeCurrent');
         },
         changeCurrent(val = this.current) {
-            let items = this.$child('radio-group')._slot.childNodes[0].childNodes;
+            let items = this.$child('radio-group')._parent._childrenVms.filter(item => {
+                return item._type === 'my-radio'
+            })
             const len = items.length;
             if (len > 0) {
                 items.forEach(item => {
-                    item._vm.changeCurrent(val === item._vm.value);
+                    item.changeCurrent(val === item._attrs.name);
                 });
             }
         },

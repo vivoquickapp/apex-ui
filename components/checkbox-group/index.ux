@@ -30,11 +30,13 @@
             this.changeCurrent();
         },
         changeCurrent(val = this.current) {
-            let items = this.$child('checkbox-group')._slot.childNodes[0].childNodes;
+            let items = this.$child('checkbox-group')._parent._childrenVms.filter(item => {
+                return item._type === 'my-checkbox'
+            })
             const len = items.length;
             if (len > 0) {
                 items.forEach(item => {
-                    item._vm.changeCurrent(val.indexOf(item._vm.value) !== -1);
+                    item.changeCurrent(val.indexOf(item._attrs.name) !== -1);
                 });
             }
         },
