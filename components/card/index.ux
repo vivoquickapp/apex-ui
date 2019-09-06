@@ -1,6 +1,6 @@
 <template>
   <div class="apex-card {{ full ? 'apex-card-full' : '' }}">
-    <div class="apex-card-header" if="{{ thumb || title || extrat || useHeaderSlot}}">
+    <div id="apex-card-header" class="apex-card-header" show="{{ isShowHeader }}">
       <slot name="title">
         <div class="apex-card-content" if="{{ thumb || title }}">
           <image class="apex-card-thumb" src="{{ thumb }}" if="{{ thumb }}"></image>
@@ -104,10 +104,15 @@
             footer: {
                 type: String,
                 default: ''
-            },
-            useHeaderSlot: {
-                default: false,
             }
+        },
+
+        computed:{
+          isShowHeader(){
+            let hasTitleSlot = this.$child('apex-card-header')._slot.namedSlotCache.title !== undefined
+            let hasExtraSlot = this.$child('apex-card-header')._slot.namedSlotCache.extra !== undefined
+            return this.thumb || this.title || this.extra || hasTitleSlot || hasExtraSlot
+          }
         }
     }
 </script>
