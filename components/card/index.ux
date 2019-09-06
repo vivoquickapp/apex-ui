@@ -84,35 +84,42 @@
   }
 </style>
 <script>
-    export default {
-        props: {
-            full: {
-                default: false,
-            },
-            title: {
-                type: String,
-                default: '',
-            },
-            thumb: {
-                type: String,
-                default: '',
-            },
-            extra: {
-                type: String,
-                default: '',
-            },
-            footer: {
-                type: String,
-                default: ''
-            }
-        },
-
-        computed:{
-          isShowHeader(){
-            let hasTitleSlot = this.$child('apex-card-header')._slot.namedSlotCache.title !== undefined
-            let hasExtraSlot = this.$child('apex-card-header')._slot.namedSlotCache.extra !== undefined
-            return this.thumb || this.title || this.extra || hasTitleSlot || hasExtraSlot
-          }
-        }
+export default {
+  data(){
+    return{
+      isShowHeader: false
     }
+  },
+  props: {
+    full: {
+        default: false,
+    },
+    title: {
+        type: String,
+        default: '',
+    },
+    thumb: {
+        type: String,
+        default: '',
+    },
+    extra: {
+        type: String,
+        default: '',
+    },
+    footer: {
+        type: String,
+        default: ''
+    },
+  },
+
+  onReady() {
+    this.isShowHeader = this.calIsShowHeader()
+  },
+
+  calIsShowHeader(){
+    let hasTitleSlot = this.$child('apex-card-header')._slot.namedSlotCache.title !== undefined
+    let hasExtraSlot = this.$child('apex-card-header')._slot.namedSlotCache.extra !== undefined
+    return this.thumb || this.title || this.extra || hasTitleSlot || hasExtraSlot
+  }
+}
 </script>

@@ -69,7 +69,6 @@ export default {
   data() {
     return {
       totalList: [],
-      currentp: 1
     }
   },
   props: {
@@ -101,16 +100,13 @@ export default {
     }
   },
   onInit() {
-    this.currentp = this.current
     this.totalList = Array.from({ length: this.total }, () => '')
   },
   clickPage(type) {
-    if(this.currentp!=1&&type==='prev'){
-      this.currentp--;
+    if(this.current !=1&&type==='prev'){
       this.$emit('tap',{type})
     }
-    if(this.currentp<this.total&&type==='next'){
-      this.currentp++;
+    if(this.current<this.total&&type==='next'){
       this.$emit('tap',{type})
     }
   }

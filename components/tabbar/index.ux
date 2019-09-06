@@ -1,12 +1,13 @@
+<import name="tabbar-btn" src="./tabbar-btn.ux"></import>
+ 
 <template>
   <div class="{{tabbar.length !== 0 ? 'wrap' : ''}}">
     <slot content="content"></slot>
     <div class="tab-bar" if="{{tabbar.length !== 0}}">
       <div class="shadow"></div>
       <div class="tab tab-recommend">
-        <div for="{{tab in tabbar}}" data-path="{{tab.pagePath}}" onclick="changePage">
-          <image src="{{tab.iconPath}}" if="{{tab.iconPath}}"></image>
-          <text class="{{tab.active?'selected':''}}">{{tab.text}}</text>
+        <div for="{{tab in tabbar}}">
+          <tabbar-btn tab="{{tab}}"></tabbar-btn>
         </div>
       </div>
     </div>
@@ -69,23 +70,16 @@
 </style>
 
 <script>
-    import router from "@system.router";
-
-    export default {
-        data() {
-            return {
-                isRecommendPage: true,
-            }
-        },
-        props: {
-            tabbar: {
-                default: []
-            }
-        },
-        changePage(e) {
-            router.replace({
-                uri: e.target.dataset.path
-            })
+export default {
+    data() {
+        return {
+            isRecommendPage: true,
+        }
+    },
+    props: {
+        tabbar: {
+            default: []
         }
     }
+}
 </script>

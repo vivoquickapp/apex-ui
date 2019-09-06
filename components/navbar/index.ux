@@ -1,6 +1,6 @@
 <template>
   <div class="apex-navbar apex-navbar-{{theme}}" style="height:{{height}}px">
-    <div class="left" data-type="left" onclick="clickHandler">
+    <div class="left" onclick="clickHandlerLeft">
       <text class="text" if="{{ leftText }}">{{ leftText }}</text>
     </div>
     <div class="title">
@@ -11,7 +11,7 @@
         <slot></slot>
       </block>
     </div>
-    <div class="right" data-type="right" onclick="clickHandler">
+    <div class="right" onclick="clickHandlerRight">
       <text class="text" if="{{ rightText }}">{{ rightText }}</text>
     </div>
   </div>
@@ -76,10 +76,13 @@
                 default: false
             }
         },
-        clickHandler(e) {
-            const {type} = e.target.dataset;
-            console.log('navbar', e.target.dataset.type);
-            this.$emit('tap', {type});
+
+        clickHandlerLeft() {
+            this.$emit('tap', {type:'left'})
+        },
+
+        clickHandlerRight() {
+            this.$emit('tap', {type:'right'})
         },
     }
 </script>
