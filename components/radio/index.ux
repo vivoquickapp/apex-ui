@@ -1,6 +1,6 @@
 <template>
   <div class="apex-radio apex-radio-{{position}}" onclick="clickHandler">
-    <div class="apex-radio-checked {{my_checked?'apex-radio-active':''}}"
+    <div class="apex-radio-checked {{my_checked?'apex-radio-active':''}} apex-radio-{{shape}}"
          style="background-color: {{(my_checked||disabled)?my_color:''}}">
       <div class="apex-radio-icon {{disabled?'apex-radio-disabled':''}}" show="{{my_checked}}"></div>
     </div>
@@ -49,6 +49,10 @@
       flex-direction: row-reverse;
       justify-content: space-between;
     }
+
+    &-square {
+      border-radius: 5px;
+    }
   }
 
 </style>
@@ -80,7 +84,10 @@
             },
             group: {
                 default: ''
-            }
+            },
+            shape: {
+                default: 'circle'  // circle square
+            },
         },
         onInit() {
             this.$watch('disabled', 'handleDisabled');
