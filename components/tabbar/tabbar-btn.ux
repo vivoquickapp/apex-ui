@@ -1,0 +1,48 @@
+<template>
+  <div onclick="changePage">
+    <image src="{{tab.active ? tab.selectedIconPath : tab.iconPath}}" if="{{tab.iconPath || tab.selectedIconPath}}"></image>
+    <text class="{{tab.active?'selected':''}}">{{tab.text}}</text>
+  </div>
+</template>
+
+<style lang="less">
+@import '../styles/base.less';
+
+div {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+image {
+  width: (58 * @base-ratio)+0px;
+  height: (58 * @base-ratio)+0px;
+}
+
+text {
+  font-size: 30px;
+}
+
+.selected {
+  color: #0091ff;
+}
+</style>
+
+<script>
+import router from "@system.router";
+
+export default {
+  props: {
+    tab:''
+  },
+
+  changePage(){
+    console.log(this.tab.pagePath)
+    router.replace({
+      uri: this.tab.pagePath
+    })
+  }
+}
+</script>
+
+

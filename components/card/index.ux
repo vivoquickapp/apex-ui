@@ -1,6 +1,6 @@
 <template>
   <div class="apex-card {{ full ? 'apex-card-full' : '' }}">
-    <div class="apex-card-header" if="{{ thumb || title || extrat || useHeaderSlot}}">
+    <div id="apex-card-header" class="apex-card-header" show="{{ isShowHeader }}">
       <slot name="title">
         <div class="apex-card-content" if="{{ thumb || title }}">
           <image class="apex-card-thumb" src="{{ thumb }}" if="{{ thumb }}"></image>
@@ -84,30 +84,42 @@
   }
 </style>
 <script>
-    export default {
-        props: {
-            full: {
-                default: false,
-            },
-            title: {
-                type: String,
-                default: '',
-            },
-            thumb: {
-                type: String,
-                default: '',
-            },
-            extra: {
-                type: String,
-                default: '',
-            },
-            footer: {
-                type: String,
-                default: ''
-            },
-            useHeaderSlot: {
-                default: false,
-            }
-        }
+export default {
+  data(){
+    return{
+      isShowHeader: false
     }
+  },
+  props: {
+    full: {
+        default: false,
+    },
+    title: {
+        type: String,
+        default: '',
+    },
+    thumb: {
+        type: String,
+        default: '',
+    },
+    extra: {
+        type: String,
+        default: '',
+    },
+    footer: {
+        type: String,
+        default: ''
+    },
+  },
+
+  onReady() {
+    this.isShowHeader = this.calIsShowHeader()
+  },
+
+  calIsShowHeader(){
+    let hasTitleSlot = this.$child('apex-card-header')._slot.namedSlotCache.title !== undefined
+    let hasExtraSlot = this.$child('apex-card-header')._slot.namedSlotCache.extra !== undefined
+    return this.thumb || this.title || this.extra || hasTitleSlot || hasExtraSlot
+  }
+}
 </script>
