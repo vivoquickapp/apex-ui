@@ -21,7 +21,6 @@
     width: 100%;
     justify-content: center;
     background-color: @primary-color;
-    z-index: @zindex-message;
     height: 60px;
     opacity: 1;
 
