@@ -1,10 +1,10 @@
 <template>
     <div class="apex-input-number">
       <text class="apex-input-number-minus {{ my_value <= my_min ? 'apex-input-number-disabled' : '' }}"
-            data-disabled="{{ my_value <= my_min }}" onclick="handleMinus" show="{{ !positive || my_value > 0 }}">-
+            data-disabled="{{ my_value <= my_min }}" onclick="handleMinus" if="{{ !positive || my_value > 0 }}">-
       </text>
       <input class="apex-input-number-text {{ my_min >= my_max ? 'apex-input-number-disabled' : '' }}" type="number"
-             value="{{ my_value }}" disabled="{{ my_min >= my_max }}" onchange="handleChange" show="{{ !positive || my_value > 0 }}"/>
+             value="{{ my_value }}" disabled="{{ my_min >= my_max }}" onchange="handleChange" if="{{ !positive || my_value > 0 }}"/>
       <text class="apex-input-number-plus {{ my_value >= my_max ? 'apex-input-number-disabled' : '' }}"
             data-disabled="{{ my_value >= my_max }}" onclick="handlePlus">+
       </text>
@@ -20,7 +20,7 @@
   
       text {
         height: 60px;
-        width: 80px;
+        width: 60px;
         text-align: center;
         font-size: @size-font-small;
         border: 1px solid @border-color-base;
@@ -42,7 +42,7 @@
         text-align: center;
         height: 60px;
         line-height: 60px;
-        width: 70px;
+        width: 60px;
         font-size: @size-font-small;
       }
   
@@ -119,8 +119,7 @@
           },
   
           handleChange(e) {
-              console.log('change', e);
-              let {value} = e;
+              let value = parseFloat(e.target.value)
               const {my_min, my_max} = this._data;
   
               if (value > my_max) {
