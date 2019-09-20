@@ -5,7 +5,7 @@
       <div class="shadow"></div>
       <div class="tab tab-recommend">
         <div for="{{tab in tabbar}}">
-          <image  data-path="{{tab.pagePath}}" onclick="changePage" src="{{tab.iconPath}}" if="{{tab.iconPath}}"></image>
+          <image  data-path="{{tab.pagePath}}" onclick="changePage" src="{{tab.active?tab.selectedIconPath:tab.iconPath}}" if="{{tab.iconPath}}"></image>
           <text  data-path="{{tab.pagePath}}" onclick="changePage" class="{{tab.active?'selected':''}}">{{tab.text}}</text>
         </div>
       </div>
