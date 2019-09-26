@@ -2,7 +2,7 @@
   <div class="segmentroot">
     <div class="segment {{ 'segment-'+theme }} {{ disabled ? 'segment-disabled' : '' }}" if="{{values.length}}">
       <div for="values" onclick="change($idx)" class="segment__item {{ currentp === $idx ? 'segment__item-current' : '' }} {{ $idx === 0 ? 'segment__item-left' : $idx === values.length-1 ? 'segment__item-right' : $idx === values.length-2 && $idx != 0 ? 'segment__item-right2' : ''}}">
-        <text class="{{ currentp === $idx ? 'segment__item-current-text' : '' }}">{{$item}}{{$idx===values.length-1}}</text></div>
+        <text class="{{ currentp === $idx ? 'segment__item-current-text' : '' }}">{{$item}}</text></div>
     </div>
   </div>
 </template>
