@@ -1,0 +1,86 @@
+<template>
+    <div class="apex-media">
+      <image class="apex-media-image" src="{{thumb}}" style="{{thumbStyle}}" if="{{thumb}}"></image>
+      <div class="apex-media-wrap">
+        <div class="apex-media-hd">
+          <div class="apex-media-title" if="{{ title }}">
+            <text>{{ title }}</text>
+          </div>
+          <div class="apex-media-label" if="{{ label }}">
+            <text>{{ label }}</text>
+          </div>
+        </div>
+        <slot></slot>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    props: {
+      thumb: {
+        type: String,
+        default: '',
+      },
+      thumbStyle: {
+        type: [String, Object],
+        default: ''
+      },
+      title: {
+        type: String,
+        default: '',
+      },
+      label: {
+        type: String,
+        default: '',
+      }
+    },
+  }
+  </script>
+  
+  <style lang="less">
+  .apex-media{
+    flex-direction: row;
+    padding: 10px 20px;
+  
+    &-image{
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+    }
+  
+    &-wrap{
+      width: 100%;
+      flex-direction: column;
+      margin-left: 20px;
+    }
+  
+    &-hd{
+      flex-direction: column;
+      width: 100%;
+      height: 150px;
+    }
+  
+    &-title{
+      width: 100%;
+      text{
+        lines: 1;
+        text-overflow: ellipsis;
+        color: #000;
+        font-size: 45px;
+        font-weight: 400;
+      }
+    }
+  
+    &-label{
+      width: 100%;
+      text{
+        lines: 2;
+        text-overflow: ellipsis;
+        color: #808080;
+        font-size: 30px;
+      }
+    }
+  }
+  </style>
+  

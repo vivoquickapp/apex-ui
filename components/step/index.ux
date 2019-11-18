@@ -1,0 +1,219 @@
+<import name="my-icon" src="../icon/index"></import>
+
+<template>
+  <div class="apex-step" style="width: {{width}};flex-direction: {{direction === 'horizontal' ? 'row' : 'column'}}">
+    <div class="apex-step-wrap" style="flex-direction: {{direction === 'horizontal' ? 'column' : 'row'}};width: {{direction === 'horizontal' ? '80%' : '100%'}};">
+      <div class="apex-step-hd  {{className}}">
+        <div class="apex-step-icon" if="{{!hasIcon}}"><text style="color: {{iconColor}};">{{index + 1}}</text></div>
+        <div class="apex-step-icon" else>
+          <my-icon type="{{thumb}}" size="50" color="{{iconColor}}" if="{{thumb}}"></my-icon>
+        </div>
+      </div>
+      <div class="apex-step-bd {{direction === 'horizontal' ? 'apex-step-bd-horizontal' : 'apex-step-bd-vertical'}}">
+        <div class="apex-step-title" if="{{ title }}">
+          <text>{{ title }}</text>
+        </div>
+        <div class="apex-step-title" else>
+          <slot name="title"></slot>
+        </div>
+        <div class="apex-step-content" if="{{ content }}">
+          <text>{{ content }}</text>
+        </div>
+        <div class="apex-step-content" else>
+          <slot name="content"></slot>
+        </div>
+      </div>
+    </div>
+    <div class="{{lineStyle}}" if="{{ index !== length - 1 }}"></div>
+  </div>
+</template>
+
+<script>
+const defaultStatus = ['wait', 'process', 'finish', 'error']
+const defaultIcon = 'checkmark'
+
+export default {
+  data() {
+    return {
+      width: '100%',
+      length: 1,
+      index: 0,
+      current: 0,
+      direction: 'horizontal',
+      className: '',
+      hasIcon: false,
+      thumb: '',
+      myStatus: '',
+    }
+  },
+
+  props: {
+    status: {
+      type: String,
+      default: '',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    content: {
+      type: String,
+      default: '',
+    },
+    icon: {
+      type: String,
+      default: '',
+    },
+    groupId: {
+      type: String,
+      required: true,
+      default: ''
+    }
+  },
+
+  computed: {
+    iconColor() {
+      let color = '#1c2438'
+      const status = this.myStatus
+      if (status === 'wait') color = '#dddee1'
+      if (status === 'process') color = '#fff'
+      if (status === 'finish') color = '#2d8cf0'
+      if (status === 'error') color = '#ed3f14'
+      return color
+    },
+
+    lineStyle() {
+      let style = ''
+      if (this.direction === 'horizontal') {
+        if (this.myStatus === 'finish') {
+          style = 'apex-step-horizontal-finish'
+        } else {
+          style = 'apex-step-horizontal-unfinish'
+        }
+      } else if (this.direction === 'vertical') {
+        if (this.myStatus === 'finish') {
+          style = 'apex-step-vertical-finish'
+        } else {
+          style = 'apex-step-vertical-unfinish'
+        }
+      }
+      return style
+    }
+  },
+
+  onReady() {
+    const parent = this.$parent().$child(this.groupId)
+    const temp = parent.steps
+    const steps = temp ? [...temp, this] : [this]
+    parent.steps = steps
+  },
+
+  updateStatus(opts = {}) {
+    const width = opts.direction === 'horizontal' ? 100 / opts.length + '%' : '100%'
+    const index = defaultStatus.indexOf(this.status)
+    const hasIcon = opts.index < opts.current || this.icon
+    const thumb = this.icon || defaultIcon
+    const myStatus = index !== -1 ? defaultStatus[index] : opts.index < opts.current ? 'finish' : opts.index === opts.current ? 'process' : ''
+    const className = `apex-step-${myStatus}`
+    Object.assign(this._data, {
+      ...opts,
+      width,
+      className,
+      hasIcon,
+      thumb,
+      myStatus
+    })
+  }
+}
+</script>
+
+<style lang="less">
+.apex-step {
+  &-wrap {
+    align-items: center;
+    padding: 10px;
+  }
+
+  &-hd {
+    width: 70px;
+    height: 70px;
+    background-color: #fff;
+    border: 3px solid #dddee1;
+    border-radius: 60px;
+    justify-content: center;
+  }
+
+  &-bd {
+    flex-direction: column;
+    &-horizontal {
+      align-items: center;
+      margin-top: 10px;
+    }
+    &-vertical {
+      align-items: flex-start;
+      margin-top: 20px;
+      margin-left: 20px;
+    }
+  }
+
+  &-title {
+    text {
+      color: #000;
+      font-size: 45px;
+      font-weight: bold;
+      lines: 1;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &-content {
+    text {
+      font-size: 30px;
+      color: #dddee1;
+      lines: 2;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &-process {
+    background-color: #2d8cf0;
+    border: 3px solid #2d8cf0;
+  }
+
+  &-finish {
+    border: 3px solid #2d8cf0;
+  }
+
+  &-error {
+    border: 3px solid #ed3f14;
+  }
+
+  &-horizontal-unfinish {
+    width: 20%;
+    height: 5px;
+    background-color: #dddee1;
+    margin-top: 40px;
+  }
+
+  &-horizontal-finish {
+    width: 20%;
+    height: 5px;
+    background-color: #2d8cf0;
+    margin-top: 40px;
+  }
+
+  &-vertical-unfinish {
+    width: 5px;
+    height: 50px;
+    background-color: #dddee1;
+    margin-left: 40px;
+  }
+
+  &-vertical-finish {
+    width: 5px;
+    height: 50px;
+    background-color: #2d8cf0;
+    margin-left: 40px;
+  }
+}
+</style>

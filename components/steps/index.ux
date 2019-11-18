@@ -1,0 +1,58 @@
+<template>
+    <div class="apex-steps">
+      <div style="flex-direction: {{direction === 'horizontal' ? 'row' : 'column'}}">
+        <slot></slot>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    props: {
+      current: {
+        type: Number,
+        default: 0
+      },
+      direction: {
+        type: String,
+        default: 'horizontal',
+        validator: function (value) {
+          return ['horizontal', 'vertical'].indexOf(value) !== -1
+        }
+      },
+      id: {
+        type: String,
+        required: true,
+        default: ''
+      }
+    },
+  
+    onInit() {
+      this.$watch('current', 'updateCurrent')
+    },
+  
+    onReady() {
+      this.updateCurrent()
+    },
+  
+    updateCurrent() {
+      const elements = this.steps
+      const { current, direction } = this
+  
+      if (elements.length > 0) {
+        elements.forEach((element, index) => {
+          element.updateStatus({
+            length: elements.length,
+            index,
+            current,
+            direction,
+          })
+        })
+      }
+    }
+  }
+  </script>
+  
+  <style>
+  </style>
+  

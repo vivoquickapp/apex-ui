@@ -1,0 +1,118 @@
+<template>
+  <div class="badge-wrap">
+    <stack if="{{dot}}" class="badge-wrap-dot">
+      <div class="badge-wrap-dot-slot">
+        <slot></slot>
+      </div>
+      <div class="dot-class" show="{{hasCount}}"></div>
+    </stack>
+    <stack else class="badge-wrap-count">
+      <div class="badge-wrap-count-slot" style="margin-right: {{offset}}px;">
+        <slot></slot>
+      </div>
+      <div class="{{ moreThenTen  ? 'count-class-more-then-ten' : 'count-class' }}" show="{{hasCount}}">
+        <text>{{finalCount}}</text>
+      </div>
+    </stack>
+  </div>
+</template>
+
+<style lang="less">
+@import "../styles/base.less";
+
+.badge-wrap{
+  flex-direction: column;
+
+  &-dot{
+    flex-direction: column;
+    &-slot{
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+  }
+
+  &-count{
+    flex-direction: column;
+    &-slot{
+      margin-top: 23px;
+    }
+  }
+}
+
+.dot-class{
+  background-color:@error-color;
+  border-radius: 50px;
+  width: 18px;
+  height: 18px;
+  align-self: flex-end;
+  border: 2px solid #ffffff;
+}
+
+.count-class-more-then-ten{
+  background-color:@error-color;
+  justify-content: center;
+  border-radius: 20px;
+  align-self: flex-end;
+  height: 45px;
+  border: 2px solid #ffffff;
+  text{
+    color: #ffffff;
+    font-size: 25px;
+    margin: 10px 20px;
+  }
+}
+
+.count-class{
+  background-color:@error-color;
+  justify-content: center;
+  border-radius: 50px;
+  align-self: flex-end;
+  height: 45px;
+  width: 45px;
+  border: 2px solid #ffffff;
+  text{
+    color: #ffffff;
+    font-size: 25px;
+    margin: 10px;
+  }
+}
+</style>
+
+<script>
+export default {
+  props: {
+    dot: {
+      type: Boolean,
+      default: false
+    },
+    overflowCount: {
+      type: Number,
+      default: 99
+    },
+    count: {
+      type: Number,
+      default: 0
+    }
+  },
+  computed: {
+    finalCount(){
+      if(!this.count || parseInt(this.count) <= 0) return ''
+      return parseInt(this.count) > parseInt(this.overflowCount) ? `${this.overflowCount}+` : this.count
+    },
+    hasCount(){
+      let result = false
+      if(this.count && parseInt(this.count) > 0){
+        result = true
+      }
+      return result
+    },
+    moreThenTen(){
+      return parseInt(this.count) >= 10 ? true: false;
+    },
+    offset(){
+      let l = parseInt(this.count) > parseInt(this.overflowCount) ? this.overflowCount.toString().length : this.count.toString().length
+      return 20 + 10 * ( l - 1 )
+    }
+  }
+};
+</script>

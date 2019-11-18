@@ -1,0 +1,186 @@
+<import name="my-icon" src="../icon/index"></import>
+
+<template>
+  <div class="apex-textarea">
+    <div class="apex-textarea-wrap">
+      <div class="apex-textarea-label {{disabled? 'disabled' : ''}}" if="{{ label }}">
+        <text class="{{disabled? 'disabled' : ''}}">{{ label }}</text>
+      </div>
+      <div else>
+        <slot name="label"></slot>
+      </div>
+      <div class="apex-textarea-textarea-wrap">
+        <textarea 
+          id="apex-textarea"
+          class="apex-textarea-textarea {{disabled? 'disabled' : ''}}"
+          style="{{ textareaStyle }}"
+          placeholder="{{ placeholder }}"
+          disabled="{{ disabled }}"
+          maxlength="{{ maxlength }}"
+          onchange="onChange"
+          onfocus="onFocus"
+          >{{inputValue}}</textarea>
+      </div>
+      <div class="apex-textarea-clear" onclick="onClear" if="{{clear && !disable && inputValue && inputValue.length > 0 }}">
+        <my-icon type="close-circle" color="#B2B2B2" size="40"></my-icon>
+      </div>
+      <div class="apex-textarea-extra" if="{{extra}}">
+        <text class="{{disabled? 'disabled' : ''}}">{{ extra }}</text>
+        </div>
+      <div else>
+        <slot name="extra"></slot>
+      </div>
+    </div> 
+    <div class="apex-textarea-count" if="{{hasCount}}">
+      <text>{{ inputValue.length }}/{{ maxlength === -1 ? '∞' : maxlength }}</text>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data(){
+    return {
+      inputValue: this.defaultValue
+    }
+  },
+
+  props: {
+    label: {
+      type: String,
+      default: '',
+    },
+    extra: {
+      type: String,
+      default: '',
+    },
+    defaultValue: {
+      type: String,
+      default: '',
+    },
+    placeholder: {
+      type: String,
+      default: '',
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    maxlength: {
+      type: Number,
+      default: 140,
+    },
+    focus: {
+      type: Boolean,
+      default: false,
+    },
+    rows: {
+      type: Number,
+      default: 1
+    },
+    hasCount: {
+      type: Boolean,
+      default: false,
+    },
+    clear: {
+      type: Boolean,
+      default: false,
+    },
+    error: {
+      type: Boolean,
+      default: false,
+    }
+  },
+
+  computed: {
+    textareaStyle() {
+      const rows = this.rows
+      return `height: ${rows * 48}px;`
+    }
+  },
+
+  onInit() {
+    setTimeout(() => {
+      if(this.focus){
+        const apexTextArea = this.$element('apex-textarea')
+        apexTextArea.focus()
+      }
+    }, 0)
+  },
+
+  onFocus(){
+    console.log('onfocus')
+    const apexTextArea = this.$element('apex-textarea')
+    apexTextArea.select()
+  },
+
+  onClear(){
+    console.log('clear')
+    this.inputValue = ''
+  },
+
+  onChange(e){
+    console.log('change')
+    this.inputValue = e.value
+    this.$emit('textareaChange', { value: this.inputValue })
+  }
+}
+</script>
+
+<style lang="less">
+.apex-textarea{
+  flex-direction: column;
+
+  &-label{
+    margin-right: 20px;
+    width: 300px;
+    height: 48px;
+    /* margin-top: -20px; */
+    text{
+      font-size: 35px;
+      color: #000;
+      lines: 1;
+      text-overflow: ellipsis;
+      text-align: left;
+    }
+  }
+
+  &-textarea{
+    width: 100%;
+    /* height: 700px; */
+    font-size: 40px;
+    color: #000;
+
+    &-wrap{
+      width:100%;
+    }
+  }
+
+  &-extra{
+    margin: 0 10px;
+    width: 60px;
+    height: 48px;
+    text{
+      font-size: 35px;
+      color: #000;
+      lines: 1;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &-clear{
+    margin: 0 10px;
+    width: 60px;
+    height: 48px;
+  }
+
+  &-count{
+    justify-content: flex-end;
+    margin-right: 20px;
+  }
+
+  .disabled{
+    color: rgb(150, 150, 150);
+  }
+}
+</style>
