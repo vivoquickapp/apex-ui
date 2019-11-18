@@ -1,0 +1,304 @@
+<import name="my-icon" src="apex-ui/components/icon/index"></import>
+<template>
+  <div class="apex-dialog" if="{{visible}}">
+    <div class="mask {{showModal?'mask-exist':'mask-none'}}">
+      <div class="dialog" style="{{setDialog}}">
+        <div class="box">
+          <div class="top">
+            <text class="title {{defaultOptions.closable?'title-close':'title-none'}}">{{defaultPrompt.title || defaultOptions.title || title}}</text>
+            <div class="close" if="{{defaultOptions.closable}}" onclick="bindClose">
+              <slot name="close">
+                <text>x</text>
+              </slot>
+            </div>
+          </div>
+          <text class="content">{{ defaultPrompt.content || defaultOptions.content || content }}</text>
+          <div if="{{ dialogType === 'prompt' }}">
+            <input id="focus" type="{{ defaultPrompt.fieldtype }}" style="{{defaultPrompt.inputStyle}}" value="{{ value }}" placeholder="{{ defaultPrompt.placeholder }}" onchange="bindChange" maxlength="{{ defaultPrompt.maxlength === -1?'':defaultPrompt.maxlength }}" onenterkeyclick="bindEnter" />
+          </div>
+        </div>
+        <div class="btn {{dialogType === 'alter'||this.vertical===true?'btn-vertical':'btn-horizontal'}}">
+          <block if="{{defaultOptions.buttons}}" for="defaultOptions.buttons">
+            <div class="btnbox {{ $idx === defaultOptions.buttons.length-1 || $item.hasborder===false ?'':'_border'}}" onclick="bindButton($idx)">
+              <text style="{{$item.style||''}}">{{$item.btn||$item}}</text>
+            </div>
+          </block>
+          <block if="{{defaultOptions.buttons.length===0}}">
+            <div if="{{dialogType!=='alter'}}" class="btnbox _border" onclick="bindCancel">
+              <text>{{defaultOptions.cancel}}</text>
+            </div>
+            <div onclick="bindAffirm" class="btnbox">
+              <text>{{defaultOptions.affirm}}</text>
+            </div>
+          </block>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data: {
+    showModal: false,
+    setDialog: {},
+    value: '',
+    defaultOptions: {
+      closable: false,
+      title: '',
+      content: '',
+      buttons: [],
+      cancel: "取消",
+      affirm: "确认",
+    },
+    defaultPrompt: {
+      title: '',
+      content: '',
+      value: '',
+      fieldtype: 'text',
+      placeholder: '请输入文本',
+      focus: false,
+      inputStyle: {},
+      maxlength: -1
+    }
+  },
+  props: {
+    vertical: {
+      type: Boolean,
+      default: false
+    },
+    title: {
+      type: String,
+      default: '默认标题'
+    },
+    content: {
+      type: String,
+      default: '默认内容'
+    },
+    dialogStyle: {
+      type: Object,
+      default: {}
+    },
+    dialogType: {
+      type: String,
+      default: 'text'
+    },
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    options: {
+      type: Object,
+      default: {}
+    },
+    prompt: {
+      type: Object,
+      default: {}
+    },
+  },
+  onInit() {
+    this.$watch('visible', 'modalHandler')
+    this.$watch('dialogStyle', 'dialogStyleHandler')
+    this.$watch('defaultPrompt.value', 'valueHandler')
+    this.resetData()
+  },
+  onReady() {
+    if (this.dialogType === 'prompt' && this.$visible !== false) {
+      this.$element('focus').focus({ focus: this.defaultPrompt.focus })
+    }
+  },
+  valueHandler(newV, oldV) {
+    this.value = newV
+  },
+  optionsHandler(newV, oldV) {
+    newV.closable ? this.defaultOptions.closable = newV.closable : false
+    newV.title ? this.defaultOptions.title = newV.title : ''
+    newV.content ? this.defaultOptions.content = newV.content : ''
+    newV.buttons ? this.defaultOptions.buttons = newV.buttons : []
+    newV.cancel ? this.defaultOptions.cancel = newV.cancel : ''
+    newV.affirm ? this.defaultOptions.affirm = newV.affirm : ''
+  },
+  promptHandler(newV, oldV) {
+    newV.title ? this.defaultPrompt.title = newV.title : ''
+    newV.content ? this.defaultPrompt.content = newV.content : ''
+    newV.value ? this.defaultPrompt.value = newV.value : ''
+    newV.fieldtype ? this.defaultPrompt.fieldtype = newV.fieldtype : ''
+    newV.placeholder ? this.defaultPrompt.placeholder = newV.placeholder : ''
+    newV.focus ? this.defaultPrompt.focus = newV.focus : false
+    newV.inputStyle ? this.defaultPrompt.inputStyle = newV.inputStyle : {}
+  },
+  dialogStyleHandler(newV, oldV) {
+    console.log(newV, oldV)
+    this.setDialog = newV
+  },
+  resetData() {
+    if (this.visible === false) {
+      this.defaultOptions = {
+        closable: false,
+        title: '',
+        content: '',
+        buttons: [],
+        cancel: "取消",
+        affirm: "确认",
+      }
+      this.defaultPrompt = {
+        title: '',
+        content: '',
+        value: '',
+        fieldtype: 'text',
+        placeholder: '请输入文本',
+        focus: false,
+        inputStyle: {},
+      }
+      this.setDialog = {}
+    }
+    this.$watch('options', 'optionsHandler')
+    this.$watch('prompt', 'promptHandler')
+    this.$watch('dialogStyle', 'dialogStyleHandler')
+    this.$watch('defaultPrompt.value', 'valueHandler')
+  },
+  modalHandler(newV, oldV) {
+    this.showModal = newV
+  },
+  bindCancel(evt) {
+    evt.stopPropagation()
+    this.$emit('cancel', { event: evt })
+    if (this.dialogType === 'prompt') {
+      this.value = ''
+    }
+  },
+  bindChange(evt) {
+    this.value = evt.value
+    this.$emit('change', { event: evt })
+  },
+  bindAffirm(evt) {
+    evt.stopPropagation()
+    this.$emit('affirm', { event: evt })
+    if (this.dialogType === 'prompt') {
+      this.value = ''
+    }
+  },
+  bindEnter(evt) {
+    evt.stopPropagation()
+    if (this.dialogType === 'prompt') {
+      this.$emit('enter', { event: evt })
+      this.$element('focus').focus({ focus: false })
+      this.value = ''
+    }
+  },
+  bindButton(index, $evt) {
+    if (this.dialogType === 'prompt') {
+      this.value = ''
+    }
+    this.$emit(`click${index}`, { index, event: $evt })
+  },
+  bindClose(evt) {
+    evt.stopPropagation()
+    this.$emit('close')
+  }
+}
+</script>
+
+<style lang="less">
+.mask {
+  position: fixed;
+  flex: 1;
+  top: 0;
+  bottom: 0;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  &-exist {
+    background-color: rgba(5, 5, 5, 0.6);
+  }
+  &-none {
+    background-color: transparent;
+    visibility: hidden;
+  }
+  .dialog {
+    flex-direction: column;
+    background-color: #fff;
+    width: 84%;
+    &-border {
+      border: 1px solid #e7e7e7;
+    }
+    .box {
+      flex-direction: column;
+      .top {
+        width: 100%;
+        padding: 30px;
+        padding-bottom: 15px;
+        justify-content: space-between;
+        .title {
+          text-align: center;
+          color: #000;
+          font-size: 32px;
+          &-close {
+            width: 95%;
+            margin-left: 25px;
+          }
+          &-none {
+            width: 100%;
+          }
+        }
+        .close {
+          width: 5%;
+          margin-top: -20px;
+          text {
+            text-align: center;
+            width: 100%;
+            font-size: 50px;
+          }
+        }
+      }
+      .content {
+        padding: 30px;
+        padding-top: 15px;
+        font-size: 28px;
+        color: #a0a0a0;
+        text-align: center;
+      }
+      input {
+        font-size: 28px;
+        border: 1px solid #e7e7e7;
+        width: 100%;
+        margin: 30px;
+        height: 60px;
+        line-height: 60px;
+        margin-top: 0px;
+        padding-left: 16px;
+      }
+    }
+    .btn {
+      .btnbox {
+        padding: 24px;
+        border-top: 1px solid #e7e7e7;
+        text {
+          width: 100%;
+          text-align: center;
+          font-size: 32px;
+          color: #000000;
+        }
+      }
+      ._border {
+        border-right: 1px solid #e7e7e7;
+      }
+      .btnbox:active {
+        background-color: #e7e7e7;
+      }
+      &-vertical {
+        flex-direction: column;
+        .btnbox {
+          width: 100%;
+        }
+      }
+      &-horizontal {
+        flex-direction: row;
+        .btnbox {
+          width: 50%;
+        }
+      }
+    }
+  }
+}
+</style>

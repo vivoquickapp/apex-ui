@@ -1,0 +1,179 @@
+<import name="my-icon" src="../icon/index"></import>
+
+<template>
+  <div class="apex-accordion">
+    <div class="apex-accordion-hd" onclick="onClick">
+      <div class="apex-accordion-hd-left">
+        <div if="{{thumb}}">
+          <image class="apex-accordion-thumb" src="{{thumb}}"></image>
+        </div>
+        <div if="{{title}}">
+          <text class="apex-accordion-title">{{title}}</text>
+        </div>
+        <div else>
+          <slot name="header"></slot>
+        </div>
+      </div>
+      <div class="{{className}}" if="{{showArrow}}">
+        <my-icon type="arrow-down" size="50" color="#ddd"></my-icon>
+      </div>
+    </div>
+    <div class="apex-accordion-bd" if="{{current}}">
+      <div class="apex-accordion-content" if="{{content}}">
+        <text>{{content}}</text>
+      </div>
+      <slot></slot>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      current: false,
+      index: '0',
+      clicked: false
+    }
+  },
+
+  props: {
+    key: {
+      type: String,
+      default: '',
+    },
+    thumb: {
+      type: String,
+      default: '',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    content: {
+      type: String,
+      default: '',
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    showArrow: {
+      type: Boolean,
+      default: true,
+    },
+    groupId: {
+      type: String,
+      required: true,
+      default: ''
+    },
+  },
+
+  computed: {
+    className(){
+      if(this.clicked){
+        return this.current ? 'apex-accordion-current-clicked' : 'apex-accordion-arrow-clicked'
+      }else{
+        return this.current ? 'apex-accordion-current' : 'apex-accordion-arrow'
+      }
+    }
+  },
+
+  onReady() {
+    const parent = this.$parent().$child(this.groupId)
+    const temp = parent.accordions
+    const accordions = temp ? [...temp, this] : [this]
+    parent.accordions = accordions
+  },
+
+  changeCurrent(current, index) {
+    this.current = current
+    this.index = index
+  },
+
+  onClick() {
+    const { index, disabled } = this
+    const parent = this.$parent().$child(this.groupId)
+    
+    if (disabled || !parent) return
+    
+    this.clicked = true
+    parent.onClickItem(index)
+  },
+
+}
+</script>
+
+<style lang="less">
+.apex-accordion {
+  flex-direction: column;
+  background-color: #fff;
+  border-top: 1px solid #d0d0d0;
+
+  &-hd {
+    padding: 25px;
+    justify-content: space-between;
+  }
+
+  &-thumb{
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-right: 10px;
+  }
+
+  &-title {
+    font-size: 35px;
+    color: #000;
+    lines: 1;
+    text-overflow: ellipsis;
+  }
+
+  &-content {
+    text {
+      color: #000;
+    }
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(180deg);
+    }
+  }
+
+  @keyframes rotate2 {
+    from {
+      transform: rotate(180deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+
+  &-arrow-clicked {
+    animation-name: rotate2;
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+  }
+
+  &-current-clicked {
+    animation-name: rotate;
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+  }
+
+  &-current {
+    transform: rotate(180deg);
+  }
+
+  &-bd {
+    padding: 30px;
+    border-top: 1px solid#D0D0D0;
+  }
+}
+</style>

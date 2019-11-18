@@ -1,0 +1,110 @@
+<template>
+    <div class="apex-accordion-group">
+      <div class="apex-accordion-group-title" if="{{title}}">
+        <text>{{title}}</text>
+      </div>
+      <div class="apex-accordion-group-slot">
+        <slot></slot>
+      </div>
+      <div class="apex-accordion-group-label" if="{{label}}">
+        <text>{{label}}</text>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    data() {
+      return {
+        activeKeys: []
+      }
+    },
+  
+    props: {
+      defaultOpen: {
+        type: Array,
+        default: [],
+      },
+      accordion: {
+        type: Boolean,
+        default: false,
+      },
+      title: {
+        type: String,
+        default: '',
+      },
+      label: {
+        type: String,
+        default: '',
+      },
+      id: {
+        type: String,
+        required: true,
+        default: ''
+      }
+    },
+  
+    onReady() {
+      this.updated(this.defaultOpen)
+    },
+  
+    changeCurrents(activeKeys) {
+      const elements = this.accordions
+      if (elements.length > 0) {
+        for (let index = 0; index < elements.length; index++) {
+          const element = elements[index]
+          const key = element.key || String(index)
+          const current = this.accordion ? activeKeys[0] === key : activeKeys.indexOf(key) !== -1
+          element.changeCurrent(current, key)
+        }
+      }
+    },
+  
+    updated(activeKeys = this.activeKeys) {
+      if (this.activeKeys !== activeKeys) {
+        this.activeKeys = activeKeys
+      }
+  
+      this.changeCurrents(activeKeys)
+    },
+  
+    emitEvent(key) {
+      this.$emit('change', { key })
+    },
+  
+    onClickItem(key) {
+      let activeKeys = this.activeKeys
+  
+      //第一次点击开启，第二次点击关闭
+      if (this.accordion) {
+        activeKeys = activeKeys[0] === key ? [] : [key]
+      } else {
+        activeKeys = activeKeys.indexOf(key) !== -1 ? activeKeys.filter((n) => n !== key) : [...activeKeys, key]
+      }
+  
+      this.updated(activeKeys)
+      this.emitEvent(this.accordion ? activeKeys[0] : activeKeys)
+    },
+  }
+  </script>
+  
+  <style lang="less">
+  .apex-accordion-group {
+    flex-direction: column;
+    background-color: #eee;
+    width: 100%;
+  
+    &-title {
+      margin: 10px 20px;
+    }
+  
+    &-slot {
+      flex-direction: column;
+      border-bottom: 1px solid #d0d0d0;
+    }
+  
+    &-label {
+      margin: 10px 20px;
+    }
+  }
+  </style>  

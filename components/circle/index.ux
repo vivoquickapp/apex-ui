@@ -1,0 +1,182 @@
+<template>
+    <stack style="{{style}}">
+      <canvas id="canvasId"></canvas>
+      <div class="slot">
+        <slot></slot>
+      </div>
+    </stack>
+  </template>
+
+  <script>
+  const toAngle = (a) => a / 180 * Math.PI
+  const percent = (a) => toAngle(a / 100 * 360)
+
+  export default {
+    data(){
+      return {
+        beginAngle: toAngle(this.sAngle),
+        startAngle: toAngle(this.sAngle),
+        endAngle: percent(this.percent) + toAngle(this.sAngle),
+        color: this.strokeColor
+      }
+    },
+
+    props: {
+      percent: {
+        type: Number,
+        default: 0,
+        validator: function(value) {
+          return value >= 0 && value <= 100
+        }
+      },
+      size: {
+        type: Number,
+        default: 300
+      },
+      strokeWidth: {
+        type: Number,
+        default: 20
+      },
+      strokeColor: {
+        type: String,
+        default: '#2d8cf0'
+      },
+      strokeLinecap: {
+        type: String,
+        default: 'round'  //round|square|butt
+      },
+      trailWidth: {
+        type: Number,
+        default: 20
+      },
+      trailColor: {
+        type: String,
+        default: '#eaeef2'
+      },
+      showTrail: {
+        type: Boolean,
+        default: true
+      },
+      sAngle: {
+        type: Number,
+        default: 0
+      },
+      anticlockwise: {
+        type: Boolean,
+        default: false
+      }
+    },
+
+    computed: {
+      style(){
+        return `width: ${this.size}px; height: ${this.size}px;`
+      }
+    },
+
+    onInit() {
+      this.$watch('strokeColor', 'watchStrokeColorChange')
+      this.$watch('percent', 'watchPercentChange')
+
+      setTimeout(() => {
+        const canvas = this.$element('canvasId')
+        this.ctx = canvas.getContext('2d')
+        this.draw()
+      }, 0)
+    },
+
+    watchStrokeColorChange(newVal){
+      this.color = newVal
+    },
+
+    watchPercentChange(newVal,oldVal){
+      if(newVal <= 0) newVal = 0
+      if(newVal >= 100) newVal = 100
+      this.endAngle = percent(newVal) + this.beginAngle
+
+      this.clearTimer()
+
+      this.draw()
+    },
+
+    draw(){
+      const { anticlockwise, strokeLinecap, showTrail, size, strokeWidth, color, trailWidth, trailColor, ctx} = this
+      //圆的圆心位置
+      const position = size / 2
+      const radius = position - strokeWidth / 2
+      const p = 2 * Math.PI
+      const beginAngle = anticlockwise ? p - this.beginAngle : this.beginAngle
+      const startAngle = anticlockwise ? p - this.startAngle : this.startAngle
+      const endAngle = anticlockwise ? p - this.endAngle : this.endAngle
+      const step = (endAngle - startAngle) / 100
+      let tempEndAngle = startAngle
+      let count = 0
+      const _this = this
+
+      function drawBackground(){
+        // 绘制背景环
+        if(showTrail) {
+          ctx.beginPath()
+          ctx.arc(position, position, radius, 0, 2 * Math.PI,true)
+          ctx.lineWidth = trailWidth
+          ctx.strokeStyle = trailColor
+          ctx.stroke()
+        }
+      }
+
+      function drawCircle(tempEndAngle){
+        // 绘制进度
+        ctx.beginPath()
+        ctx.arc(position, position, radius, beginAngle, tempEndAngle, anticlockwise )
+        ctx.lineWidth = strokeWidth
+        ctx.strokeStyle = color
+        ctx.lineCap = strokeLinecap
+        ctx.stroke()
+      }
+
+      (function startDraw(ctx){
+        tempEndAngle += step
+        if(!anticlockwise && tempEndAngle <= beginAngle){
+          tempEndAngle = beginAngle
+        }
+        if(!anticlockwise && tempEndAngle >= 2 * Math.PI + beginAngle){
+          tempEndAngle = 2 * Math.PI+ beginAngle
+        }
+        if(anticlockwise && tempEndAngle <= beginAngle - 2 * Math.PI){
+          tempEndAngle = beginAngle - 2 * Math.PI
+        }
+        if(anticlockwise && tempEndAngle >= beginAngle){
+          tempEndAngle = beginAngle
+        }
+        ctx.clearRect(0, 0, size, size)
+        drawBackground()
+        drawCircle(tempEndAngle)
+        _this.startAngle = tempEndAngle
+        if(count >= 100) return
+        count++
+        _this.timer = setTimeout(() => {
+          startDraw(ctx)
+        }, 10)
+      }(ctx))
+
+    },
+
+    /**
+     * 清除定时器
+     */
+    clearTimer() {
+      if (this.timer) {
+        clearTimeout(this.timer)
+        this.timer = null
+      }
+    },
+  }
+  </script>
+
+  <style>
+  .slot{
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  </style>
