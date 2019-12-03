@@ -1,13 +1,13 @@
 <template>
-<div>
+  <div>
     <div class="tag tag--hover {{ 'tag--'+ color }}">
-        <text class="{{ 'tag--' + color + '-text' }}">
-            <slot></slot>
-        </text>
-        <div class="tag__icon" if="{{ closable }}"></div>
+      <text class="{{ 'tag--' + color + '-text' }}">
+        <slot></slot>
+      </text>
+      <div class="tag__icon" if="{{ closable }}"></div>
     </div>
     <div style="flex:1"></div>
-</div>
+  </div>
 </template>
 
 <style lang="less">
@@ -257,30 +257,34 @@
  * 判断是否预设的颜色值
  * @param {String} color 颜色值
  */
-const isPresetColor = (color) => {
-    if (!color) {
-        return false
-    }
-    return (/^(pink|red|yellow|orange|cyan|green|blue|purple|geekblue|magenta|volcano|gold|lime)(-inverse)?$/.test(color))
-}
+const isPresetColor = color => {
+  if (!color) {
+    return false;
+  }
+  return /^(pink|red|yellow|orange|cyan|green|blue|purple|geekblue|magenta|volcano|gold|lime)(-inverse)?$/.test(
+    color
+  );
+};
 export default {
-    data() {
-        return {
-            tagStyle: ''
-        }
+  data() {
+    return {
+      tagStyle: ""
+    };
+  },
+  props: {
+    color: {
+      type: String,
+      default: ""
     },
-    props: {
-        color: {
-            type: String,
-            default: ''
-        },
-        closable: {
-            type: Boolean,
-            default: false
-        },
-    },
-    onInit() {
-        this.tagStyle = !isPresetColor(this.color) ? `background-color: ${this.color}` : ''
-    },
-}
+    closable: {
+      type: Boolean,
+      default: false
+    }
+  },
+  onInit() {
+    this.tagStyle = !isPresetColor(this.color)
+      ? `background-color: ${this.color}`
+      : "";
+  }
+};
 </script>

@@ -17,72 +17,72 @@
   </div>
 </template>
 <style lang="less">
-  @import '../styles/base.less';
+@import "../styles/base.less";
 
-  .apex-navbar {
-    justify-content: space-between;
-    width: 100%;
-    padding: 10px;
+.apex-navbar {
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  text {
+    color: #ffffff;
+  }
+  &-light {
+    background-color: #ffffff;
     text {
-      color: #FFFFFF;
-    }
-    &-light {
-      background-color: #FFFFFF;
-      text {
-        color: @text-color;
-      }
-    }
-    &-dark {
-      background-color: @title-color;
-    }
-    &-royal {
-      background-color: @warning-color;
-    }
-    &-positive {
-      background-color: @success-color;
-    }
-    &-calm {
-      background-color: @primary-color;
+      color: @text-color;
     }
   }
+  &-dark {
+    background-color: @title-color;
+  }
+  &-royal {
+    background-color: @warning-color;
+  }
+  &-positive {
+    background-color: @success-color;
+  }
+  &-calm {
+    background-color: @primary-color;
+  }
+}
 </style>
 <script>
-    export default {
-        props: {
-            theme: {
-                type: String,
-                default: 'light' //  light、positive、calm、royal、dark
-            },
-            title: {
-                type: String,
-                default: ''
-            },
-            leftText: {
-                type: String,
-                default: ''
-            },
-            rightText: {
-                type: String,
-                default: ''
-            },
-            height: {
-                default: 100
-            },
-            bgColor: {
-                type: String,
-                default: ''
-            },
-            fixed: {
-                default: false
-            }
-        },
-
-        clickHandlerLeft() {
-            this.$emit('tap', {type:'left'})
-        },
-
-        clickHandlerRight() {
-            this.$emit('tap', {type:'right'})
-        },
+export default {
+  props: {
+    theme: {
+      type: String,
+      default: "light" //  light、positive、calm、royal、dark
+    },
+    title: {
+      type: String,
+      default: ""
+    },
+    leftText: {
+      type: String,
+      default: ""
+    },
+    rightText: {
+      type: String,
+      default: ""
+    },
+    height: {
+      default: 100
+    },
+    bgColor: {
+      type: String,
+      default: ""
+    },
+    fixed: {
+      default: false
     }
+  },
+
+  clickHandlerLeft() {
+    this.$emit("tap", { type: "left" });
+  },
+
+  clickHandlerRight() {
+    this.$emit("tap", { type: "right" });
+  }
+};
 </script>

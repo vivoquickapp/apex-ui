@@ -3,14 +3,17 @@
 <template>
   <div class="apex-textarea">
     <div class="apex-textarea-wrap">
-      <div class="apex-textarea-label {{disabled? 'disabled' : ''}}" if="{{ label }}">
+      <div
+        class="apex-textarea-label {{disabled? 'disabled' : ''}}"
+        if="{{ label }}"
+      >
         <text class="{{disabled? 'disabled' : ''}}">{{ label }}</text>
       </div>
       <div else>
         <slot name="label"></slot>
       </div>
       <div class="apex-textarea-textarea-wrap">
-        <textarea 
+        <textarea
           id="apex-textarea"
           class="apex-textarea-textarea {{disabled? 'disabled' : ''}}"
           style="{{ textareaStyle }}"
@@ -19,60 +22,67 @@
           maxlength="{{ maxlength }}"
           onchange="onChange"
           onfocus="onFocus"
-          >{{inputValue}}</textarea>
+          >{{ inputValue }}</textarea
+        >
       </div>
-      <div class="apex-textarea-clear" onclick="onClear" if="{{clear && !disable && inputValue && inputValue.length > 0 }}">
+      <div
+        class="apex-textarea-clear"
+        onclick="onClear"
+        if="{{clear && !disable && inputValue && inputValue.length > 0 }}"
+      >
         <my-icon type="close-circle" color="#B2B2B2" size="40"></my-icon>
       </div>
       <div class="apex-textarea-extra" if="{{extra}}">
         <text class="{{disabled? 'disabled' : ''}}">{{ extra }}</text>
-        </div>
+      </div>
       <div else>
         <slot name="extra"></slot>
       </div>
-    </div> 
+    </div>
     <div class="apex-textarea-count" if="{{hasCount}}">
-      <text>{{ inputValue.length }}/{{ maxlength === -1 ? '∞' : maxlength }}</text>
+      <text
+        >{{ inputValue.length }}/{{ maxlength === -1 ? "∞" : maxlength }}</text
+      >
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  data(){
+  data() {
     return {
       inputValue: this.defaultValue
-    }
+    };
   },
 
   props: {
     label: {
       type: String,
-      default: '',
+      default: ""
     },
     extra: {
       type: String,
-      default: '',
+      default: ""
     },
     defaultValue: {
       type: String,
-      default: '',
+      default: ""
     },
     placeholder: {
       type: String,
-      default: '',
+      default: ""
     },
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     maxlength: {
       type: Number,
-      default: 140,
+      default: 140
     },
     focus: {
       type: Boolean,
-      default: false,
+      default: false
     },
     rows: {
       type: Number,
@@ -80,63 +90,63 @@ export default {
     },
     hasCount: {
       type: Boolean,
-      default: false,
+      default: false
     },
     clear: {
       type: Boolean,
-      default: false,
+      default: false
     },
     error: {
       type: Boolean,
-      default: false,
+      default: false
     }
   },
 
   computed: {
     textareaStyle() {
-      const rows = this.rows
-      return `height: ${rows * 48}px;`
+      const rows = this.rows;
+      return `height: ${rows * 48}px;`;
     }
   },
 
   onInit() {
     setTimeout(() => {
-      if(this.focus){
-        const apexTextArea = this.$element('apex-textarea')
-        apexTextArea.focus()
+      if (this.focus) {
+        const apexTextArea = this.$element("apex-textarea");
+        apexTextArea.focus();
       }
-    }, 0)
+    }, 0);
   },
 
-  onFocus(){
-    console.log('onfocus')
-    const apexTextArea = this.$element('apex-textarea')
-    apexTextArea.select()
+  onFocus() {
+    console.log("onfocus");
+    const apexTextArea = this.$element("apex-textarea");
+    apexTextArea.select();
   },
 
-  onClear(){
-    console.log('clear')
-    this.inputValue = ''
+  onClear() {
+    console.log("clear");
+    this.inputValue = "";
   },
 
-  onChange(e){
-    console.log('change')
-    this.inputValue = e.value
-    this.$emit('textareaChange', { value: this.inputValue })
+  onChange(e) {
+    console.log("change");
+    this.inputValue = e.value;
+    this.$emit("textareaChange", { value: this.inputValue });
   }
-}
+};
 </script>
 
 <style lang="less">
-.apex-textarea{
+.apex-textarea {
   flex-direction: column;
 
-  &-label{
+  &-label {
     margin-right: 20px;
     width: 300px;
     height: 48px;
     /* margin-top: -20px; */
-    text{
+    text {
       font-size: 35px;
       color: #000;
       lines: 1;
@@ -145,22 +155,22 @@ export default {
     }
   }
 
-  &-textarea{
+  &-textarea {
     width: 100%;
     /* height: 700px; */
     font-size: 40px;
     color: #000;
 
-    &-wrap{
-      width:100%;
+    &-wrap {
+      width: 100%;
     }
   }
 
-  &-extra{
+  &-extra {
     margin: 0 10px;
     width: 60px;
     height: 48px;
-    text{
+    text {
       font-size: 35px;
       color: #000;
       lines: 1;
@@ -168,18 +178,18 @@ export default {
     }
   }
 
-  &-clear{
+  &-clear {
     margin: 0 10px;
     width: 60px;
     height: 48px;
   }
 
-  &-count{
+  &-count {
     justify-content: flex-end;
     margin-right: 20px;
   }
 
-  .disabled{
+  .disabled {
     color: rgb(150, 150, 150);
   }
 }

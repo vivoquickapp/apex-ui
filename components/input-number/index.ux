@@ -1,144 +1,157 @@
 <template>
-    <div class="apex-input-number">
-      <text class="apex-input-number-minus {{ my_value <= my_min ? 'apex-input-number-disabled' : '' }}"
-            data-disabled="{{ my_value <= my_min }}" onclick="handleMinus" if="{{ !positive || my_value > 0 }}">-
-      </text>
-      <input class="apex-input-number-text {{ my_min >= my_max ? 'apex-input-number-disabled' : '' }}" type="number"
-             value="{{ my_value }}" disabled="{{ my_min >= my_max }}" onchange="handleChange" if="{{ !positive || my_value > 0 }}"/>
-      <text class="apex-input-number-plus {{ my_value >= my_max ? 'apex-input-number-disabled' : '' }}"
-            data-disabled="{{ my_value >= my_max }}" onclick="handlePlus">+
-      </text>
-    </div>
-  </template>
-  <style lang="less">
-    @import '../styles/base';
-  
-    .apex-input-number {
-      color: @text-color;
-      flex-direction: row;
-      align-self: baseline;
-  
-      text {
-        height: 60px;
-        width: 60px;
-        text-align: center;
-        font-size: @size-font-small;
-        border: 1px solid @border-color-base;
-      }
-  
-      &-minus {
-        border-radius: 2px;
-      }
-      &-plus {
-        border-radius: 2px;
-      }
-  
-      &-text {
-        border-top-width: 1px;
-        border-bottom-width: 1px;
-        border-style: solid;
-        border-top-color: #dddee1;
-        border-bottom-color: #dddee1;
-        text-align: center;
-        height: 60px;
-        line-height: 60px;
-        width: 60px;
-        font-size: @size-font-small;
-      }
-  
-      &-disabled {
-        border-color: @btn-disable-border;
-        color: @btn-disable-color;
-        background-color: @btn-disable-bg;
-      }
+  <div class="apex-input-number">
+    <text
+      class="apex-input-number-minus {{ my_value <= my_min ? 'apex-input-number-disabled' : '' }}"
+      data-disabled="{{ my_value <= my_min }}"
+      onclick="handleMinus"
+      if="{{ !positive || my_value > 0 }}"
+      >-
+    </text>
+    <input
+      class="apex-input-number-text {{ my_min >= my_max ? 'apex-input-number-disabled' : '' }}"
+      type="number"
+      value="{{ my_value }}"
+      disabled="{{ my_min >= my_max }}"
+      onchange="handleChange"
+      if="{{ !positive || my_value > 0 }}"
+    />
+    <text
+      class="apex-input-number-plus {{ my_value >= my_max ? 'apex-input-number-disabled' : '' }}"
+      data-disabled="{{ my_value >= my_max }}"
+      onclick="handlePlus"
+      >+
+    </text>
+  </div>
+</template>
+<style lang="less">
+@import "../styles/base";
+
+.apex-input-number {
+  color: @text-color;
+  flex-direction: row;
+  align-self: baseline;
+
+  text {
+    height: 60px;
+    width: 60px;
+    text-align: center;
+    font-size: @size-font-small;
+    border: 1px solid @border-color-base;
+  }
+
+  &-minus {
+    border-radius: 2px;
+  }
+  &-plus {
+    border-radius: 2px;
+  }
+
+  &-text {
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-style: solid;
+    border-top-color: #dddee1;
+    border-bottom-color: #dddee1;
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    width: 60px;
+    font-size: @size-font-small;
+  }
+
+  &-disabled {
+    border-color: @btn-disable-border;
+    color: @btn-disable-color;
+    background-color: @btn-disable-bg;
+  }
+}
+</style>
+<script>
+import { addNum } from "../common/scripts/util";
+
+export default {
+  props: {
+    value: {
+      default: 1
+    },
+    min: {
+      default: -Infinity
+    },
+    max: {
+      default: Infinity
+    },
+    step: {
+      default: 1
+    },
+    positive: {
+      default: false
     }
-  </style>
-  <script>
-      import {addNum} from "../common/scripts/util";
-  
-      export default {
-          props: {
-              value: {
-                  default: 1
-              },
-              min: {
-                  default: -Infinity
-              },
-              max: {
-                  default: Infinity
-              },
-              step: {
-                  default: 1
-              },
-              positive:{
-                  default: false
-              }
-          },
-  
-          data() {
-              return {
-                  my_value: this.value,
-                  my_step: this.step,
-                  my_min: this.min,
-                  my_max: this.max
-              }
-          },
-  
-          handleChangeStep(e, type) {
-              const {dataset = {}} = e.target;
-              const {disabled} = dataset;
-              const {my_step} = this._data;
-              let {my_value} = this._data;
-              const {my_min, my_max} = this._data;
-  
-              if (disabled) return null;
-  
-              if (type === 'minus') {
-                  my_value = addNum(my_value, -my_step);
-              } else if (type === 'plus') {
-                  my_value = addNum(my_value, my_step);
-              }
-  
-              if (my_value > my_max) {
-                  my_value = my_max;
-              } else if (my_value < my_min) {
-                  my_value = my_min;
-              }
-  
-              this.my_value = my_value
-  
-              this.handleEmit(my_value, type);
-          },
-  
-          handleMinus(e) {
-              this.handleChangeStep(e, 'minus');
-          },
-  
-          handlePlus(e) {
-              this.handleChangeStep(e, 'plus');
-          },
-  
-          handleChange(e) {
-              let value = parseFloat(e.target.value)
-              const {my_min, my_max} = this._data;
-  
-              if (value > my_max) {
-                  value = my_max;
-              } else if (value < my_min) {
-                  value = my_min;
-              }
-              this.my_value = value;
-  
-              this.handleEmit(value);
-          },
-  
-          handleEmit(value, type) {
-              const data = {
-                  value: value
-              };
-              if (type) data.type = type;
-  
-              this.$emit('change', data);
-          }
-      }
-  </script>
+  },
+
+  data() {
+    return {
+      my_value: this.value,
+      my_step: this.step,
+      my_min: this.min,
+      my_max: this.max
+    };
+  },
+
+  handleChangeStep(e, type) {
+    const { dataset = {} } = e.target;
+    const { disabled } = dataset;
+    const { my_step } = this._data;
+    let { my_value } = this._data;
+    const { my_min, my_max } = this._data;
+
+    if (disabled) return null;
+
+    if (type === "minus") {
+      my_value = addNum(my_value, -my_step);
+    } else if (type === "plus") {
+      my_value = addNum(my_value, my_step);
+    }
+
+    if (my_value > my_max) {
+      my_value = my_max;
+    } else if (my_value < my_min) {
+      my_value = my_min;
+    }
+
+    this.my_value = my_value;
+
+    this.handleEmit(my_value, type);
+  },
+
+  handleMinus(e) {
+    this.handleChangeStep(e, "minus");
+  },
+
+  handlePlus(e) {
+    this.handleChangeStep(e, "plus");
+  },
+
+  handleChange(e) {
+    let value = parseFloat(e.target.value);
+    const { my_min, my_max } = this._data;
+
+    if (value > my_max) {
+      value = my_max;
+    } else if (value < my_min) {
+      value = my_min;
+    }
+    this.my_value = value;
+
+    this.handleEmit(value);
+  },
+
+  handleEmit(value, type) {
+    const data = {
+      value: value
+    };
+    if (type) data.type = type;
+
+    this.$emit("change", data);
+  }
+};
+</script>

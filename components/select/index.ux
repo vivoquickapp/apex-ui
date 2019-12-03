@@ -1,0 +1,190 @@
+<import name="my-icon" src="apex-ui/components/icon/index"></import>
+<template>
+  <div class="apex-select">
+    <div class="mask" if="{{visible}}"></div>
+    <div class="select-body" if="{{visible}}">
+      <div class="title">
+        <text
+          class="btn"
+          style="text-align: left;color:#a9a9a9;"
+          onclick="bindCancel"
+          >取消</text
+        >
+        <text style="text-align: center;color:#000000;width:80%;">请选择</text>
+        <text
+          class="btn"
+          style="text-align: right;color:#32cd32;"
+          onclick="bindComfirm"
+          >确定</text
+        >
+      </div>
+      <list class="opt-list">
+        <list-item
+          type="opt"
+          for="{{options}}"
+          onclick="bindChange($idx,$item)"
+        >
+          <div class="checkBox">
+            <div
+              class="circle  {{$item.status?'circle-active':'circle-none'}}"
+              if="{{type==='checkBox'}}"
+            >
+              <my-icon type="checkmark" color="#ffffff" size="56"></my-icon>
+            </div>
+            <text if="{{$item.name}}" style="margin-left:20px;">{{
+              $item.name
+            }}</text>
+            <text if="{{!$item.name}}" style="margin-left:20px;">{{
+              $item
+            }}</text>
+          </div>
+          <div class="radio" if="{{type==='radio' && $item.status}}">
+            <my-icon type="checkmark" color="#32cd32" size="56"></my-icon>
+          </div>
+        </list-item>
+      </list>
+    </div>
+  </div>
+</template>
+
+<script>
+const optDefault = {
+  options: [],
+  visible: false,
+  type: "radio",
+  max: -1
+};
+export default {
+  data() {
+    return {
+      ...optDefault,
+      count: 0
+    };
+  },
+  onInit() {},
+  showSelect(opt) {
+    let { type = "radio", options, max = -1 } = opt;
+    if (this.options.length === 0 && typeof options[0] === "string") {
+      this.options = [];
+      this.count = 0;
+      options.filter((item, index) => {
+        this.options.push({ name: item, status: false });
+      });
+    }
+    if (max > -1) {
+      type = "checkBox";
+    }
+    Object.assign(this._data, {
+      visible: true,
+      type: type,
+      options: this.options,
+      max: max
+    });
+  },
+  hideSelect(type = "cancel") {
+    if (type === "comfirm") {
+      let arr = [];
+      this.options.filter((item, index) => {
+        if (typeof item === "object") {
+          item.status === true ? arr.push(item.name) : arr.splice(index, 1);
+        }
+        if (typeof item === "string") {
+          this.options.splice(index, 1, { name: item, status: false });
+        }
+      });
+      return arr.join(",");
+    }
+  },
+  bindCancel() {
+    Object.assign(this._data, {
+      visible: false
+    });
+  },
+  bindComfirm() {
+    let data = this.hideSelect("comfirm");
+    this.$emit("comfirm", { data });
+    Object.assign(this._data, {
+      visible: false
+    });
+  },
+  bindChange(index, item) {
+    if (this.type === "radio") {
+      this.options.filter(($ele, $idx) => {
+        this.options[$idx].status = false;
+      });
+      this.options[index].status = true;
+    }
+    if (this.type === "checkBox") {
+      if (this.options[index].status === true) {
+        this.options[index].status = false;
+        if (this.count <= this.max && this.count >= 0) {
+          this.count--;
+        }
+      } else {
+        if (this.max === -1) {
+          this.options[index].status = true;
+        }
+        if (this.max > -1) {
+          if (this.count < this.max) {
+            this.options[index].status = true;
+            this.count++;
+          }
+        }
+      }
+    }
+  }
+};
+</script>
+
+<style lang="less">
+.mask {
+  background-color: rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+.select-body {
+  background-color: rgb(255, 255, 255);
+  width: 100%;
+  height: 35%;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  flex-direction: column;
+  .title {
+    width: 100%;
+    height: 100px;
+    background-color: #f6f6f6;
+    padding: 20px;
+    border-bottom: 1px solid #e4e4e4;
+    justify-content: space-between;
+    .btn {
+      width: 10%;
+    }
+  }
+  .opt-list {
+    width: 100%;
+    padding: 0 20px;
+    align-content: space-around;
+    list-item {
+      flex: 1;
+      height: 80px;
+      border-bottom: 1px solid #e4e4e4;
+      justify-content: space-between;
+      align-items: center;
+      .circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        border: 1px solid #32cd32;
+        background-color: #ffffff;
+        &-active {
+          background-color: #32cd32;
+        }
+      }
+    }
+  }
+}
+</style>

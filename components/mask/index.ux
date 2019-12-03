@@ -1,0 +1,66 @@
+<template>
+  <div
+    style="z-index: {{zIndex}}"
+    class="mask {{isVisible?'show':isAnimationEnd?'hide':''}} {{animationClass()}} {{transparent?'bgcolor-transparent':'bgcolor-default'}}"
+  ></div>
+</template>
+<style lang="less">
+@import "../styles/base.less";
+
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  animation-duration: 200ms;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+.bgcolor-transparent {
+  background-color: transparent;
+}
+.bgcolor-default {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+</style>
+<script>
+export default {
+  props: {
+    transparent: {
+      default: false
+    },
+    zIndex: {
+      default: 1000
+    }
+  },
+  data() {
+    return {
+      isAnimationEnd: true,
+      isVisible: false,
+      timer: null
+    };
+  },
+  animationClass() {
+    if (this.isVisible) {
+      return "opacity-hide-to-show";
+    } else {
+      return "opacity-show-to-hide";
+    }
+  },
+  show() {
+    if (this.timer) return;
+    this.isVisible = true;
+    this.isAnimationEnd = false;
+  },
+  hide() {
+    if (this.timer) return;
+    this.isVisible = false;
+    this.timer = setTimeout(() => {
+      this.isAnimationEnd = true;
+      this.timer = null;
+    }, 200);
+  }
+};
+</script>

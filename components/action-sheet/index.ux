@@ -1,0 +1,209 @@
+<import name="my-popup" src="../popup/index"></import>
+<import name="my-button" src="../button/index"></import>
+<import name="my-icon" src="../icon/index"></import>
+
+<template>
+  <my-popup id="popup" position="bottom" onclose="cancel">
+    <div class="{{theme}}-sheet">
+      <div class="{{theme}}-sheet-options-wrap">
+        <text class="{{theme}}-sheet-title-text">{{ titleText }}</text>
+        <div
+          class="{{theme}}-sheet-btn {{$item.disabled?'sheet-btn-disabled':''}}"
+          for="{{buttons}}"
+          onclick="handleClickBtn('btn',$idx,$item)"
+        >
+          <my-icon
+            type="{{$item.icon.type || 'share-alt'}}"
+            size="{{$item.icon.size || 40}}"
+            color="{{$item.icon.color || theme=='default'?'#495060':'#007aff'}}"
+            if="{{$item.icon && (!$item.icon.position || $item.icon.position == 'left')}}"
+          ></my-icon>
+          <text class="{{theme}}-sheet-btn-text">{{ $item.text }}</text>
+          <my-icon
+            type="{{$item.icon.type || 'share-alt'}}"
+            size="{{$item.icon.size || 40}}"
+            color="{{$item.icon.color || theme=='default'?'#495060':'#007aff'}}"
+            if="{{$item.icon && $item.icon.position == 'right'}}"
+          ></my-icon>
+        </div>
+        <div
+          class="{{theme}}-sheet-btn {{theme}}-sheet-btn-delete"
+          onclick="handleClickBtn('delete')"
+          if="{{destructiveText}}"
+        >
+          <text class="{{theme}}-sheet-btn-delete-text">{{
+            destructiveText
+          }}</text>
+        </div>
+      </div>
+
+      <div
+        class="{{theme}}-sheet-btn {{theme}}-sheet-btn-cancel"
+        onclick="handleClickBtn('cancel')"
+      >
+        <text class="{{theme}}-sheet-btn-cancel-text">{{ cancelText }}</text>
+      </div>
+    </div>
+  </my-popup>
+</template>
+<style lang="less">
+.default-sheet {
+  flex-direction: column;
+  background-color: #efeff4;
+  .default-sheet-options-wrap {
+    flex-direction: column;
+    background-color: #ffffff;
+    .default-sheet-title-text {
+      padding: 30px 20px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid #d9d9d9;
+    }
+  }
+
+  .default-sheet-btn {
+    flex: 1;
+    flex-direction: row;
+    justify-content: center;
+    padding: 30px 20px;
+    text-align: center;
+    &:active {
+      border-color: #d1d3d6;
+      background-color: #e4e5e7;
+    }
+  }
+
+  .default-sheet-btn {
+    border-bottom: 1px solid #d9d9d9;
+    .default-sheet-btn-text {
+      color: #495060;
+      margin: 0 10px;
+    }
+  }
+  .default-sheet-btn-delete {
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 0;
+    .default-sheet-btn-delete-text {
+      color: #ff3b30;
+    }
+  }
+  .default-sheet-btn-cancel {
+    border-top: 0;
+    margin-top: 20px;
+    background-color: #ffffff;
+    .default-sheet-btn-cancel-text {
+      color: #495060;
+    }
+  }
+}
+
+.iOS-sheet {
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 0 20px 20px;
+  .iOS-sheet-options-wrap {
+    flex-direction: column;
+    background-color: #f1f2f3;
+    border-radius: 10px;
+    .iOS-sheet-title-text {
+      padding: 30px 20px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid #d9d9d9;
+    }
+  }
+
+  .iOS-sheet-btn {
+    flex: 1;
+    flex-direction: row;
+    justify-content: center;
+    padding: 23px 20px;
+    text-align: center;
+    &:active {
+      border-color: #d1d3d6;
+      background-color: #e4e5e7;
+    }
+  }
+
+  .iOS-sheet-btn {
+    border-bottom: 1px solid #d9d9d9;
+    .iOS-sheet-btn-text {
+      color: #007aff;
+      margin: 0 10px;
+      font-size: 42px;
+      font-weight: 500;
+    }
+  }
+  .iOS-sheet-btn-delete {
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 0;
+    .iOS-sheet-btn-delete-text {
+      color: #ff3b30;
+      font-size: 42px;
+      font-weight: 500;
+    }
+  }
+
+  .iOS-sheet-btn-cancel {
+    margin-top: 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    .iOS-sheet-btn-cancel-text {
+      color: #007aff;
+      font-size: 42px;
+      font-weight: 500;
+    }
+  }
+}
+
+.sheet-btn-disabled {
+  opacity: 0.3;
+  border-bottom: 0;
+}
+</style>
+<script>
+export default {
+  props: {},
+  data() {
+    return {
+      theme: "default",
+      titleText: null,
+      buttons: [],
+      cancelText: "取消",
+      cancel() {},
+      destructiveText: null,
+      destructiveButtonClicked() {}
+    };
+  },
+  showSheet(options = {}) {
+    Object.keys(options).forEach(key => {
+      this[key] = options[key];
+    });
+
+    this.$child("popup").show();
+  },
+  hideSheet() {
+    this.$child("popup").hide();
+  },
+  closeSheet() {
+    this.$child("popup").handleClickClose();
+  },
+  handleClickBtn(type, index, item) {
+    let isHideSheet;
+
+    if (type == "cancel") {
+      this.closeSheet();
+    } else if (type == "delete") {
+      isHideSheet = this.destructiveButtonClicked();
+
+      if (isHideSheet) this.hideSheet();
+    } else {
+      if (item.disabled) return;
+
+      isHideSheet = this.buttonClicked(index, item);
+
+      if (isHideSheet) this.hideSheet();
+    }
+  }
+};
+</script>

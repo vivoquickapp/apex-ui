@@ -1,0 +1,337 @@
+<template>
+  <div class="apex-wrap">
+    <div class="files">
+      <block if="{{ uploadFileList.length }}">
+        <block for="{{ (index, file) in uploadFileList }}">
+          <div
+            class="file {{ file.status ? 'file-' + file.status : '' }}"
+            data-index="{{index}}"
+            data-file="{{file}}"
+            onclick="onPreview"
+          >
+            <stack>
+              <video
+                id="{{ file.uid }}"
+                class="thumb"
+                src="{{ file.uri }}"
+                if="{{ type ==='video' }}"
+              ></video>
+              <image class="thumb" src="{{ file.uri }}" else></image>
+              <div
+                class="remove"
+                data-file="{{ file }}"
+                onclick="onRemove"
+                if="{{ removeIcon !== 'false' || !removeIcon }}"
+              >
+                <image
+                  src="data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle fill-opacity='.4' fill='%23404040' cx='8' cy='8' r='8'/%3E%3Cpath d='M11.898 4.101a.345.345 0 0 0-.488 0L8 7.511l-3.411-3.41a.345.345 0 0 0-.488.488l3.411 3.41-3.41 3.412a.345.345 0 0 0 .488.488L8 8.487l3.411 3.411a.345.345 0 0 0 .488-.488L8.488 8l3.41-3.412a.344.344 0 0 0 0-.487z' fill='%23FFF'/%3E%3C/g%3E%3C/svg%3E"
+                ></image>
+              </div>
+            </stack>
+          </div>
+        </block>
+      </block>
+      <div
+        class="button"
+        onclick="onSelect"
+        if="{{ max === -1 || max > uploadFileList.length }}"
+      >
+        <slot></slot>
+      </div>
+    </div>
+  </div>
+</template>
+<style lang="less">
+.apex-wrap {
+  padding: 0 10px;
+
+  .files {
+    flex-wrap: wrap;
+
+    .file {
+      height: 160px;
+      width: 160px;
+      margin: 10px;
+      padding: 5px;
+      border: 2px solid #dcdcdc;
+      border-radius: 5px;
+
+      stack {
+        flex-direction: row-reverse;
+
+        .thumb {
+          height: 160px;
+          width: 160px;
+        }
+
+        .remove {
+          align-self: flex-start;
+
+          image {
+            height: 30px;
+            width: 30px;
+            margin: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .button {
+    height: 160px;
+    width: 160px;
+    margin: 10px;
+    border: 2px dashed #dedede;
+    border-radius: 5px;
+    justify-content: center;
+    align-content: center;
+  }
+}
+</style>
+<script>
+import media from "@system.media";
+import request from "@system.request";
+
+export default {
+  props: {
+    max: {
+      default: -1 // 最大显示数量 值为-1时不限数量
+    },
+    multi: {
+      default: false // 是否支持多选
+    },
+    type: {
+      default: "image" // 'image', 'video'
+    },
+    url: {
+      default: "" // 服务器上传api地址
+    },
+    name: {
+      default: ""
+    },
+    header: {
+      default: {}
+    },
+    formData: {
+      default: []
+    },
+    uploaded: {
+      default: true // 是否默认上传
+    },
+    disabled: {
+      default: false
+    },
+    removeIcon: {
+      default: true
+    }
+  },
+  data() {
+    return {
+      uploadFileList: [],
+      tempFilePaths: [],
+      fileList: [],
+      uploadMax: -1,
+      uploadCount: 9,
+      createdAt: Date.now(),
+      index: 0
+    };
+  },
+  getUid() {
+    return `apex-upload--${this.createdAt}-${++this.index}`;
+  },
+  /**
+   * 从本地相册选择图片或使用相机拍照
+   */
+  onSelect() {
+    const success = res => {
+      this.tempFilePaths = res.uris || [res.uri];
+      if (this.tempFilePaths.length + this.uploadFileList.length > this.max)
+        return; // 判断最大文件数量
+      this.tempFilePaths = this.tempFilePaths.map(item => {
+        return {
+          uri: item,
+          uid: this.getUid(),
+          name: this.name,
+          filename: item.split("/").reverse()[0]
+        };
+      });
+
+      this.$emit("before", { fileList: this.tempFilePaths });
+
+      // 判断是否取消默认的上传行为
+      if (this.uploaded !== "false" || !this.uploaded) {
+        this.uploadFile();
+      }
+    };
+
+    // disabled
+    if (this.disabled === "true" || this.disabled === true) return;
+
+    // choose video
+    if (this.type === "video") {
+      if (this.multi) {
+        media.pickVideos({
+          success
+        });
+      } else {
+        media.pickVideo({
+          success
+        });
+      }
+      return;
+    }
+
+    // choose image
+    if (this.multi) {
+      media.pickImages({
+        success
+      });
+    } else {
+      media.pickImage({
+        success
+      });
+    }
+  },
+  /**
+   * 上传文件改变时的回调函数
+   * @param {Object} info 文件信息
+   */
+  onChange(info = {}) {
+    this.uploadFileList = info.fileList;
+    this.$emit("change", info);
+  },
+  /**
+   * 开始上传文件的回调函数
+   * @param {Object} file 文件对象
+   */
+  onStart(file) {
+    const targetItem = {
+      ...file,
+      status: "uploading"
+    };
+
+    this.onChange({
+      file: targetItem,
+      fileList: [...this.uploadFileList, targetItem]
+    });
+  },
+  /**
+   * 上传文件成功时的回调函数
+   * @param {Object} file 文件对象
+   * @param {Object} res 请求响应对象
+   */
+  onSuccess(file, res) {
+    const fileList = [...this.uploadFileList];
+    const index = fileList.map(item => item.uid).indexOf(file.uid);
+
+    if (index !== -1) {
+      const targetItem = {
+        ...file,
+        status: "done",
+        res
+      };
+      const info = {
+        file: targetItem,
+        fileList
+      };
+
+      // replace
+      fileList.splice(index, 1, targetItem);
+
+      this.$emit("success", info);
+
+      this.onChange(info);
+    }
+  },
+  /**
+   * 上传文件失败时的回调函数
+   * @param {Object} file 文件对象
+   * @param {Object} res 请求响应对象
+   */
+  onFail(file, res) {
+    const fileList = [...this.uploadFileList];
+    const index = fileList.map(item => item.uid).indexOf(file.uid);
+
+    if (index !== -1) {
+      const targetItem = {
+        ...file,
+        status: "error",
+        res
+      };
+      const info = {
+        file: targetItem,
+        fileList
+      };
+
+      // replace
+      fileList.splice(index, 1, targetItem);
+
+      this.$emit("fail", info);
+
+      this.onChange(info);
+    }
+  },
+  /**
+   * 上传文件
+   */
+  uploadFile() {
+    if (!this.tempFilePaths.length) return;
+
+    const { url, header, formData, disabled } = this;
+    const file = this.tempFilePaths.shift();
+
+    if (!url || disabled || !file.uri) return;
+
+    this.onStart(file);
+
+    request.upload({
+      url,
+      header,
+      files: [file],
+      data: formData,
+      success: res => this.onSuccess(file, res),
+      fail: res => this.onFail(file, res),
+      complete: res => {
+        this.$emit("complete", res);
+        this.uploadFile();
+      }
+    });
+  },
+  /**
+   * 点击文件时的回调函数
+   * @param {Object} e 参数对象
+   */
+  onPreview(e) {
+    const { file, index } = e.currentTarget.dataset;
+    this.$emit("preview", { file, index, fileList: this.uploadFileList });
+  },
+  /**
+   * 点击删除图标时的回调函数
+   * @param {Object} e 参数对象
+   */
+  onRemove(e) {
+    e.stopPropagation(); // 取消事件冒泡
+    const { file } = e.currentTarget.dataset;
+    const fileList = [...this.uploadFileList];
+    const index = fileList.map(item => item.uid).indexOf(file.uid);
+
+    if (index !== -1) {
+      const targetItem = {
+        ...file,
+        status: "remove"
+      };
+      const info = {
+        file: targetItem,
+        fileList
+      };
+
+      // delete
+      fileList.splice(index, 1);
+
+      this.$emit("remove", { ...info });
+
+      this.onChange(info);
+    }
+  }
+};
+</script>

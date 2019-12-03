@@ -1,0 +1,243 @@
+<import name="my-mask" src="../mask/index"></import>
+<import name="my-icon" src="../icon/index"></import>
+
+<template>
+  <div class="wrap {{isVisible?'show':isAnimationEnd?'hide':''}}">
+    <my-mask id="mask" z-index="{{zIndex}}" onclick="handleClickMask"></my-mask>
+
+    <div
+      class="popup {{`popup-${position}`}} {{isAnimationEnd?'hide':animationClass()}}"
+    >
+      <div class="popup-header" show="{{hasHeader}}">
+        <text class="popup-header-text" if="{{title}}">{{ title }}</text>
+        <block else>
+          <slot name="header"></slot>
+        </block>
+      </div>
+      <div class="popup-body">
+        <text class="popup-body-text" if="{{content}}">{{ content }}</text>
+        <slot name="default"></slot>
+      </div>
+      <div class="popup-footer" show="{{hasFooter}}">
+        <text class="popup-footer-text" if="{{extra}}">{{ extra }}</text>
+        <block else>
+          <slot name="footer"></slot>
+        </block>
+      </div>
+
+      <div class="popup-close" show="{{closable}}">
+        <my-icon
+          type="close"
+          size="70"
+          color="#888888"
+          onclick="handleClickClose"
+        ></my-icon>
+      </div>
+    </div>
+  </div>
+</template>
+<style lang="less">
+@import "../styles/base.less";
+
+.wrap {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  .popup {
+    flex-direction: column;
+    background-color: #fff;
+
+    animation-duration: 200ms;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    .popup-header {
+      .popup-header-text {
+        flex: 1;
+        padding: 30px 70px 30px;
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+      }
+    }
+    .popup-body {
+      flex-direction: column;
+      .popup-body-text {
+        flex: 1;
+        text-align: center;
+        padding: 15px 70px 60px;
+      }
+    }
+    .popup-footer {
+      .popup-footer-text {
+        flex: 1;
+        padding: 30px 70px 30px;
+        text-align: center;
+      }
+    }
+    .popup-close {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+    &-center {
+      width: 80%;
+    }
+
+    &-left {
+      width: 80%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+    &-right {
+      width: 80%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    &-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+
+    &-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+}
+</style>
+<script>
+export default {
+  props: {
+    title: {
+      default: ""
+    },
+    content: {
+      default: ""
+    },
+    extra: {
+      default: ""
+    },
+    position: {
+      default: "center"
+    },
+    closable: {
+      default: false
+    },
+    mask: {
+      default: true
+    },
+    maskClosable: {
+      default: true
+    },
+    zIndex: {
+      default: 1000
+    },
+    hasHeader: {
+      default: true
+    },
+    hasFooter: {
+      default: true
+    }
+  },
+  data() {
+    return {
+      isAnimationEnd: true,
+      isVisible: false,
+      timerOfAnimation: null
+    };
+  },
+  animationClass() {
+    if (this.isVisible) {
+      switch (this.position) {
+        case "center":
+          return "opacity-hide-to-show";
+          break;
+        case "left":
+          return "translate-left-to-center";
+          break;
+        case "right":
+          return "translate-right-to-center";
+          break;
+        case "top":
+          return "translate-top-to-center";
+          break;
+        case "bottom":
+          return "translate-bottom-to-center";
+          break;
+        default:
+          return "";
+      }
+    } else {
+      switch (this.position) {
+        case "center":
+          return "opacity-show-to-hide";
+          break;
+        case "left":
+          return "translate-center-to-left";
+          break;
+        case "right":
+          return "translate-center-to-right";
+          break;
+        case "top":
+          return "translate-center-to-top";
+          break;
+        case "bottom":
+          return "translate-center-to-bottom";
+          break;
+        default:
+          return "";
+      }
+    }
+  },
+  toggleMask(fn) {
+    if (this.mask) {
+      this.$child("mask")[fn]();
+    }
+  },
+  show() {
+    if (this.timerOfAnimation) return;
+    this.isVisible = true;
+    this.isAnimationEnd = false;
+
+    this.toggleMask("show");
+  },
+  hide() {
+    if (this.timerOfAnimation) return;
+    this.isVisible = false;
+
+    this.toggleMask("hide");
+
+    this.timerOfAnimation = setTimeout(() => {
+      this.isAnimationEnd = true;
+      this.$emit("closed");
+      this.timerOfAnimation = null;
+    }, 200);
+  },
+  handleClickMask() {
+    if (this.maskClosable) {
+      this.hide();
+      this.$emit("close");
+    }
+  },
+  handleClickClose() {
+    this.hide();
+    this.$emit("close");
+  }
+};
+</script>

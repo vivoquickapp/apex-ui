@@ -1,0 +1,148 @@
+<import name="my-button" src="apex-ui/components/button/index"></import>
+<import name="my-icon" src="apex-ui/components/icon/index"></import>
+<template>
+  <div class="apex-wrap">
+    <div class="content-wrap">
+      <div class="header">
+        <div if="resultIcon" class="icon">
+          <my-icon
+            type="{{icon.type}}"
+            size="{{icon.size}}"
+            color="{{icon.color}}"
+          ></my-icon>
+        </div>
+        <block else>
+          <slot name="header"></slot>
+        </block>
+      </div>
+      <div class="body">
+        <text if="{{ title }}" class="title">{{ title }}</text>
+        <text if="{{ desc }}" class="desc">{{ desc }}</text>
+        <div if="buttons.length" class="buttons">
+          <block for="(index, button) in buttons">
+            <my-button type="{{button.type}}" ontap="clickHandler(index)">
+              {{ button.text }}
+            </my-button>
+          </block>
+        </div>
+        <slot></slot>
+      </div>
+    </div>
+    <div class="footer {{fixed ? 'fixed' : ''}}">
+      <block if="extra">
+        <text>extra</text>
+      </block>
+      <block else>
+        <slot name="footer"></slot>
+      </block>
+    </div>
+  </div>
+</template>
+<style lang="less">
+.apex-wrap {
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+
+  .content-wrap {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+    .header {
+      margin: 80px;
+    }
+
+    .body {
+      flex-direction: column;
+      width: 100%;
+
+      .title {
+        text-align: center;
+        font-size: 50px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .desc {
+        text-align: center;
+        font-size: 30px;
+        margin-bottom: 50px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  }
+
+  .footer {
+    margin: 30px 0;
+  }
+}
+
+.fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  justify-content: center;
+  align-content: center;
+  padding: 30px 0;
+}
+</style>
+<script>
+const defaultIcon = {
+  type: "checkmark-circle",
+  size: 200,
+  color: "#33cd5f"
+};
+export default {
+  props: {
+    icon: {
+      default: null
+    },
+    title: {
+      default: ""
+    },
+    desc: {
+      default: ""
+    },
+    buttons: {
+      default: []
+    },
+    extra: {
+      default: ""
+    },
+    fixed: {
+      default: false
+    }
+  },
+  data() {
+    return {
+      resultIcon: null
+    };
+  },
+  onInit() {
+    this.resultIcon = this.getIcon(this.icon);
+    this.$watch("icon", "handleIcon");
+  },
+  handleIcon(newVal) {
+    this.resultIcon = this.getIcon(newVal);
+  },
+  getIcon(icon) {
+    if (icon !== null && typeof icon === "object") {
+      return Object.assign({}, defaultIcon, icon);
+    } else if (typeof icon === "string") {
+      return Object.assign({}, defaultIcon, {
+        type: icon
+      });
+    }
+    return defaultIcon;
+  },
+  clickHandler(index) {
+    this.$emit("tap", { index: index });
+  }
+};
+</script>

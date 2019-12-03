@@ -1,14 +1,37 @@
-<import name="my-icon" src="apex-ui/components/icon/index"></import> 
+<import name="my-icon" src="apex-ui/components/icon/index"></import>
 <template>
   <div class="apex-search-bar">
     <div class="{{pixClass}}">
       <div class="box">
         <my-icon type="search" size="36" color="#afafaf"></my-icon>
-        <input id="input" style="text-align:{{mask?'center':'left'}}" enterkeytype="{{enterkeytype}}" type="text" value='{{value}}' onchange="bindChange" onfocus="bindFocus" onblur="bindBlur" maxlength="{{maxlength}}" placeholder-color="{{placeholderColor}}" placeholder="{{placeholder}}" disabled="{{disabled}}" onenterkeyclick="enterEvent" onselectionchange="bindSelectionchange" select="{{select}}">
-        </input>
-        <my-icon type="close-circle" size="36" color="#afafaf" onclick="bindClear" if="{{clearIcon&&clear}}"></my-icon>
+        <input
+          id="input"
+          style="text-align:{{mask?'center':'left'}}"
+          enterkeytype="{{enterkeytype}}"
+          type="text"
+          value="{{value}}"
+          onchange="bindChange"
+          onfocus="bindFocus"
+          onblur="bindBlur"
+          maxlength="{{maxlength}}"
+          placeholder-color="{{placeholderColor}}"
+          placeholder="{{placeholder}}"
+          disabled="{{disabled}}"
+          onenterkeyclick="enterEvent"
+          onselectionchange="bindSelectionchange"
+          select="{{select}}"
+        />
+        <my-icon
+          type="close-circle"
+          size="36"
+          color="#afafaf"
+          onclick="bindClear"
+          if="{{clearIcon&&clear}}"
+        ></my-icon>
       </div>
-      <text class="cancel" if="{{cancel}}" onclick="bindCancel">{{cancelText}}</text>
+      <text class="cancel" if="{{cancel}}" onclick="bindCancel">{{
+        cancelText
+      }}</text>
     </div>
   </div>
 </template>
@@ -18,8 +41,8 @@ export default {
   data: {
     mask: true,
     clearIcon: false,
-    value: '',
-    cancel: false,
+    value: "",
+    cancel: false
   },
   props: {
     hasCancel: {
@@ -28,18 +51,18 @@ export default {
     },
     placeholderColor: {
       type: String,
-      default: 'rgb(128, 128, 128)'
+      default: "rgb(128, 128, 128)"
     },
     placeholder: {
       type: String,
-      default: '搜索'
+      default: "搜索"
     },
     maxlength: {
       type: Number
     },
     pixClass: {
       type: String,
-      default: 'wrap'
+      default: "wrap"
     },
     disabled: {
       type: Boolean,
@@ -47,7 +70,7 @@ export default {
     },
     cancelText: {
       type: String,
-      default: '取消'
+      default: "取消"
     },
     inputFocus: {
       type: Boolean,
@@ -55,7 +78,7 @@ export default {
     },
     inputValue: {
       type: String,
-      default: ''
+      default: ""
     },
     clear: {
       type: Boolean,
@@ -71,70 +94,73 @@ export default {
     selectionEnd: {
       type: Number
     },
-    enterkeytype:{
+    enterkeytype: {
       type: String,
-      default: 'defualt'
+      default: "defualt"
     }
   },
   onInit() {
     if (this.hasCancel) {
-      this.cancel = this.hasCancel
+      this.cancel = this.hasCancel;
     }
     if (this.inputValue) {
-      this.value = this.inputValue
+      this.value = this.inputValue;
     }
   },
   onReady() {
     if (this.inputFocus === true && this.disabled === false) {
-      this.mask = false
-      this.$element('input').focus({ focus: true })
+      this.mask = false;
+      this.$element("input").focus({ focus: true });
     }
     if (this.select === true) {
-      this.$element('input').select()
+      this.$element("input").select();
     }
     if (this.selectionStart !== undefined && this.selectionEnd !== undefined) {
-      this.$element('input').setSelectionRange({ start: this.selectionStart, end: this.selectionEnd })
+      this.$element("input").setSelectionRange({
+        start: this.selectionStart,
+        end: this.selectionEnd
+      });
     }
   },
   bindFocus(evt) {
-    this.$emit('focus', { event: evt })
-    this.cancel = true
-    this.mask = false
+    this.$emit("focus", { event: evt });
+    this.cancel = true;
+    this.mask = false;
   },
   bindBlur(evt) {
-    this.$emit('blur', { event: evt })
+    this.$emit("blur", { event: evt });
     if (!this.hasCancel) {
-      this.cancel = false
+      this.cancel = false;
     }
     if (this.clear === true && this.disabled === false) {
-      this.clearIcon = false
+      this.clearIcon = false;
     }
-    this.value = ''
-    this.mask = true
-    this.$element('input').focus({ focus: false })
+    this.value = "";
+    this.mask = true;
+    this.$element("input").focus({ focus: false });
   },
   bindClear() {
-    this.$emit('clear', { inputValue: this.value })
-    this.inputValue ? this.value = this.inputValue : this.value = ''
+    this.$emit("clear", { inputValue: this.value });
+    this.inputValue ? (this.value = this.inputValue) : (this.value = "");
   },
   bindChange(evt) {
-    this.$emit('change', { event: evt })
-    this.value = evt.value
-    if (this.value !== '') {
-      this.clearIcon = true
+    this.$emit("change", { event: evt });
+    this.value = evt.value;
+    if (this.value !== "") {
+      this.clearIcon = true;
     }
   },
   bindCancel() {
-    this.$emit('cancel')
-    this.bindBlur()
+    this.$emit("cancel");
+    this.bindBlur();
   },
   enterEvent(evt) {
-    this.$emit('enterkeyclick', { event: evt })
+    this.$emit("enterkeyclick", { event: evt });
   },
   bindSelectionchange(evt) {
-    this.$emit('selectionchange', { event: evt })
+    this.$emit("selectionchange", { event: evt });
   }
-}
+};
 </script>
 
 <style lang="less">

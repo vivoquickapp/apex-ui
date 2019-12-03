@@ -1,0 +1,126 @@
+<template>
+  <stack class="apex-index">
+    <list id="list" class="apex-index-list">
+      <slot></slot>
+    </list>
+    <div class="apex-index-nav" if="{{ names.length > 0 }}">
+      <block for="{{ names }}">
+        <div class="apex-index-nav-item" onclick="handleClick($item)">
+          <text>{{ $item.name }}</text>
+        </div>
+      </block>
+    </div>
+    <div class="apex-index-indicator" if="{{ showIndicator && isShow}}">
+      <text>{{ currentName }}</text>
+    </div>
+  </stack>
+</template>
+
+<script>
+import vibrator from "@system.vibrator";
+
+export default {
+  data() {
+    return {
+      names: [],
+      isShow: false,
+      currentName: ""
+    };
+  },
+
+  props: {
+    id: {
+      type: String,
+      default: ""
+    },
+
+    showIndicator: {
+      type: Boolean,
+      default: true
+    }
+  },
+
+  onReady() {
+    this.updateIndexItem();
+  },
+
+  updateIndexItem() {
+    this.items.forEach((element, index) => {
+      element.update(index);
+    });
+  },
+
+  updateNames(item = {}) {
+    this.names.push(item);
+  },
+
+  handleClick(item) {
+    if (item.index !== undefined) {
+      this.clearTimer();
+
+      this.$element("list").scrollTo({ index: item.index });
+      this.isShow = true;
+      this.currentName = item.name;
+      vibrator.vibrate({
+        mode: "short"
+      });
+
+      this.timer = setTimeout(() => {
+        this.isShow = false;
+        this.currentName = "";
+      }, 300);
+    }
+  },
+
+  clearTimer() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+  }
+};
+</script>
+
+<style lang="less">
+.apex-index {
+  &-list {
+    flex-direction: column;
+  }
+
+  &-nav {
+    flex-direction: column;
+    position: fixed;
+    right: 0px;
+    top: 250px;
+    align-items: center;
+    justify-content: center;
+
+    &-item {
+      padding: 3px 10px;
+
+      text {
+        color: #000000;
+        font-size: 25px;
+      }
+    }
+  }
+
+  &-indicator {
+    width: 150px;
+    height: 150px;
+    position: fixed;
+    top: 550px;
+    left: 300px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      color: #ffffff;
+      font-size: 50px;
+      font-weight: bold;
+    }
+  }
+}
+</style>

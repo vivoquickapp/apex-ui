@@ -5,187 +5,190 @@
       <div class="circle-box {{activeClass}}">
         <div class="circle"></div>
       </div>
-      <text class="open-text font-icon" if="{{checked&&open}}">{{open || '开启'}}</text>
-      <text class="close-text font-icon" if="{{!checked&&close}}">{{close || '关闭'}}</text>
+      <text class="open-text font-icon" if="{{checked&&open}}">{{
+        open || "开启"
+      }}</text>
+      <text class="close-text font-icon" if="{{!checked&&close}}">{{
+        close || "关闭"
+      }}</text>
     </stack>
   </div>
 </template>
 
 <style lang="less">
-  @import '../styles/base.less';
-  @font-face {
-    font-family: iconfont;
-    src: url('../icon/iconfonts.ttf');
-  }
+@import "../styles/base.less";
+@font-face {
+  font-family: iconfont;
+  src: url("../icon/iconfonts.ttf");
+}
 
-  .font-icon {
-    font-family: iconfont;
-    text-align: center;
-  }
+.font-icon {
+  font-family: iconfont;
+  text-align: center;
+}
 
-  .wrap {
-    width: @SwitchWidth + 0px;
-    height: @SwitchHeight + 0px;
-    border-radius: @SwitchCircleSize + 0px;
-    .open-text {
-      color: #FFFFFF;
-      font-size: 20px;
-      padding-left: 10px;
-    }
-    .close-text {
-      color: #FFFFFF;
-      font-size: 20px;
-      padding-left: 45px;
-    }
+.wrap {
+  width: @SwitchWidth + 0px;
+  height: @SwitchHeight + 0px;
+  border-radius: @SwitchCircleSize + 0px;
+  .open-text {
+    color: #ffffff;
+    font-size: 20px;
+    padding-left: 10px;
   }
-
-  stack {
-    align-items: center;
+  .close-text {
+    color: #ffffff;
+    font-size: 20px;
+    padding-left: 45px;
   }
+}
 
+stack {
+  align-items: center;
+}
+
+.box {
+  width: 100%;
+  height: 100%;
+  border-radius: @SwitchHeight + 0px;
+}
+
+.switch-on {
+  background-color: @SwitchOnColor;
+}
+
+.switch-off {
+  background-color: @SwitchOffColor;
+}
+
+.switch-disabled-on {
   .box {
-    width: 100%;
-    height: 100%;
-    border-radius: @SwitchHeight + 0px;
+    background-color: @SwitchDisabledOnColor;
   }
-
-  .switch-on {
-    background-color: @SwitchOnColor;
-  }
-
-  .switch-off {
-    background-color: @SwitchOffColor;
-  }
-
-  .switch-disabled-on {
-    .box {
-      background-color: @SwitchDisabledOnColor;
-    }
-    .circle {
-
-    }
-  }
-
-  .switch-disabled-off {
-    .box {
-      background-color: @SwitchDisabledOffColor;
-    }
-    .circle {
-      background-color: #cccccc;
-    }
-  }
-
-  .circle-box {
-    padding-left: @SwitchPadding + 0px;
-    padding-right: @SwitchPadding + 0px;
-    width: 100%;
-  }
-
-  .circel-checked {
-    animation-name: checked;
-    animation-duration: 100ms;
-    animation-iteration-count: 1;
-    transform: translateX(@SwitchCircleTranslateX);
-  }
-
-  .circel-dischecked {
-    animation-name: dischecked;
-    animation-duration: 100ms;
-    animation-iteration-count: 1;
-    transform: translateX(0);
-  }
-
   .circle {
-    width: @SwitchCircleSize + 0px;
-    height: @SwitchCircleSize + 0px;
-    border-radius: @SwitchCircleSize + 0px;
-    background-color: @SwitchCircleColor;
   }
+}
 
-  @keyframes checked {
-    0% {
-      transform: translateX(0px);
-    }
-    100% {
-      transform: translateX(@SwitchCircleTranslateX + 0px);
-    }
+.switch-disabled-off {
+  .box {
+    background-color: @SwitchDisabledOffColor;
   }
+  .circle {
+    background-color: #cccccc;
+  }
+}
 
-  @keyframes dischecked {
-    0% {
-      transform: translateX(@SwitchCircleTranslateX + 0px);
-    }
-    100% {
-      transform: translateX(0px);
-    }
+.circle-box {
+  padding-left: @SwitchPadding + 0px;
+  padding-right: @SwitchPadding + 0px;
+  width: 100%;
+}
+
+.circel-checked {
+  animation-name: checked;
+  animation-duration: 100ms;
+  animation-iteration-count: 1;
+  transform: translateX(@SwitchCircleTranslateX);
+}
+
+.circel-dischecked {
+  animation-name: dischecked;
+  animation-duration: 100ms;
+  animation-iteration-count: 1;
+  transform: translateX(0);
+}
+
+.circle {
+  width: @SwitchCircleSize + 0px;
+  height: @SwitchCircleSize + 0px;
+  border-radius: @SwitchCircleSize + 0px;
+  background-color: @SwitchCircleColor;
+}
+
+@keyframes checked {
+  0% {
+    transform: translateX(0px);
   }
+  100% {
+    transform: translateX(@SwitchCircleTranslateX + 0px);
+  }
+}
+
+@keyframes dischecked {
+  0% {
+    transform: translateX(@SwitchCircleTranslateX + 0px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
 </style>
 
 <script>
-    export default {
-        data() {
-            return {
-                activeClass: "circel-checked",
-                bgColor: "circel-checked",
-                checked: this.value
-            };
-        },
-        props: {
-            value: {
-                default: false
-            },
-            open: {
-                default: ''
-            },
-            close: {
-                default: ''
-            },
-            disabled: {
-                default: false
-            },
-            name: {
-                default: ''
-            }
-        },
-
-        onInit() {
-            this.isChecked();
-            this.$watch("value", "checkedChange");
-            this.$watch("disabled", "configChange");
-        },
-        checkedChange() {
-            this.checked = this.value;
-            this.isChecked();
-        },
-        configChange() {
-            this.isChecked();
-        },
-        handleClick() {
-            let disabled = this.disabled;
-            if (!disabled) {
-                this.checked = !this.checked;
-                this.isChecked();
-                this.$emit("change", {checked: this.checked, name: this.name});
-            }
-        },
-        isChecked() {
-            if (this.disabled) {
-                if (this.checked) {
-                    this.activeClass = "circel-checked";
-                    this.bgColor = "switch-disabled-on";
-                } else {
-                    this.activeClass = "circel-dischecked";
-                    this.bgColor = "switch-disabled-off";
-                }
-            } else {
-                if (this.checked) {
-                    this.activeClass = "circel-checked";
-                    this.bgColor = "switch-on";
-                } else {
-                    this.activeClass = "circel-dischecked";
-                    this.bgColor = "switch-off";
-                }
-            }
-        }
+export default {
+  data() {
+    return {
+      activeClass: "circel-checked",
+      bgColor: "circel-checked",
+      checked: this.value
     };
+  },
+  props: {
+    value: {
+      default: false
+    },
+    open: {
+      default: ""
+    },
+    close: {
+      default: ""
+    },
+    disabled: {
+      default: false
+    },
+    name: {
+      default: ""
+    }
+  },
+
+  onInit() {
+    this.isChecked();
+    this.$watch("value", "checkedChange");
+    this.$watch("disabled", "configChange");
+  },
+  checkedChange() {
+    this.checked = this.value;
+    this.isChecked();
+  },
+  configChange() {
+    this.isChecked();
+  },
+  handleClick() {
+    let disabled = this.disabled;
+    if (!disabled) {
+      this.checked = !this.checked;
+      this.isChecked();
+      this.$emit("change", { checked: this.checked, name: this.name });
+    }
+  },
+  isChecked() {
+    if (this.disabled) {
+      if (this.checked) {
+        this.activeClass = "circel-checked";
+        this.bgColor = "switch-disabled-on";
+      } else {
+        this.activeClass = "circel-dischecked";
+        this.bgColor = "switch-disabled-off";
+      }
+    } else {
+      if (this.checked) {
+        this.activeClass = "circel-checked";
+        this.bgColor = "switch-on";
+      } else {
+        this.activeClass = "circel-dischecked";
+        this.bgColor = "switch-off";
+      }
+    }
+  }
+};
 </script>

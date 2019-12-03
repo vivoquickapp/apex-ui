@@ -1,139 +1,176 @@
 <import name="my-icon" src="../icon/index.ux"></import>
 <template>
   <div class="{{visible ? 'wrap': ''}}">
-    <div class="apex-toast-mask" if="{{ visible && mask }}" onclick="hideToast"></div>
+    <div
+      class="apex-toast-mask"
+      if="{{ visible && mask }}"
+      onclick="hideToast"
+    ></div>
     <div class="apex-class apex-toast" if="{{ visible }}">
       <block if="{{ type !== 'default' }}">
         <div class="apex-toast-type">
-          <my-icon color="#ffffff" type="information-circle-outline" if="{{ type === 'info' }}" size="80"></my-icon>
-          <my-icon color="#ffffff" type="checkmark-circle-outline" if="{{ type === 'success' }}" size="80"></my-icon>
-          <my-icon color="#ffffff" type="warning" if="{{ type === 'warning' }}" size="80"></my-icon>
-          <my-icon color="#ffffff" type="close-circle-outline" if="{{ type === 'error' }}" size="80"></my-icon>
-          <progress class="loading" type="circular" if="{{ type === 'loading' }}"></progress>
+          <my-icon
+            color="#ffffff"
+            type="information-circle-outline"
+            if="{{ type === 'info' }}"
+            size="80"
+          ></my-icon>
+          <my-icon
+            color="#ffffff"
+            type="checkmark-circle-outline"
+            if="{{ type === 'success' }}"
+            size="80"
+          ></my-icon>
+          <my-icon
+            color="#ffffff"
+            type="warning"
+            if="{{ type === 'warning' }}"
+            size="80"
+          ></my-icon>
+          <my-icon
+            color="#ffffff"
+            type="close-circle-outline"
+            if="{{ type === 'error' }}"
+            size="80"
+          ></my-icon>
+          <progress
+            class="loading"
+            type="circular"
+            if="{{ type === 'loading' }}"
+          ></progress>
         </div>
       </block>
       <block else>
         <div class="custom-icon" if="{{ icon }}">
-          <my-icon color="#ffffff" apex-class="apex-toast-icon" type="{{ icon }}" if="{{ icon }}" size="80"></my-icon>
+          <my-icon
+            color="#ffffff"
+            apex-class="apex-toast-icon"
+            type="{{ icon }}"
+            if="{{ icon }}"
+            size="80"
+          ></my-icon>
         </div>
-        <image class="apex-toast-image" src="{{ image }}" if="{{ image }}"></image>
+        <image
+          class="apex-toast-image"
+          src="{{ image }}"
+          if="{{ image }}"
+        ></image>
       </block>
       <text class="apex-toast-content" if="{{ content }}">{{ content }}</text>
     </div>
   </div>
 </template>
 <style lang="less">
-  @import "../styles/base.less";
+@import "../styles/base.less";
 
-  .wrap {
+.wrap {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.apex-toast {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  margin: 0 auto;
+  padding: 10px 18px;
+  border-radius: 8px;
+
+  text {
+    color: #fff;
+    text-align: center;
+    font-size: @size-font-small;
+    lines: 1;
+    padding: 0 20px;
+    text-overflow: ellipsis;
+  }
+
+  .loading {
+    color: #ffffff;
+    height: 60px;
+    width: 60px;
+  }
+
+  .custom-icon {
+    margin: 15px;
+  }
+
+  &-type {
+    justify-content: center;
+    margin: 15px;
+  }
+
+  &-mask {
     position: fixed;
-    height: 100%;
-    width: 100%;
-    flex-direction: column;
-    justify-content: center;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 
-  .apex-toast {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    margin: 0 auto;
-    padding: 10px 18px;
-    border-radius: 8px;
-
-    text {
-      color: #fff;
-      text-align: center;
-      font-size: @size-font-small;
-      lines: 1;
-      padding: 0 20px;
-      text-overflow: ellipsis;
-    }
-
-    .loading {
-      color: #FFFFFF;
-      height: 60px;
-      width: 60px;
-    }
-
-    .custom-icon {
-      margin: 15px;
-    }
-
-    &-type {
-      justify-content: center;
-      margin: 15px;
-    }
-
-    &-mask {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-    }
-
-    &-icon {
-      font-size: 38px;
-      margin-bottom: 6px;
-    }
-
-    &-image {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      margin: 15px;
-    }
+  &-icon {
+    font-size: 38px;
+    margin-bottom: 6px;
   }
+
+  &-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin: 15px;
+  }
+}
 </style>
 <script>
-    const defaultData = {
-        visible: false,
-        content: '',
-        icon: '',
-        image: '',
-        duration: 2,
-        mask: true,
-        type: 'default', // default || success || warning || error || loading
+const defaultData = {
+  visible: false,
+  content: "",
+  icon: "",
+  image: "",
+  duration: 2,
+  mask: true,
+  type: "default" // default || success || warning || error || loading
+};
+let timmer = null;
+
+export default {
+  data() {
+    return {
+      ...defaultData
     };
-    let timmer = null;
+  },
 
-    export default {
-        data() {
-            return {
-                ...defaultData
-            }
-        },
+  onInit() {},
 
-        onInit() {
-        },
+  showToast(options) {
+    const { type = "default", duration = 2 } = options;
 
-        showToast(options) {
-            const {type = 'default', duration = 2} = options;
+    console.log("duration", duration);
+    Object.assign(this._data, {
+      ...options,
+      type: type,
+      duration: duration,
+      visible: true
+    });
+    const d = this._data.duration * 1000;
 
-            console.log('duration', duration);
-            Object.assign(this._data, {
-                ...options,
-                type: type,
-                duration: duration,
-                visible: true
-            });
-            const d = this._data.duration * 1000;
-
-            if (timmer) clearTimeout(timmer);
-            if (d !== 0) {
-                timmer = setTimeout(() => {
-                    this.hideToast();
-                    timmer = null;
-                }, d);
-            }
-        },
-
-        hideToast() {
-            Object.assign(this._data, {
-                ...defaultData
-            });
-        }
+    if (timmer) clearTimeout(timmer);
+    if (d !== 0) {
+      timmer = setTimeout(() => {
+        this.hideToast();
+        timmer = null;
+      }, d);
     }
+  },
+
+  hideToast() {
+    Object.assign(this._data, {
+      ...defaultData
+    });
+  }
+};
 </script>

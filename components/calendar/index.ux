@@ -1,9 +1,13 @@
 <template>
   <div class="apex-calendar">
     <div class="mask" show="{{showup}}" onclick="showMask"></div>
-    <div class="calendar" style="background-color:{{bgColor}}" show="{{showup}}">
+    <div
+      class="calendar"
+      style="background-color:{{bgColor}}"
+      show="{{showup}}"
+    >
       <slot name="title">
-        <text class="message">{{title}}</text>
+        <text class="message">{{ title }}</text>
       </slot>
       <div class="weekday">
         <text class="red">日</text>
@@ -16,26 +20,32 @@
       </div>
       <stack class="calendar-data">
         <list class="outer-list">
-          <list-item style="flex-direction: column;" for="{{monthItem in calendar}}" type="month">
+          <list-item
+            style="flex-direction: column;"
+            for="{{monthItem in calendar}}"
+            type="month"
+          >
             <text class="date" style="background-color:{{subtitle}}">
-              {{monthItem.year}}年{{monthItem.month}}月
+              {{ monthItem.year }}年{{ monthItem.month }}月
             </text>
             <div class="inner-list">
-              <div for="{{day in monthItem.allDays}}" class="list-item {{day.fullDate < yearTodate ? 'list-item-disabled':''}}" onclick="touchItem(day)" style="background-color:{{ step1 === day || step1 === day.fullDate || step2 === day ? clickStyle[0] : arr.indexOf(day.fullDate) ! == -1 ? clickStyle[1] : bgColor }}">
-                <text>{{day.day}}</text>
+              <div
+                for="{{day in monthItem.allDays}}"
+                class="list-item {{day.fullDate < yearTodate ? 'list-item-disabled':''}}"
+                onclick="touchItem(day)"
+                style="background-color:{{ step1 === day || step1 === day.fullDate || step2 === day ? clickStyle[0] : arr.indexOf(day.fullDate) ! == -1 ? clickStyle[1] : bgColor }}"
+              >
+                <text>{{ day.day }}</text>
               </div>
             </div>
           </list-item>
         </list>
         <div class="top" if="!!currentYear">
-          <text class="date">
-            {{currentYear}}年{{currentMonth}}月
-          </text>
+          <text class="date"> {{ currentYear }}年{{ currentMonth }}月 </text>
         </div>
       </stack>
     </div>
   </div>
-
 </template>
 <style lang="less">
 .calendar {
@@ -123,358 +133,379 @@ export default {
       default: false
     },
     title: {
-      default: 'test message'
+      default: "test message"
     },
     trip: {
-      default: ''
+      default: ""
     },
     number: {
       default: 8
     },
     bgColor: {
-      default: '#ffffff'
+      default: "#ffffff"
     },
     subtitle: {
-      default: 'aliceblue'
+      default: "aliceblue"
     },
     clickStyle: {
       type: Array,
-      default: ['#f7c992', '#ffe4c4']
+      default: ["#f7c992", "#ffe4c4"]
     }
   },
   data() {
     return {
-      currentYear: '',
-      currentMonth: '',
+      currentYear: "",
+      currentMonth: "",
       appearCount: 0,
       calendar: [],
       count: 0,
-      step1: '',
-      step2: '',
+      step1: "",
+      step2: "",
       arr: [],
-      yearTodate: '',
+      yearTodate: "",
       go: {},
       back: {},
       showup: false,
-      type: 'single',
-    }
+      type: "single"
+    };
   },
   onInit() {
-    this.calendar = this.fillCalendar(parseInt(this.number))
-    this.$watch('visible', 'visibleHandler')
-    this.$watch('trip', 'typeHandler')
-    this.getToday()
+    this.calendar = this.fillCalendar(parseInt(this.number));
+    this.$watch("visible", "visibleHandler");
+    this.$watch("trip", "typeHandler");
+    this.getToday();
   },
   visibleHandler(newValue, oldValue) {
     if (newValue) {
-      this.showup = newValue
+      this.showup = newValue;
     }
   },
   typeHandler(newV, oldV) {
-    this.type = newV
-    if (newV !== oldV && oldV !== '') {
-      this.clearcalendar()
+    this.type = newV;
+    if (newV !== oldV && oldV !== "") {
+      this.clearcalendar();
     }
   },
   activeToday(year, month, today) {
     this.calendar.forEach(item => {
       if (item.year === year && item.month === month) {
         item.allDays.forEach(ele => {
-          ele.day === today ? this.yearTodate = ele.fullDate : null
-        })
+          ele.day === today ? (this.yearTodate = ele.fullDate) : null;
+        });
       }
-    })
+    });
   },
   getToday() {
-    const date = new Date()
-    let year = date.getFullYear()
-    let month = date.getMonth() + 1
-    let today = date.getDate()
-    this.activeToday(year, month, today)
+    const date = new Date();
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let today = date.getDate();
+    this.activeToday(year, month, today);
   },
   showMask() {
-    this.showup = false
+    this.showup = false;
   },
   getMonthDays(year, month) {
-    return new Date(year, month, 0).getDate()
+    return new Date(year, month, 0).getDate();
   },
   getWeekday(year, month, day) {
-    return new Date(year, month - 1, day).getDay()
+    return new Date(year, month - 1, day).getDay();
   },
   getFirstDayOfMonth(year, month) {
-    return this.getWeekday(year, month, 1)
+    return this.getWeekday(year, month, 1);
   },
   getEmptyGrids(year, month) {
     // FirstDayOfMonth代表本月的第一天是星期几
-    const FirstDayOfMonth = this.getFirstDayOfMonth(year, month)
-    let emptyGrids = []
+    const FirstDayOfMonth = this.getFirstDayOfMonth(year, month);
+    let emptyGrids = [];
     // 有空格的情况
     if (FirstDayOfMonth > 0) {
       for (let i = 0; i < FirstDayOfMonth; i++) {
         emptyGrids.push({
-          'num': '',
-          'fullDate': 'x'  //x是我自己定义的一个值，代表没有日期
-        })
+          num: "",
+          fullDate: "x" //x是我自己定义的一个值，代表没有日期
+        });
       }
       // 将空格放入数组
-      return emptyGrids
+      return emptyGrids;
     } else {
       // 否则返回一个新数组
-      return []
+      return [];
     }
   },
   getNextMonthGrids(year, month) {
     // FirstDayOfMonth代表本月的第一天是星期几
-    const FirstDayOfMonth = this.getFirstDayOfMonth(year, month)
-    let emptyGrids = []
+    const FirstDayOfMonth = this.getFirstDayOfMonth(year, month);
+    let emptyGrids = [];
     // 有空格的情况
     if (FirstDayOfMonth > 0) {
       for (let i = 0; i < 7 - FirstDayOfMonth; i++) {
         emptyGrids.push({
-          'num': '',
-          'fullDate': 'x'  //x是我自己定义的一个值，代表没有日期
-        })
+          num: "",
+          fullDate: "x" //x是我自己定义的一个值，代表没有日期
+        });
       }
       // 将空格放入数组
-      return emptyGrids
+      return emptyGrids;
     } else {
       // 否则返回一个新数组
-      return []
+      return [];
     }
   },
   getDaysOfThisMonth(year, month) {
-    let days = []
-    const AllDaysOfMonth = this.getMonthDays(year, month)
-    let fullMonth = month.toString().length === 1 ? `0${month}` : month
+    let days = [];
+    const AllDaysOfMonth = this.getMonthDays(year, month);
+    let fullMonth = month.toString().length === 1 ? `0${month}` : month;
     for (let i = 0; i < AllDaysOfMonth; i++) {
       let day = i + 1,
-        fullDay = day
-      fullDay = fullDay.toString().length === 1 ? `0${day}` : fullDay
+        fullDay = day;
+      fullDay = fullDay.toString().length === 1 ? `0${day}` : fullDay;
       days.push({
         day,
         fullDay,
-        'fullDate': `${year}-${fullMonth}-${fullDay}`
-      })
+        fullDate: `${year}-${fullMonth}-${fullDay}`
+      });
     }
     // 返回每个月的具体日期
-    return days
+    return days;
   },
   fillCalendar(n = 1) {
-    const time = new Date()
-    let year = time.getFullYear()
-    let month = time.getMonth() + 1
-    let fullMonth
-    let calendar = []
+    const time = new Date();
+    let year = time.getFullYear();
+    let month = time.getMonth() + 1;
+    let fullMonth;
+    let calendar = [];
     // 计算年月以及具体日历
     for (let i = month; i < time.getMonth() + 1 + n; i++) {
-      let emptyGrids = this.getEmptyGrids(year, month)
-      let nextMonthGrids = this.getNextMonthGrids(year, month + 1)
-      let daysOfThisMonth = this.getDaysOfThisMonth(year, month)
+      let emptyGrids = this.getEmptyGrids(year, month);
+      let nextMonthGrids = this.getNextMonthGrids(year, month + 1);
+      let daysOfThisMonth = this.getDaysOfThisMonth(year, month);
       // 把空格和具体日历合为一个数组
-      let allDays = [...emptyGrids, ...daysOfThisMonth, ...nextMonthGrids]
+      let allDays = [...emptyGrids, ...daysOfThisMonth, ...nextMonthGrids];
       // 对年份和月份的计算做一些判断
       if (month > 12) {
-        year++
-        month = 1
-        fullMonth = '01'
+        year++;
+        month = 1;
+        fullMonth = "01";
         calendar.push({
           year,
           month,
           fullMonth,
           allDays
-        })
-        month++
+        });
+        month++;
       } else if (month === 12) {
-        month = 12
-        fullMonth = '12'
+        month = 12;
+        fullMonth = "12";
         calendar.push({
           year,
           month,
           fullMonth,
           allDays
-        })
-        month = 1
-        year++
+        });
+        month = 1;
+        year++;
       } else {
-        fullMonth = month.toString().length === 1 ? `0${month}` : month
+        fullMonth = month.toString().length === 1 ? `0${month}` : month;
         calendar.push({
           year,
           month,
           fullMonth,
           allDays
-        })
-        month++
+        });
+        month++;
       }
     }
-    console.log('calendar', calendar)
-    return calendar
+    console.log("calendar", calendar);
+    return calendar;
   },
   touchItem(day) {
-    if (day.fullDate < this.yearTodate || day.fullDate === 'x') {
-      return
+    if (day.fullDate < this.yearTodate || day.fullDate === "x") {
+      return;
     }
     if (this.count === 0) {
-      if (this.step2 !== '') {
-        this.clearcalendar()
+      if (this.step2 !== "") {
+        this.clearcalendar();
       } else {
-        if (this.type === 'round') {
-          this.count += 1
-          this.step1 = day
+        if (this.type === "round") {
+          this.count += 1;
+          this.step1 = day;
         }
-        if (this.type === 'single') {
-          let obj = {}
-          this.step1 = day.fullDate
-          obj = this.returnDateArr(this.step1)
-          this.submit(obj)
+        if (this.type === "single") {
+          let obj = {};
+          this.step1 = day.fullDate;
+          obj = this.returnDateArr(this.step1);
+          this.submit(obj);
         }
       }
     } else {
-      this.count -= 1
-      this.step2 = day
+      this.count -= 1;
+      this.step2 = day;
       // 开始计算步长
-      const step1Date = this.step1.fullDate.split('-')
-      const step2Date = this.step2.fullDate.split('-')
+      const step1Date = this.step1.fullDate.split("-");
+      const step2Date = this.step2.fullDate.split("-");
       const params = {
         step1Date,
         step2Date,
         theDayOfGo: parseInt(step1Date[2]),
         theDayOfBack: parseInt(step2Date[2]),
         countDistance: this.getMonthDays(step1Date[0], step1Date[1])
-      }
+      };
       if (params.step1Date[0] === params.step2Date[0]) {
-        this.theSameYear(params)
+        this.theSameYear(params);
       }
       if (params.step1Date[0] < params.step2Date[0]) {
-        this.differYears(params)
+        this.differYears(params);
       }
       if (params.step1Date[0] > params.step2Date[0]) {
-        this.clearcalendar()
+        this.clearcalendar();
       }
     }
   },
   clearcalendar() {
-    this.step1 = ''
-    this.step2 = ''
-    this.arr = []
+    this.step1 = "";
+    this.step2 = "";
+    this.arr = [];
   },
   clearSteps(step1Date, step2Date) {
     if (step1Date[0] === step2Date[0]) {
-      if (step1Date[1] > step2Date[1] || (step1Date[1] === step2Date[1] && step1Date[2] > step2Date[2])) {
-        this.clearcalendar()
+      if (
+        step1Date[1] > step2Date[1] ||
+        (step1Date[1] === step2Date[1] && step1Date[2] > step2Date[2])
+      ) {
+        this.clearcalendar();
       }
     }
   },
   filterTheDate(idx, dateArr, gapOfMonths) {
     if (!gapOfMonths) {
       // 相差月份为0的月份之间(例如:8-9月,或1-2月)
-      idx < 10 ? this.arr.unshift(`${dateArr[0]}-${dateArr[1]}-0${idx}`) : this.arr.push(`${dateArr[0]}-${dateArr[1]}-${idx}`)
+      idx < 10
+        ? this.arr.unshift(`${dateArr[0]}-${dateArr[1]}-0${idx}`)
+        : this.arr.push(`${dateArr[0]}-${dateArr[1]}-${idx}`);
     } else {
       // 相差月份不为0的月份之间(例如:10月-12月,1月-5月)
       if (gapOfMonths < 10) {
-        idx < 10 ? this.arr.push(`${dateArr[0]}-0${gapOfMonths}-0${idx}`) : this.arr.push(`${dateArr[0]}-0${gapOfMonths}-${idx}`)
+        idx < 10
+          ? this.arr.push(`${dateArr[0]}-0${gapOfMonths}-0${idx}`)
+          : this.arr.push(`${dateArr[0]}-0${gapOfMonths}-${idx}`);
       } else {
-        idx < 10 ? this.arr.push(`${dateArr[0]}-${gapOfMonths}-0${idx}`) : this.arr.push(`${dateArr[0]}-${gapOfMonths}-${idx}`)
+        idx < 10
+          ? this.arr.push(`${dateArr[0]}-${gapOfMonths}-0${idx}`)
+          : this.arr.push(`${dateArr[0]}-${gapOfMonths}-${idx}`);
       }
     }
   },
   getTheMoths(gapOfMonths, month, date) {
     for (let i = 1; i < gapOfMonths; i++) {
-      let thisMonth = parseInt(month) + i
-      let days = this.getMonthDays(date[0], Math.abs(thisMonth))
+      let thisMonth = parseInt(month) + i;
+      let days = this.getMonthDays(date[0], Math.abs(thisMonth));
       for (let k = 1; k <= days; k++) {
-        this.filterTheDate(k, date, Math.abs(thisMonth))
+        this.filterTheDate(k, date, Math.abs(thisMonth));
       }
     }
   },
   theSameYear(params) {
     // 相同年份
-    const { step1Date, step2Date, theDayOfGo, theDayOfBack, countDistance } = params
-    let monthsBetweenMonths = parseInt(step2Date[1]) - parseInt(step1Date[1])
+    const {
+      step1Date,
+      step2Date,
+      theDayOfGo,
+      theDayOfBack,
+      countDistance
+    } = params;
+    let monthsBetweenMonths = parseInt(step2Date[1]) - parseInt(step1Date[1]);
     if (monthsBetweenMonths > 0) {
-      this.getTheMoths(monthsBetweenMonths, step1Date[1], step1Date)
-      monthsBetweenMonths = 0
+      this.getTheMoths(monthsBetweenMonths, step1Date[1], step1Date);
+      monthsBetweenMonths = 0;
     }
     if (monthsBetweenMonths === 0) {
       if (step1Date[2] <= step2Date[2] && step1Date[1] === step2Date[1]) {
         for (let i = theDayOfGo; i <= step2Date[2]; i++) {
-          this.filterTheDate(i, step2Date)
+          this.filterTheDate(i, step2Date);
         }
-        this.getRound()
+        this.getRound();
       }
       if (step1Date[1] < step2Date[1]) {
         for (let i = theDayOfGo; i <= countDistance; i++) {
-          this.filterTheDate(i, step1Date)
+          this.filterTheDate(i, step1Date);
         }
         for (let j = 1; j <= theDayOfBack; j++) {
-          this.filterTheDate(j, step2Date)
+          this.filterTheDate(j, step2Date);
         }
-        this.getRound()
+        this.getRound();
       }
     }
-    this.clearSteps(step1Date, step2Date)
+    this.clearSteps(step1Date, step2Date);
   },
   differYears(params) {
     // 不同年份
-    const { step1Date, step2Date, theDayOfGo, theDayOfBack, countDistance } = params
-    const step1AfterMonths = 12 - parseInt(step1Date[1]) + 1
-    const step2BeforeMonths = parseInt(step2Date[1])
-    let theMonthsBetweenTwoYears = step1AfterMonths + step2BeforeMonths
+    const {
+      step1Date,
+      step2Date,
+      theDayOfGo,
+      theDayOfBack,
+      countDistance
+    } = params;
+    const step1AfterMonths = 12 - parseInt(step1Date[1]) + 1;
+    const step2BeforeMonths = parseInt(step2Date[1]);
+    let theMonthsBetweenTwoYears = step1AfterMonths + step2BeforeMonths;
     if (theMonthsBetweenTwoYears > 0) {
-      this.getTheMoths(step1AfterMonths, step1Date[1], step1Date)
-      this.getTheMoths(step2BeforeMonths, -step2Date[1], step2Date)
-      theMonthsBetweenTwoYears = 0
+      this.getTheMoths(step1AfterMonths, step1Date[1], step1Date);
+      this.getTheMoths(step2BeforeMonths, -step2Date[1], step2Date);
+      theMonthsBetweenTwoYears = 0;
     }
     if (theMonthsBetweenTwoYears === 0) {
       for (let i = theDayOfGo; i <= countDistance; i++) {
-        this.filterTheDate(i, step1Date)
+        this.filterTheDate(i, step1Date);
       }
       for (let j = 1; j <= theDayOfBack; j++) {
-        this.filterTheDate(j, step2Date)
+        this.filterTheDate(j, step2Date);
       }
-      this.getRound()
+      this.getRound();
     }
-    this.clearSteps(step1Date, step2Date)
+    this.clearSteps(step1Date, step2Date);
   },
   getRound() {
     // 数组排序
-    this.arr = this.arr.sort()
-    let goArr = this.arr[0].split('-')
-    let backArr = this.arr[this.arr.length - 1].split('-')
-    this.go = this.returnDateArr(goArr)
-    this.back = this.returnDateArr(backArr)
-    this.submit()
+    this.arr = this.arr.sort();
+    let goArr = this.arr[0].split("-");
+    let backArr = this.arr[this.arr.length - 1].split("-");
+    this.go = this.returnDateArr(goArr);
+    this.back = this.returnDateArr(backArr);
+    this.submit();
   },
   returnDateArr(date) {
-    let str = ''
-    let arr = []
-    if (typeof (date) === 'object') {
-      str = date.join('/')
-      arr = date
+    let str = "";
+    let arr = [];
+    if (typeof date === "object") {
+      str = date.join("/");
+      arr = date;
     } else {
-      str = date.replace(/-/g, '/')
-      arr = date.split('-')
+      str = date.replace(/-/g, "/");
+      arr = date.split("-");
     }
-    const weekArr = ['日', '一', '二', '三', '四', '五', '六']
-    const weekIdx = new Date(Date.parse(str)).getDay()
+    const weekArr = ["日", "一", "二", "三", "四", "五", "六"];
+    const weekIdx = new Date(Date.parse(str)).getDay();
     const obj = {
       year: parseInt(arr[0]),
       month: parseInt(arr[1]),
       day: parseInt(arr[2]),
       week: weekArr[weekIdx]
-    }
-    return obj
+    };
+    return obj;
   },
   submit(obj) {
     if (!obj) {
       obj = {
         start: this.go,
         end: this.back
-      }
+      };
     }
-    this.$emit('schedule', { data: JSON.stringify(obj), message: 'success' })
+    this.$emit("schedule", { data: JSON.stringify(obj), message: "success" });
     setTimeout(() => {
-      this.showMask()
+      this.showMask();
     }, 150);
-  },
-}
+  }
+};
 </script>

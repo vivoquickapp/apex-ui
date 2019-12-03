@@ -5,43 +5,44 @@
 </template>
 
 <style lang="less">
-  @import "../styles/base.less";
+@import "../styles/base.less";
 
-  .apex-checkbox-group {
-    flex-direction: column;
-  }
-
+.apex-checkbox-group {
+  flex-direction: column;
+}
 </style>
 
 <script>
-    export default {
-        data() {
-            return {};
-        },
-        props: {
-            current: {
-                default: []
-            },
-        },
-        onInit() {
-            this.$watch('current', 'changeCurrent');
-        },
-        onReady() {
-            this.changeCurrent();
-        },
-        changeCurrent(val = this.current) {
-            let items = this.$child('checkbox-group')._parent._childrenVms.filter(item => {
-                return item._type === 'my-checkbox'
-            })
-            const len = items.length;
-            if (len > 0) {
-                items.forEach(item => {
-                    item.changeCurrent(val.indexOf(item._attrs.name) !== -1);
-                });
-            }
-        },
-        emitEvent(params) {
-            this.$emit('change', params);
-        }
-    };
+export default {
+  data() {
+    return {};
+  },
+  props: {
+    current: {
+      default: []
+    }
+  },
+  onInit() {
+    this.$watch("current", "changeCurrent");
+  },
+  onReady() {
+    this.changeCurrent();
+  },
+  changeCurrent(val = this.current) {
+    let items = this.$child("checkbox-group")._parent._childrenVms.filter(
+      item => {
+        return item._type === "my-checkbox";
+      }
+    );
+    const len = items.length;
+    if (len > 0) {
+      items.forEach(item => {
+        item.changeCurrent(val.indexOf(item._attrs.name) !== -1);
+      });
+    }
+  },
+  emitEvent(params) {
+    this.$emit("change", params);
+  }
+};
 </script>

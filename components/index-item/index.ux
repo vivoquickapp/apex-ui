@@ -1,0 +1,70 @@
+<template>
+  <list-item type="index-item" class="apex-index-item">
+    <div class="apex-index-item-hd">
+      <text class="name">{{ name }}</text>
+    </div>
+    <div class="apex-index-item-bd">
+      <slot></slot>
+    </div>
+  </list-item>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      index: 0
+    };
+  },
+
+  props: {
+    name: {
+      type: String,
+      default: ""
+    },
+    groupId: {
+      type: String,
+      default: ""
+    }
+  },
+
+  onReady() {
+    const parent = this.$parent().$child(this.groupId);
+    this.parent = parent;
+    const temp = parent.items;
+    const items = temp ? [...temp, this] : [this];
+    parent.items = items;
+  },
+
+  update(index = this.index) {
+    this.index = index;
+    if (this.name) {
+      this.parent.updateNames({
+        index: this.index,
+        name: this.name
+      });
+    }
+  }
+};
+</script>
+
+<style lang="less">
+.apex-index-item {
+  flex-direction: column;
+
+  &-bd {
+    flex-direction: column;
+  }
+
+  &-hd {
+    background-color: #eee;
+    padding: 10px 25px;
+
+    .name {
+      color: #000000;
+      font-size: 40px;
+      font-weight: bold;
+    }
+  }
+}
+</style>
