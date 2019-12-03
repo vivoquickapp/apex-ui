@@ -1,0 +1,463 @@
+<import name="my-icon" src="../icon/index"></import>
+
+<template>
+  <div class="filterbar-wrap">
+    <div class="filterbar-bd">
+      <div>
+        <block for="{{(index,item) in items}}">
+          <div
+            class="filterbar-item"
+            if="{{item.type==='radio'}}"
+            style="width:{{width}};"
+            onclick="handleClick(item)"
+          >
+            <!-- 如果当前radio的option被选中则显示option的label -->
+            <text style="color:{{radioLabel?'#f15353':'#000'}};">{{
+              radioLabel || item.label
+            }}</text>
+            <my-icon
+              type="arrow-down"
+              size="20"
+              color="{{radioLabel?'#f15353':'#bbb'}}"
+            ></my-icon>
+          </div>
+          <div
+            class="filterbar-item"
+            if="{{item.type==='text'}}"
+            style="width:{{width}};"
+            onclick="handleClick(item)"
+          >
+            <text
+              style="color:{{item.value === barResult ?'#f15353':'#000'}};"
+              >{{ item.label }}</text
+            >
+          </div>
+          <div
+            class="filterbar-item"
+            if="{{item.type==='sort'}}"
+            style="width:{{width}};"
+            onclick="handleClick(item)"
+          >
+            <text
+              style="color:{{barResult.indexOf(item.value) === 0 ?'#f15353':'#000'}};"
+              >{{ item.label }}</text
+            >
+            <div class="filterbar-item-icons">
+              <my-icon
+                type="arrow-up"
+                size="15"
+                color="{{barResult === ''+item.value+true?'#f15353':'#bbb'}}"
+              ></my-icon>
+              <my-icon
+                type="arrow-down"
+                size="15"
+                color="{{barResult === ''+item.value+false?'#f15353':'#bbb'}}"
+              ></my-icon>
+            </div>
+          </div>
+          <div
+            class="filterbar-item"
+            if="{{item.type==='filter'}}"
+            style="width:{{width}};"
+            onclick="handleClick(item)"
+          >
+            <text style="color:{{hasSideFilter ?'#f15353':'#000'}};">{{
+              item.label
+            }}</text>
+            <my-icon
+              type="funnel"
+              size="30"
+              color="{{hasSideFilter ?'#f15353':'#ddd'}}"
+            ></my-icon>
+          </div>
+        </block>
+      </div>
+      <div
+        class="filterbar-options"
+        if="{{options.length > 0 && isRadioClick}}"
+      >
+        <block for="{{options}}">
+          <div
+            class="filterbar-options-item"
+            onclick="handleOptionClick($item)"
+          >
+            <text>{{ $item.label }}</text>
+            <div
+              class="filterbar-options-item-icon"
+              if="{{$item.value === barResult}}"
+            >
+              <my-icon type="checkmark" size="70" color="#f15353"></my-icon>
+            </div>
+          </div>
+        </block>
+      </div>
+    </div>
+    <div class="filterbar-side" if="{{showSideFilter}}">
+      <div class="filterbar-side-backdrop" onclick="closeSideFilter"></div>
+      <div class="filterbar-side-filter">
+        <list class="filterbar-side-filter-list">
+          <block for="{{(index,child) in filterChildren}}">
+            <list-item class="filterbar-side-filter-listitem" type="option">
+              <div class="filterbar-side-filter-listitem-hd">
+                <text>{{ child.label }}</text>
+              </div>
+              <div class="filterbar-side-filter-listitem-bd">
+                <block for="{{child.children}}">
+                  <text
+                    class="side-filter-item {{!!sideResult[index] && sideResult[index].includes($item.value)?'side-filter-item-clicked':''}}"
+                    onclick="handleFilterClick($item,index,child)"
+                    >{{ $item.label }}</text
+                  >
+                </block>
+              </div>
+            </list-item>
+          </block>
+        </list>
+        <div class="filterbar-side-filter-buttons">
+          <input
+            class="filterbar-side-filter-buttons-reset"
+            type="button"
+            value="{{cancelText}}"
+            onclick="handleReset"
+          />
+          <input
+            class="filterbar-side-filter-buttons-confirm"
+            type="button"
+            value="{{confirmText}}"
+            onclick="handleConfirm"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      barResult: "", //顶部筛选栏结果
+      sideResult: [], //侧边筛选栏结果
+      tempSideResult: [],
+      options: [],
+      showSideFilter: false,
+      isRadioClick: false
+    };
+  },
+
+  props: {
+    items: {
+      type: Array,
+      default: []
+    },
+    confirmText: {
+      type: String,
+      default: "确定"
+    },
+    cancelText: {
+      type: String,
+      default: "重置"
+    }
+  },
+
+  computed: {
+    width() {
+      return `${100 / this.items.length}%`;
+    },
+    radioLabel() {
+      let result = "";
+      if (this.options.length > 0) {
+        const tempArr = this.options.filter(item => {
+          return item.value === this.barResult;
+        });
+        result = tempArr.length > 0 ? tempArr[0].label : "";
+      }
+      return result;
+    },
+    //侧边筛选栏筛选条件
+    filterChildren() {
+      const tempArr = this.items.filter(item => {
+        return item.type === "filter";
+      });
+      if (tempArr.length > 0) {
+        return tempArr[0].children;
+      } else {
+        return [];
+      }
+    },
+    hasSideFilter() {
+      return (
+        !!this.sideResult &&
+        this.sideResult.some(item => !!item && item.length > 0)
+      );
+    }
+  },
+
+  onInit() {
+    this.initSideResult();
+    this.initResult();
+  },
+
+  handleClick(item) {
+    if (item.type === "radio") {
+      this.options = item.children;
+      this.isRadioClick = !this.isRadioClick;
+    }
+    if (item.type === "text") {
+      this.options = [];
+      this.barResult = item.value;
+      this.handleEmit();
+    }
+    if (item.type === "sort") {
+      this.options = [];
+      if (
+        this.barResult.indexOf(item.value) !== 0 ||
+        this.barResult === "" + item.value + false
+      ) {
+        this.barResult = "" + item.value + true;
+      } else if (this.barResult === "" + item.value + true) {
+        this.barResult = "" + item.value + false;
+      }
+      this.handleEmit();
+    }
+    if (item.type === "filter") {
+      this.showSideFilter = true;
+      this.tempSideResult = JSON.stringify(this.sideResult);
+    }
+  },
+
+  handleOptionClick(item) {
+    this.barResult = item.value;
+    this.isRadioClick = false;
+    this.handleEmit();
+  },
+
+  closeSideFilter() {
+    this.showSideFilter = false;
+    this.sideResult = JSON.parse(this.tempSideResult);
+  },
+
+  handleFilterClick(item, index, child) {
+    if (child.type === "radio") {
+      if (!this.sideResult[index] || !this.sideResult[index].length) {
+        this.sideResult.splice(index, 1, [item.value]);
+      } else if (this.sideResult[index][0] !== item.value) {
+        this.sideResult.splice(index, 1, [item.value]);
+      } else if (this.sideResult[index][0] === item.value) {
+        this.sideResult.splice(index, 1, []);
+      }
+    }
+    if (child.type === "checkbox") {
+      if (!this.sideResult[index] || !this.sideResult[index].length) {
+        this.sideResult.splice(index, 1, [item.value]);
+      } else if (!this.sideResult[index].includes(item.value)) {
+        this.sideResult.splice(index, 1, [
+          ...this.sideResult[index],
+          item.value
+        ]);
+      } else if (this.sideResult[index].includes(item.value)) {
+        this.sideResult[index].splice(
+          this.sideResult[index].indexOf(item.value),
+          1
+        );
+      }
+    }
+  },
+
+  handleReset() {
+    this.initSideResult();
+  },
+
+  handleConfirm() {
+    this.showSideFilter = false;
+    this.handleEmit();
+  },
+
+  calHasSideFilter() {
+    this.hasSideFilter =
+      !!this.sideResult && this.sideResult.some(item => item.length > 0);
+  },
+
+  initSideResult() {
+    this.sideResult = new Array(this.filterChildren.length);
+  },
+
+  initResult() {
+    this.items.forEach(item => {
+      if (item.checked) {
+        if (item.type === "radio") {
+          this.options = item.children;
+          item.children.forEach(item => {
+            if (item.checked) {
+              this.barResult = item.value;
+            }
+          });
+        }
+        if (item.type === "text") {
+          this.barResult = item.value;
+        }
+        if (item.type === "sort") {
+          this.barResult = "" + item.value + true;
+        }
+        if (item.type === "filter") {
+          item.children.forEach((item, index) => {
+            if (item.checked) {
+              item.children.forEach(item => {
+                if (item.checked) {
+                  this.sideResult.splice(index, 1, [item.value]);
+                }
+              });
+            }
+          });
+        }
+      }
+    });
+  },
+
+  handleEmit() {
+    this.$emit("filter", {
+      barResult: JSON.stringify(this.barResult),
+      sideResult: JSON.stringify(this.sideResult)
+    });
+  }
+};
+</script>
+
+<style lang="less">
+.filterbar {
+  &-bd {
+    flex-direction: column;
+  }
+
+  &-item {
+    height: 40px;
+    margin: 15px 0;
+    border-left: 1px solid #ddd;
+    justify-content: center;
+
+    text {
+      margin-left: 5px;
+      lines: 1;
+      text-overflow: ellipsis;
+    }
+
+    &-icons {
+      flex-direction: column;
+      margin-left: 10px;
+      margin-top: 10px;
+    }
+  }
+
+  &-options {
+    flex-direction: column;
+    border-bottom: 1px solid #dddddd;
+    border-top: 1px solid #dddddd;
+
+    &-item {
+      width: 100%;
+      height: 90px;
+      justify-content: space-between;
+      margin-left: 30px;
+      padding: 20px 0;
+      border-bottom: 1px solid #dddddd;
+
+      &-icon {
+        margin-right: 40px;
+      }
+
+      text {
+        font-size: 35px;
+        color: #000000;
+      }
+    }
+  }
+
+  &-side {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+
+    &-backdrop {
+      position: fixed;
+      width: 10%;
+      left: 0px;
+      top: 0px;
+      bottom: 0px;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    &-filter {
+      position: fixed;
+      width: 90%;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      background-color: #ffffff;
+      flex-direction: column;
+
+      &-list {
+        margin-bottom: 100px;
+      }
+
+      &-listitem {
+        flex-direction: column;
+        margin: 30px 20px 0px;
+        &-hd {
+          justify-content: space-between;
+          text {
+            color: #000000;
+            font-size: 30px;
+          }
+        }
+
+        &-bd {
+          flex-wrap: wrap;
+        }
+      }
+
+      &-buttons {
+        position: fixed;
+        bottom: 0px;
+        right: 0px;
+        width: 90%;
+        border-top: 1px solid #ddd;
+
+        &-reset {
+          width: 50%;
+          height: 100px;
+          background-color: #fff;
+          color: #000000;
+        }
+
+        &-confirm {
+          width: 50%;
+          height: 100px;
+          background-color: #ed3f14;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}
+
+.side-filter-item {
+  background-color: #f0f2f5;
+  border-radius: 10px;
+  width: 30%;
+  height: 70px;
+  font-size: 25px;
+  text-align: center;
+  margin: 10px 20px 10px 0;
+  lines: 1;
+  text-overflow: ellipsis;
+  color: #000000;
+
+  &-clicked {
+    background-color: #ffffff;
+    border: 1px solid #f15353;
+    color: #f15353;
+  }
+}
+</style>

@@ -10,8 +10,11 @@
       <div class="badge-wrap-count-slot" style="margin-right: {{offset}}px;">
         <slot></slot>
       </div>
-      <div class="{{ moreThenTen  ? 'count-class-more-then-ten' : 'count-class' }}" show="{{hasCount}}">
-        <text>{{finalCount}}</text>
+      <div
+        class="{{ moreThenTen  ? 'count-class-more-then-ten' : 'count-class' }}"
+        show="{{hasCount}}"
+      >
+        <text>{{ finalCount }}</text>
       </div>
     </stack>
   </div>
@@ -20,27 +23,27 @@
 <style lang="less">
 @import "../styles/base.less";
 
-.badge-wrap{
+.badge-wrap {
   flex-direction: column;
 
-  &-dot{
+  &-dot {
     flex-direction: column;
-    &-slot{
+    &-slot {
       margin-top: 10px;
       margin-right: 10px;
     }
   }
 
-  &-count{
+  &-count {
     flex-direction: column;
-    &-slot{
+    &-slot {
       margin-top: 23px;
     }
   }
 }
 
-.dot-class{
-  background-color:@error-color;
+.dot-class {
+  background-color: @error-color;
   border-radius: 50px;
   width: 18px;
   height: 18px;
@@ -48,29 +51,29 @@
   border: 2px solid #ffffff;
 }
 
-.count-class-more-then-ten{
-  background-color:@error-color;
+.count-class-more-then-ten {
+  background-color: @error-color;
   justify-content: center;
   border-radius: 20px;
   align-self: flex-end;
   height: 45px;
   border: 2px solid #ffffff;
-  text{
+  text {
     color: #ffffff;
     font-size: 25px;
     margin: 10px 20px;
   }
 }
 
-.count-class{
-  background-color:@error-color;
+.count-class {
+  background-color: @error-color;
   justify-content: center;
   border-radius: 50px;
   align-self: flex-end;
   height: 45px;
   width: 45px;
   border: 2px solid #ffffff;
-  text{
+  text {
     color: #ffffff;
     font-size: 25px;
     margin: 10px;
@@ -95,23 +98,28 @@ export default {
     }
   },
   computed: {
-    finalCount(){
-      if(!this.count || parseInt(this.count) <= 0) return ''
-      return parseInt(this.count) > parseInt(this.overflowCount) ? `${this.overflowCount}+` : this.count
+    finalCount() {
+      if (!this.count || parseInt(this.count) <= 0) return "";
+      return parseInt(this.count) > parseInt(this.overflowCount)
+        ? `${this.overflowCount}+`
+        : this.count;
     },
-    hasCount(){
-      let result = false
-      if(this.count && parseInt(this.count) > 0){
-        result = true
+    hasCount() {
+      let result = false;
+      if (this.count && parseInt(this.count) > 0) {
+        result = true;
       }
-      return result
+      return result;
     },
-    moreThenTen(){
-      return parseInt(this.count) >= 10 ? true: false;
+    moreThenTen() {
+      return parseInt(this.count) >= 10 ? true : false;
     },
-    offset(){
-      let l = parseInt(this.count) > parseInt(this.overflowCount) ? this.overflowCount.toString().length : this.count.toString().length
-      return 20 + 10 * ( l - 1 )
+    offset() {
+      let l =
+        parseInt(this.count) > parseInt(this.overflowCount)
+          ? this.overflowCount.toString().length
+          : this.count.toString().length;
+      return 20 + 10 * (l - 1);
     }
   }
 };

@@ -1,8 +1,12 @@
 <template>
   <stack class="apex-divider apex-class" style="height:{{height}}px">
     <div class="apex-divider-line" style="background-color:{{lineColor}}"></div>
-    <text class="apex-divider-content" style="color:{{color}};font-size:{{size}}px" if="{{content !== ''}}">
-      {{content}}
+    <text
+      class="apex-divider-content"
+      style="color:{{color}};font-size:{{size}}px"
+      if="{{content !== ''}}"
+    >
+      {{ content }}
     </text>
     <div class="apex-divider-content" else>
       <slot></slot>
@@ -11,51 +15,51 @@
 </template>
 
 <style lang="less">
-  @import "../styles/base.less";
+@import "../styles/base.less";
 
-  .apex-divider {
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    text {
-      text-align: center;
-      font-size: @size-font-small;
-    }
-    &-line {
-      width: 100%;
-      height: 2px;
-      background-color: @background-color-base;
-    }
-    &-content {
-      background-color: #ffffff;
-      padding: 0 10px;
-    }
+.apex-divider {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  text {
+    text-align: center;
+    font-size: @size-font-small;
   }
+  &-line {
+    width: 100%;
+    height: 2px;
+    background-color: @background-color-base;
+  }
+  &-content {
+    background-color: #ffffff;
+    padding: 0 10px;
+  }
+}
 </style>
 
 <script>
-    export default {
-        props: {
-            content: {
-                type: String,
-                default: ''
-            },
-            height: {
-                type: Number,
-                default: 48
-            },
-            color: {
-                type: String,
-                default: '#80848f'
-            },
-            lineColor: {
-                type: String,
-                default: '#e9eaec'
-            },
-            size: {
-                type: Number,
-                default: 24
-            }
-        },
-    };
+export default {
+  props: {
+    content: {
+      type: String,
+      default: ""
+    },
+    height: {
+      type: Number,
+      default: 48
+    },
+    color: {
+      type: String,
+      default: "#80848f"
+    },
+    lineColor: {
+      type: String,
+      default: "#e9eaec"
+    },
+    size: {
+      type: Number,
+      default: 24
+    }
+  }
+};
 </script>

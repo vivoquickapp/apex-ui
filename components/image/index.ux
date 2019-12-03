@@ -1,133 +1,152 @@
 <template>
-    <div class="apex-image">
-      <stack>
-        <div class="image-wrap">
-          <image class="apex-image-{{shape}}" style="width:{{width}};height:{{height}}" src="{{src}}" oncomplete="handleLoadedImage" onerror="handleError" if="{{src}}"></image>
-          <div else>
-            <slot></slot>
-          </div>
+  <div class="apex-image">
+    <stack>
+      <div class="image-wrap">
+        <image
+          class="apex-image-{{shape}}"
+          style="width:{{width}};height:{{height}}"
+          src="{{src}}"
+          oncomplete="handleLoadedImage"
+          onerror="handleError"
+          if="{{src}}"
+        ></image>
+        <div else>
+          <slot></slot>
         </div>
-        <div class="empty" style="width:{{width}};height:{{height}}" if="{{ status === 'empty' }}">
-          <text if="{{empty}}">{{empty}}</text>
-          <div else>
-            <slot name="empty"></slot>
-          </div>
+      </div>
+      <div
+        class="empty"
+        style="width:{{width}};height:{{height}}"
+        if="{{ status === 'empty' }}"
+      >
+        <text if="{{empty}}">{{ empty }}</text>
+        <div else>
+          <slot name="empty"></slot>
         </div>
-        <div class="loading" style="width:{{width}};height:{{height}}" elif="{{ status === 'loading' }}">
-          <text class="loading-text" if="{{loading}}">{{loading}}</text>
-          <div else>
-            <slot name="loading"></slot>
-          </div>
+      </div>
+      <div
+        class="loading"
+        style="width:{{width}};height:{{height}}"
+        elif="{{ status === 'loading' }}"
+      >
+        <text class="loading-text" if="{{loading}}">{{ loading }}</text>
+        <div else>
+          <slot name="loading"></slot>
         </div>
-        <div class="error" style="width:{{width}};height:{{height}}" elif="{{ status === 'error' }}">
-          <text class="error-text" if="{{error}}">{{error}}</text>
-          <div else>
-            <slot name="error"></slot>
-          </div>
+      </div>
+      <div
+        class="error"
+        style="width:{{width}};height:{{height}}"
+        elif="{{ status === 'error' }}"
+      >
+        <text class="error-text" if="{{error}}">{{ error }}</text>
+        <div else>
+          <slot name="error"></slot>
         </div>
-      </stack>
-    </div>
-  </template>
-  
-  <style lang="less">
-  .apex-image{
-    flex-direction: column;
-    &-rounded{
-      border-radius: 10px;
-    }
-    &-circle{
-      border-radius: 1000px;
-    }
-    &-thumbnail{
-      background-color: #ffffff;
-      padding: 10px;
-      border: 1px solid #eee;
-    }
+      </div>
+    </stack>
+  </div>
+</template>
+
+<style lang="less">
+.apex-image {
+  flex-direction: column;
+  &-rounded {
+    border-radius: 10px;
   }
-  
-  .empty{
-    background-color: #eee;
-    justify-content: center;
-    text{
-      font-size: 50px;
-      font-weight: bold;
+  &-circle {
+    border-radius: 1000px;
+  }
+  &-thumbnail {
+    background-color: #ffffff;
+    padding: 10px;
+    border: 1px solid #eee;
+  }
+}
+
+.empty {
+  background-color: #eee;
+  justify-content: center;
+  text {
+    font-size: 50px;
+    font-weight: bold;
+  }
+}
+
+.error {
+  background-color: #eee;
+  justify-content: center;
+  text {
+    font-size: 50px;
+    font-weight: bold;
+  }
+}
+
+.loading {
+  background-color: #eee;
+  justify-content: center;
+  text {
+    font-size: 50px;
+    font-weight: bold;
+  }
+}
+</style>
+
+<script>
+export default {
+  data() {
+    return {
+      status: !!this.src ? "loading" : "empty"
+    };
+  },
+
+  props: {
+    src: {
+      type: String,
+      default: ""
+    },
+    shape: {
+      type: String,
+      default: "normal" //normal|round|circle|thumbnail
+    },
+    width: {
+      type: String,
+      default: "300px"
+    },
+    height: {
+      type: String,
+      default: "300px"
+    },
+    loading: {
+      type: String,
+      default: ""
+    },
+    empty: {
+      type: String,
+      default: ""
+    },
+    error: {
+      type: String,
+      default: ""
     }
-  }
-  
-  .error{
-    background-color: #eee;
-    justify-content: center;
-    text{
-      font-size: 50px;
-      font-weight: bold;
+  },
+
+  handleLoadedImage() {
+    this.updateStatus("loaded");
+  },
+
+  handleError() {
+    this.updateStatus("error");
+  },
+
+  updateStatus(status) {
+    if (this.status !== status) {
+      this.status = status;
     }
+  },
+
+  onShow() {
+    console.log("status", this.status);
   }
-  
-  .loading{
-    background-color: #eee;
-    justify-content: center;
-    text{
-      font-size: 50px;
-      font-weight: bold;
-    }
-  }
-  </style>
-  
-  <script>
-  export default {
-    data(){
-      return {
-        status: !!this.src ? 'loading' : 'empty'
-      }
-    },
-  
-    props: {
-      src: {
-        type: String,
-        default: ''
-      },
-      shape: {
-        type: String,
-        default: 'normal'  //normal|round|circle|thumbnail
-      },
-      width: {
-        type: String,
-        default: '300px'
-      },
-      height: {
-        type: String,
-        default: '300px'
-      },
-      loading: {
-        type: String,
-        default: ''
-      },
-      empty: {
-        type: String,
-        default: ''
-      },
-      error: {
-        type: String,
-        default: ''
-      },
-    },
-  
-    handleLoadedImage(){
-      this.updateStatus('loaded')
-    },
-  
-    handleError(){
-      this.updateStatus('error')
-    },
-  
-    updateStatus(status){
-      if(this.status !== status){
-        this.status = status
-      }
-    },
-  
-    onShow() {
-      console.log('status',this.status)
-    },
-  }
-  </script>
+};
+</script>

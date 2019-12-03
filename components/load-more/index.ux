@@ -1,6 +1,10 @@
 <template>
   <div class="apex-load-more">
-    <progress type="circular" class="apex-load-more-loading" if="{{ loading }}"></progress>
+    <progress
+      type="circular"
+      class="apex-load-more-loading"
+      if="{{ loading }}"
+    ></progress>
     <stack class="stack">
       <div class="apex-load-more-line" if="{{!loading}}"></div>
       <div class="apex-load-more-tip">
@@ -13,54 +17,53 @@
 </template>
 
 <style lang="less">
-  @import "../styles/base.less";
+@import "../styles/base.less";
 
-  .apex-load-more {
-    margin: 15px;
+.apex-load-more {
+  margin: 15px;
+  justify-content: center;
+
+  stack {
     justify-content: center;
-
-    stack {
-      justify-content: center;
-      align-items: center;
-    }
-
-    text {
-      font-size: @size-font-small;
-      text-align: center;
-      background-color: #FFFFFF;
-      padding: 0 20px;
-    }
-
-    &-loading {
-      color: @primary-color;
-    }
-
-    &-line {
-      width: 80%;
-      height: 2px;
-      background-color: @background-color-base;
-    }
-
-    &-empty {
-      width: 8px;
-      height: 8px;
-      border-radius: 8px;
-      background-color: #E5E5E5;
-    }
+    align-items: center;
   }
 
+  text {
+    font-size: @size-font-small;
+    text-align: center;
+    background-color: #ffffff;
+    padding: 0 20px;
+  }
+
+  &-loading {
+    color: @primary-color;
+  }
+
+  &-line {
+    width: 80%;
+    height: 2px;
+    background-color: @background-color-base;
+  }
+
+  &-empty {
+    width: 8px;
+    height: 8px;
+    border-radius: 8px;
+    background-color: #e5e5e5;
+  }
+}
 </style>
 
 <script>
-    export default {
-        props: {
-            loading: {
-                default: true
-            },
-            tip: {
-                type: String,
-                default: ''
-            }
-        },
-    };
+export default {
+  props: {
+    loading: {
+      default: true
+    },
+    tip: {
+      type: String,
+      default: ""
+    }
+  }
+};
 </script>

@@ -1,124 +1,129 @@
 <template>
-  <canvas id="canvasId" style="height: {{height}}px;width: {{width}}px;align-self: center;" onlongpress="saveToAlbum()"></canvas>
+  <canvas
+    id="canvasId"
+    style="height: {{height}}px;width: {{width}}px;align-self: center;"
+    onlongpress="saveToAlbum()"
+  ></canvas>
 </template>
 <style lang="less"></style>
 <script>
-    import media from '@system.media'
-    import prompt from '@system.prompt'
-    import qrjs from './qr.js/index'
+import media from "@system.media";
+import prompt from "@system.prompt";
+import qrjs from "./qr.js/index";
 
-    export default {
-        props: {
-            height: {
-                default: 400
-            },
-            width: {
-                default: 400
-            },
-            content: {
-                default: ''
-            },
-            typeNumber: {
-                default: -1
-            },
-            errorCorrectLevel: {
-                default: 2
-            },
-            fgColor: {
-                default: 'black'
-            },
-            bgColor: {
-                default: 'white'
-            },
-            save: {
-                default: true
-            }
-        },
-        onInit() {
-            this.$watch('content', 'draw');
-            setTimeout(() => {
-                this.draw()
-            }, 0)
-        },
-        draw() {
-            const qrcode = qrjs(utf16to8(this.content), {
-                typeNumber: this.typeNumber,
-                errorCorrectLevel: this.errorCorrectLevel,
+export default {
+  props: {
+    height: {
+      default: 400
+    },
+    width: {
+      default: 400
+    },
+    content: {
+      default: ""
+    },
+    typeNumber: {
+      default: -1
+    },
+    errorCorrectLevel: {
+      default: 2
+    },
+    fgColor: {
+      default: "black"
+    },
+    bgColor: {
+      default: "white"
+    },
+    save: {
+      default: true
+    }
+  },
+  onInit() {
+    this.$watch("content", "draw");
+    setTimeout(() => {
+      this.draw();
+    }, 0);
+  },
+  draw() {
+    const qrcode = qrjs(utf16to8(this.content), {
+      typeNumber: this.typeNumber,
+      errorCorrectLevel: this.errorCorrectLevel
+    });
+    const cells = qrcode.modules;
+    const tileW = this.width / cells.length;
+    const tileH = this.height / cells.length;
+    const canvas = this.$element("canvasId");
+    this.ctx = canvas.getContext("2d");
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.scale(1, 1);
+
+    cells.forEach((row, rdx) => {
+      row.forEach((cell, cdx) => {
+        this.ctx.fillStyle = cell ? this.fgColor : this.bgColor;
+        const w = (cdx + 1) * tileW - cdx * tileW;
+        const h = (rdx + 1) * tileH - rdx * tileH;
+        this.ctx.fillRect(cdx * tileW, rdx * tileH, w, h);
+      });
+    });
+  },
+  saveToAlbum() {
+    if (!this.save) return;
+    this.$element("canvasId").toTempFilePath({
+      x: 0,
+      y: 0,
+      width: this.width,
+      height: this.height,
+      destWidth: this.width,
+      destHeight: this.height,
+      fileType: "png",
+      quality: 0.5,
+      success: res => {
+        const imageUrl = res.tempFilePath;
+        media.saveToPhotosAlbum({
+          uri: imageUrl,
+          success: function() {
+            prompt.showToast({
+              message: `保存成功！`
             });
-            const cells = qrcode.modules;
-            const tileW = this.width / cells.length;
-            const tileH = this.height / cells.length;
-            const canvas = this.$element('canvasId');
-            this.ctx = canvas.getContext('2d');
-            this.ctx.scale(1, 1);
+          },
+          fail: function(data, code) {
+            prompt.showToast({
+              message: `错误原因：${data}, 错误代码：${code}`
+            });
+          }
+        });
+      },
+      fail: (err, code) => {
+        prompt.showToast({
+          message: `错误原因：${err}, 错误代码：${code}`
+        });
+      }
+    });
+  }
+};
+/**
+ * 字符串转换成 UTF-8
+ * @param {String} str 文本内容
+ */
+const utf16to8 = str => {
+  const len = str.length;
+  let out = "";
 
-            cells.forEach((row, rdx) => {
-                row.forEach((cell, cdx) => {
-                    this.ctx.fillStyle = cell ? this.fgColor : this.bgColor;
-                    const w = (Math.ceil((cdx + 1) * tileW) - Math.floor(cdx * tileW));
-                    const h = (Math.ceil((rdx + 1) * tileH) - Math.floor(rdx * tileH));
-                    this.ctx.fillRect(Math.round(cdx * tileW), Math.round(rdx * tileH), w, h);
-                })
-            })
-        },
-        saveToAlbum() {
-            if (!this.save) return;
-            this.$element('canvasId').toTempFilePath({
-                x: 0,
-                y: 0,
-                width: this.width,
-                height: this.height,
-                destWidth: this.width,
-                destHeight: this.height,
-                fileType: 'png',
-                quality: 0.5,
-                success: (res) => {
-                    const imageUrl = res.tempFilePath;
-                    media.saveToPhotosAlbum({
-                        uri: imageUrl,
-                        success: function() {
-                            prompt.showToast({
-                                message: `保存成功！`
-                            })
-                        },
-                        fail: function(data, code) {
-                            prompt.showToast({
-                                message: `错误原因：${data}, 错误代码：${code}`
-                            })
-                        }
-                    })
-                },
-                fail: (err, code) => {
-                    prompt.showToast({
-                        message: `错误原因：${err}, 错误代码：${code}`
-                    })
-                }
-            })
-        }
+  for (let i = 0; i < len; i++) {
+    const c = str.charCodeAt(i);
+
+    if (c >= 0x0001 && c <= 0x007f) {
+      out += str.charAt(i);
+    } else if (c > 0x07ff) {
+      out += String.fromCharCode(0xe0 | ((c >> 12) & 0x0f));
+      out += String.fromCharCode(0x80 | ((c >> 6) & 0x3f));
+      out += String.fromCharCode(0x80 | ((c >> 0) & 0x3f));
+    } else {
+      out += String.fromCharCode(0xc0 | ((c >> 6) & 0x1f));
+      out += String.fromCharCode(0x80 | ((c >> 0) & 0x3f));
     }
-    /**
-     * 字符串转换成 UTF-8
-     * @param {String} str 文本内容
-     */
-    const utf16to8 = (str) => {
-        const len = str.length;
-        let out = '';
+  }
 
-        for (let i = 0; i < len; i++) {
-            const c = str.charCodeAt(i);
-
-            if ((c >= 0x0001) && (c <= 0x007F)) {
-                out += str.charAt(i);
-            } else if (c > 0x07FF) {
-                out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
-                out += String.fromCharCode(0x80 | ((c >> 6) & 0x3F));
-                out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
-            } else {
-                out += String.fromCharCode(0xC0 | ((c >> 6) & 0x1F));
-                out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
-            }
-        }
-
-        return out
-    }
+  return out;
+};
 </script>

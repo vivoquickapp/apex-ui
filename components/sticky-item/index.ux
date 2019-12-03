@@ -1,0 +1,110 @@
+<template>
+  <div class="apex-sticky-item">
+    <div class="apex-sticky-item-hd">
+      <div
+        class="apex-sticky-item-title"
+        if="{{ title && index !== 0}}"
+        ondisappear="handlerDisappear"
+        onappear="handlerAppear"
+      >
+        <text>{{ title }}</text>
+      </div>
+    </div>
+    <div class="apex-sticky-item-bd">
+      <div class="apex-sticky-item-content" if="{{ content }}">
+        <text>{{ content }}</text>
+      </div>
+      <div class="apex-sticky-item-content" else>
+        <slot name="content"></slot>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      index: 0
+    };
+  },
+
+  props: {
+    title: {
+      type: String,
+      default: ""
+    },
+    content: {
+      type: String,
+      default: ""
+    },
+    groupId: {
+      type: String,
+      default: ""
+    }
+  },
+
+  onReady() {
+    const parent = this.$parent().$child(this.groupId);
+    this.parent = parent;
+    const temp = parent.items;
+    const items = temp ? [...temp, this] : [this];
+    parent.items = items;
+  },
+
+  update(index = this.index) {
+    this.index = index;
+    if (this.title) {
+      this.parent.updateTitles({
+        index: this.index,
+        title: this.title
+      });
+    }
+  },
+
+  handlerDisappear() {
+    let current = this.parent.getCurrent();
+    if (this.index === current + 1) {
+      console.log("Disappear", this.index, current);
+      this.parent.updateCurrent(this.index);
+    }
+  },
+
+  handlerAppear() {
+    let current = this.parent.getCurrent();
+    if (current === this.index) {
+      let temp = this.index - 1;
+      if (temp < 0) temp = 0;
+      this.parent.updateCurrent(temp);
+    }
+  }
+};
+</script>
+
+<style lang="less">
+.apex-sticky-item {
+  flex-direction: column;
+
+  &-hd {
+    width: 100%;
+  }
+
+  &-bd {
+    width: 100%;
+  }
+
+  &-title {
+    width: 100%;
+    background-color: #eee;
+    padding: 20px 30px;
+
+    text {
+      color: #000000;
+    }
+  }
+
+  &-content {
+    width: 100%;
+  }
+}
+</style>

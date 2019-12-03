@@ -1,23 +1,35 @@
 <template>
   <div class="apex-popover">
     <div class="mask" if="{{visible}}" onclick="showMask"></div>
-    <div if="{{visible}}" onclick="showMask" style="{{boxStyle}}" class="box {{boxClassX}} {{boxClassY}}">
+    <div
+      if="{{visible}}"
+      onclick="showMask"
+      style="{{boxStyle}}"
+      class="box {{boxClassX}} {{boxClassY}}"
+    >
       <div class="frame">
-        <div class="body" style="background-color:{{normal}};width:{{bodyWidth}}px;height:{{bodyHeight}}px">
+        <div
+          class="body"
+          style="background-color:{{normal}};width:{{bodyWidth}}px;height:{{bodyHeight}}px"
+        >
           <div class="item-list">
             <div onclick="clickHandler">
-              <text class="item" if="{{title}}">{{title}}</text>
+              <text class="item" if="{{title}}">{{ title }}</text>
               <slot name="title" else></slot>
             </div>
             <div onclick="clickHandler">
-              <text class="item item-line" if="{{content}}">{{content}}</text>
+              <text class="item item-line" if="{{content}}">{{ content }}</text>
               <slot name="content" else></slot>
             </div>
           </div>
         </div>
       </div>
       <!-- 箭头 -->
-      <div class="arrows {{arrowsClass}}" style="{{styleObj}}" if="{{flag===true}}"></div>
+      <div
+        class="arrows {{arrowsClass}}"
+        style="{{styleObj}}"
+        if="{{flag===true}}"
+      ></div>
     </div>
     <div onclick="handler" style="{{pixStyle}}">
       <slot></slot>
@@ -25,8 +37,8 @@
   </div>
 </template>
 
-<script>  
-import prompt from '@system.prompt'
+<script>
+import prompt from "@system.prompt";
 export default {
   data() {
     return {
@@ -38,15 +50,15 @@ export default {
       left: 0,
       boxHeight: 200,
       boxWidth: 240,
-      normal: '#ffffff',
-      arrowsClass: '',// 箭头的class
-      styleObj: {},// 箭头的style
-      flag: false,// 是否为当前箭头
-      pixStyle: {},// 自定义margin
-      boxClassX: '',
-      boxClassY: '',
+      normal: "#ffffff",
+      arrowsClass: "", // 箭头的class
+      styleObj: {}, // 箭头的style
+      flag: false, // 是否为当前箭头
+      pixStyle: {}, // 自定义margin
+      boxClassX: "",
+      boxClassY: "",
       boxStyle: {}
-    }
+    };
   },
   props: {
     popoverWidth: {
@@ -56,165 +68,181 @@ export default {
       defualt: 0
     },
     orientation: {
-      default: 'top'
+      default: "top"
     },
     title: {
-      default: ''
+      default: ""
     },
     content: {
-      default: ''
+      default: ""
     },
     size: {
       type: Array,
-      default: []//slot中自定义元素宽高
+      default: [] //slot中自定义元素宽高
     },
     pixClass: {
-      defualt: ''
+      defualt: ""
     },
     popoverColor: {
-      defualt: ''
+      defualt: ""
     },
     pixMargin: {
       defualt: 20
     }
   },
   onInit() {
-    let top = this.pixMargin ? `${this.pixMargin}px` : '20px'
+    let top = this.pixMargin ? `${this.pixMargin}px` : "20px";
     this.pixStyle = {
       marginTop: top
-    }
+    };
   },
   handler($evt) {
-    let height = this.size[1]// slot自定义元素的高
-    let hori
+    let height = this.size[1]; // slot自定义元素的高
+    let hori;
     if (this.popoverColor) {
-      this.normal = this.popoverColor
+      this.normal = this.popoverColor;
     }
     // 限制最小气泡宽高
     if (this.popoverWidth > 200) {
-      this.bodyWidth = parseInt(this.popoverWidth)
-      this.boxWidth = parseInt(this.popoverWidth) + 40
+      this.bodyWidth = parseInt(this.popoverWidth);
+      this.boxWidth = parseInt(this.popoverWidth) + 40;
     }
     if (this.popoverHeight > 160) {
-      this.bodyHeight = parseInt(this.popoverHeight)
-      this.boxHeight = parseInt(this.popoverHeight) + 40
+      this.bodyHeight = parseInt(this.popoverHeight);
+      this.boxHeight = parseInt(this.popoverHeight) + 40;
     }
     // 上左,下左,上右,下右
-    if (this.orientation.indexOf('Right') !== -1) {
-      this.left = parseInt($evt.clientX) - parseInt($evt.offsetX) - 20
-      this.styleObj = { marginRight: `-${this.bodyWidth - 80}px` }
-      this.boxStyle.right = `${this.left}px`
+    if (this.orientation.indexOf("Right") !== -1) {
+      this.left = parseInt($evt.clientX) - parseInt($evt.offsetX) - 20;
+      this.styleObj = { marginRight: `-${this.bodyWidth - 80}px` };
+      this.boxStyle.right = `${this.left}px`;
     }
-    if (this.orientation.indexOf('Left') !== -1) {
-      this.right = parseInt($evt.clientX) - parseInt($evt.offsetX) - 20
-      this.styleObj = { marginLeft: `-${this.bodyWidth - 80}px` }
-      this.boxStyle.left = `${this.right}px`
+    if (this.orientation.indexOf("Left") !== -1) {
+      this.right = parseInt($evt.clientX) - parseInt($evt.offsetX) - 20;
+      this.styleObj = { marginLeft: `-${this.bodyWidth - 80}px` };
+      this.boxStyle.left = `${this.right}px`;
     }
-    if (this.orientation.indexOf('top') !== -1) {
-      hori = parseInt($evt.clientY) - parseInt($evt.offsetY) - this.bodyHeight - 40
-      this.boxStyle.top = `${hori}px`
-      this.arrowsClass = 'arrows-top'
-      this.boxClassY = 'box-vertical-up'
+    if (this.orientation.indexOf("top") !== -1) {
+      hori =
+        parseInt($evt.clientY) - parseInt($evt.offsetY) - this.bodyHeight - 40;
+      this.boxStyle.top = `${hori}px`;
+      this.arrowsClass = "arrows-top";
+      this.boxClassY = "box-vertical-up";
     }
-    if (this.orientation.indexOf('bottom') !== -1) {
-      hori = parseInt($evt.clientY) - parseInt($evt.offsetY) + height
-      this.boxStyle.top = `${hori}px`
-      this.arrowsClass = 'arrows-bottom'
-      this.boxClassY = 'box-vertical-down'
+    if (this.orientation.indexOf("bottom") !== -1) {
+      hori = parseInt($evt.clientY) - parseInt($evt.offsetY) + height;
+      this.boxStyle.top = `${hori}px`;
+      this.arrowsClass = "arrows-bottom";
+      this.boxClassY = "box-vertical-down";
     }
-    if (this.orientation === 'top' || this.orientation === 'bottom') {
-      this.boxStyle.right = `${this.left}px`
-      this.boxStyle.left = `${this.right}px`
+    if (this.orientation === "top" || this.orientation === "bottom") {
+      this.boxStyle.right = `${this.left}px`;
+      this.boxStyle.left = `${this.right}px`;
     }
     // 左上,左下,右上,右下
-    if (this.orientation.indexOf('right') !== -1 || this.orientation.indexOf('left') !== -1) {
-      this.styleObj.marginTop = '30px'
-      if (this.orientation.indexOf('right') !== -1) {
-        this.boxClassX = 'box-horizontal'
-        this.arrowsClass = 'arrows-right'
-        this.boxStyle.left = `${this.size[0] + 20}px`
+    if (
+      this.orientation.indexOf("right") !== -1 ||
+      this.orientation.indexOf("left") !== -1
+    ) {
+      this.styleObj.marginTop = "30px";
+      if (this.orientation.indexOf("right") !== -1) {
+        this.boxClassX = "box-horizontal";
+        this.arrowsClass = "arrows-right";
+        this.boxStyle.left = `${this.size[0] + 20}px`;
       } else {
-        this.boxStyle.right = `${this.size[0] + 20}px`
-        this.arrowsClass = 'arrows-left'
+        this.boxStyle.right = `${this.size[0] + 20}px`;
+        this.arrowsClass = "arrows-left";
       }
-      this.bodyHeight < height ? hori = parseInt($evt.clientY) - parseInt($evt.offsetY) + (height - this.bodyHeight) / 2 : hori = parseInt($evt.clientY) - parseInt($evt.offsetY) - this.bodyHeight / 2
-      this.boxStyle.top = `${hori}px`
+      this.bodyHeight < height
+        ? (hori =
+            parseInt($evt.clientY) -
+            parseInt($evt.offsetY) +
+            (height - this.bodyHeight) / 2)
+        : (hori =
+            parseInt($evt.clientY) -
+            parseInt($evt.offsetY) -
+            this.bodyHeight / 2);
+      this.boxStyle.top = `${hori}px`;
     }
-    if (this.orientation.indexOf('Top') !== -1) {
-      hori = parseInt($evt.clientY) - parseInt($evt.offsetY)
-      this.boxStyle.top = `${hori}px`
-      this.styleObj.marginTop = '40px'
-      this.styleObj.alignSelf = 'flex-start'
+    if (this.orientation.indexOf("Top") !== -1) {
+      hori = parseInt($evt.clientY) - parseInt($evt.offsetY);
+      this.boxStyle.top = `${hori}px`;
+      this.styleObj.marginTop = "40px";
+      this.styleObj.alignSelf = "flex-start";
     }
-    if (this.orientation.indexOf('Bottom') !== -1) {
-      hori = parseInt($evt.clientY) - parseInt($evt.offsetY) - this.bodyHeight + height / 2
-      this.boxStyle.top = `${hori}px`
-      this.styleObj.marginBottom = '40px'
-      this.styleObj.alignSelf = 'flex-end'
+    if (this.orientation.indexOf("Bottom") !== -1) {
+      hori =
+        parseInt($evt.clientY) -
+        parseInt($evt.offsetY) -
+        this.bodyHeight +
+        height / 2;
+      this.boxStyle.top = `${hori}px`;
+      this.styleObj.marginBottom = "40px";
+      this.styleObj.alignSelf = "flex-end";
     }
-    this.boxStyle.height = `${this.boxHeight}px`
-    this.boxStyle.width = `${this.boxWidth}px`
-    this.styleObj.backgroundColor = this.normal
-    this.getOrientation()
-    this.visible = true
+    this.boxStyle.height = `${this.boxHeight}px`;
+    this.boxStyle.width = `${this.boxWidth}px`;
+    this.styleObj.backgroundColor = this.normal;
+    this.getOrientation();
+    this.visible = true;
   },
   showMask() {
-    this.visible = false
+    this.visible = false;
   },
   // 阻止冒泡
   clickHandler(evt) {
     if (this.visible === true) {
-      this.visible = false
+      this.visible = false;
     }
     if (this.visible === false) {
-      this.visible = true
+      this.visible = true;
     }
-    evt.stopPropagation()
+    evt.stopPropagation();
   },
   getOrientation() {
     switch (this.orientation) {
-      case 'top':
-        this.flag = true
+      case "top":
+        this.flag = true;
         break;
-      case 'topRight':
-        this.flag = true
+      case "topRight":
+        this.flag = true;
         break;
-      case 'topLeft':
-        this.flag = true
+      case "topLeft":
+        this.flag = true;
         break;
-      case 'bottom':
-        this.flag = true
+      case "bottom":
+        this.flag = true;
         break;
-      case 'bottomRight':
-        this.flag = true
+      case "bottomRight":
+        this.flag = true;
         break;
-      case 'bottomLeft':
-        this.flag = true
+      case "bottomLeft":
+        this.flag = true;
         break;
-      case 'left':
-        this.flag = true
+      case "left":
+        this.flag = true;
         break;
-      case 'leftTop':
-        this.flag = true
+      case "leftTop":
+        this.flag = true;
         break;
-      case 'leftBottom':
-        this.flag = true
+      case "leftBottom":
+        this.flag = true;
         break;
-      case 'right':
-        this.flag = true
+      case "right":
+        this.flag = true;
         break;
-      case 'rightTop':
-        this.flag = true
+      case "rightTop":
+        this.flag = true;
         break;
-      case 'rightBottom':
-        this.flag = true
+      case "rightBottom":
+        this.flag = true;
         break;
 
       default:
         break;
     }
-  },
-}
+  }
+};
 </script>
 <style lang="less">
 .mask {

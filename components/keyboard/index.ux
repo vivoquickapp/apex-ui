@@ -1,0 +1,249 @@
+<template>
+  <div>
+    <div class="apex-keyboard" if="{{visible}}">
+      <stack>
+        <div class="mask" onclick="hide()"></div>
+        <div class="wrap">
+          <div class="title">
+            <text>{{ title }}</text>
+          </div>
+          <div class="password">
+            <stack if="{{maxlength !== -1}}">
+              <div class="container" style="background-color: #ffffff;">
+                <text
+                  class="{{index !== maxlength-1 ? 'border' : ''}}"
+                  style="width: {{100/maxlength}}%"
+                  for="{{(index, item) in Array(+maxlength).fill(0)}}"
+                ></text>
+              </div>
+              <div class="container">
+                <text
+                  style="width: {{100/maxlength}}%"
+                  for="{{(index, item) in numbers}}"
+                  show="{{ index < maxlength }}"
+                >
+                  {{ !password ? item : "*" }}
+                </text>
+              </div>
+            </stack>
+            <div
+              class="container"
+              if="{{maxlength === -1}}"
+              style="background-color: #ffffff;justify-content: center;"
+            >
+              <text for="{{(index, item) in numbers}}">
+                {{ !password ? item : "*" }}
+              </text>
+            </div>
+          </div>
+          <div class="info">
+            <text>{{ info }}</text>
+          </div>
+          <div class="keyboard">
+            <div class="line">
+              <text onclick="clickNumber(buttons[1])" class="border">{{
+                buttons[1]
+              }}</text>
+              <text onclick="clickNumber(buttons[2])" class="border">{{
+                buttons[2]
+              }}</text>
+              <text onclick="clickNumber(buttons[3])">{{ buttons[3] }}</text>
+            </div>
+            <div class="line">
+              <text onclick="clickNumber(buttons[4])" class="border">{{
+                buttons[4]
+              }}</text>
+              <text onclick="clickNumber(buttons[5])" class="border">{{
+                buttons[5]
+              }}</text>
+              <text onclick="clickNumber(buttons[6])">{{ buttons[6] }}</text>
+            </div>
+            <div class="line">
+              <text onclick="clickNumber(buttons[7])" class="border">{{
+                buttons[7]
+              }}</text>
+              <text onclick="clickNumber(buttons[8])" class="border">{{
+                buttons[8]
+              }}</text>
+              <text onclick="clickNumber(buttons[9])">{{ buttons[9] }}</text>
+            </div>
+            <div class="line">
+              <text class="btn border" onclick="cancelBtn()">{{
+                cancelText
+              }}</text>
+              <text onclick="clickNumber(buttons[0])" class="border">{{
+                buttons[0]
+              }}</text>
+              <text class="btn" onclick="deleteNumber()">{{ deleteText }}</text>
+            </div>
+          </div>
+        </div>
+      </stack>
+    </div>
+  </div>
+</template>
+<style lang="less">
+.apex-keyboard {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  .mask {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .wrap {
+    background-color: #f6f6f6;
+    flex-direction: column;
+    align-self: flex-end;
+
+    .title {
+      justify-content: center;
+      border-bottom-color: #dcdcdc;
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+
+      text {
+        padding: 20px;
+        font-size: 32px;
+        font-weight: bold;
+      }
+    }
+
+    .password {
+      justify-content: center;
+      align-items: center;
+      border-bottom-color: #dcdcdc;
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+
+      .container {
+        width: 100%;
+        height: 80px;
+        margin: 20px;
+        background-color: transparent;
+
+        text {
+          height: 50px;
+          margin: 15px 0;
+          font-weight: bold;
+          font-size: 40px;
+          text-align: center;
+        }
+      }
+    }
+
+    .info {
+      background-color: #ffffff;
+      justify-content: center;
+      border-bottom-color: #dcdcdc;
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+
+      text {
+        font-size: 24px;
+        padding: 10px;
+        font-weight: bold;
+      }
+    }
+
+    .keyboard {
+      flex-direction: column;
+
+      .line {
+        border-bottom-color: #dcdcdc;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+
+        text {
+          height: 100px;
+          width: 33.33%;
+          background-color: #ffffff;
+          text-align: center;
+          font-size: 40px;
+          font-weight: bold;
+        }
+
+        text:active {
+          background-color: #eeeeee;
+        }
+
+        .btn {
+          background-color: #f6f6f6;
+          font-size: 30px;
+        }
+      }
+    }
+  }
+}
+
+.border {
+  border-right-color: #dcdcdc;
+  border-right-style: solid;
+  border-right-width: 1px;
+}
+</style>
+<script>
+export default {
+  props: {
+    title: {
+      default: "输入数字密码"
+    },
+    info: {
+      default: "安全键盘"
+    },
+    cancelText: {
+      default: "取消"
+    },
+    deleteText: {
+      default: "删除"
+    },
+    maxlength: {
+      default: 6
+    },
+    password: {
+      default: true
+    },
+    disorder: {
+      default: false
+    }
+  },
+  data() {
+    return {
+      numbers: [],
+      buttons: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      visible: false
+    };
+  },
+  onInit() {
+    if (this.disorder === true) {
+      this.buttons.sort(() => Math.random() - 0.5);
+    }
+  },
+  clickNumber(number) {
+    if (+this.maxlength !== -1 && this.numbers.length >= +this.maxlength)
+      return;
+    this.numbers.push(number);
+    if (this.numbers.length === +this.maxlength) {
+      this.$emit("complete", { numbers: this.numbers });
+    }
+    this.$emit("change", { numbers: this.numbers });
+  },
+  deleteNumber() {
+    this.numbers.pop();
+    this.$emit("change", { numbers: this.numbers });
+  },
+  hide() {
+    this.visible = false;
+    this.$emit("close", { numbers: this.numbers });
+  },
+  show() {
+    this.visible = true;
+  },
+  cancelBtn() {
+    this.$emit("cancel", { numbers: this.numbers });
+  }
+};
+</script>

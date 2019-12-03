@@ -1,40 +1,41 @@
 <template>
-  <text class="font-icon" style="font-size: {{size}}px;color: {{color}};">{{ unescapeFontIconCode(iconMap[type]) }}
+  <text class="font-icon" style="font-size: {{size}}px;color: {{color}};"
+    >{{ unescapeFontIconCode(iconMap[type]) }}
   </text>
 </template>
 <style lang="less">
-  @font-face {
-    font-family: iconfont;
-    src: url('iconfonts.ttf');
-  }
+@font-face {
+  font-family: iconfont;
+  src: url("iconfonts.ttf");
+}
 
-  .font-icon {
-    font-family: iconfont;
-    text-align: center;
-  }
+.font-icon {
+  font-family: iconfont;
+  text-align: center;
+}
 </style>
 <script>
-    import {icons} from './icons';
+import { icons } from "./icons";
 
-    export default {
-        data() {
-            return {
-                iconMap: icons
-            }
-        },
-        props: {
-            type: {
-                default: 'empty'
-            },
-            size: {
-                default: 14
-            },
-            color: {
-                default: ''
-            }
-        },
-        unescapeFontIconCode(iconCode = '') {
-            return unescape(iconCode.replace(/&#x/g, '%u').replace(/;/g, ''))
-        }
+export default {
+  data() {
+    return {
+      iconMap: icons
+    };
+  },
+  props: {
+    type: {
+      default: "empty"
+    },
+    size: {
+      default: 14
+    },
+    color: {
+      default: ""
     }
+  },
+  unescapeFontIconCode(iconCode = "") {
+    return unescape(iconCode.replace(/&#x/g, "%u").replace(/;/g, ""));
+  }
+};
 </script>

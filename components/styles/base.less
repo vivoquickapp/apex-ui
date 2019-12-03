@@ -89,3 +89,124 @@
 @avatar-font-size-sm: 40px;
 @avatar-border-radius: @border-radius-small;
 @border-radius-small: 4px;
+
+// Animation 样式
+.hide {
+    display: none;
+}
+.show {
+    display: flex;
+}
+ 
+
+.opacity-hide-to-show {
+    animation-name: opacityHideToShow;
+}
+.opacity-show-to-hide {
+    animation-name: opacityShowToHide;
+}
+.translate-left-to-center {
+    animation-name: translateLeftToCenter;
+}
+.translate-center-to-left {
+    animation-name: translateCenterToLeft;
+}
+.translate-right-to-center {
+    animation-name: translateRightToCenter;
+}
+.translate-center-to-right {
+    animation-name: translateCenterToRight;
+}
+.translate-top-to-center {
+    animation-name: translateTopToCenter;
+}
+.translate-center-to-top {
+    animation-name: translateCenterToTop;
+}
+.translate-bottom-to-center {
+    animation-name: translateBottomToCenter;
+}
+.translate-center-to-bottom {
+    animation-name: translateCenterToBottom;
+}
+
+@keyframes opacityHideToShow {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+}
+@keyframes opacityShowToHide {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+}
+@keyframes translateLeftToCenter {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+@keyframes translateCenterToLeft {
+    from {
+      transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+@keyframes translateRightToCenter {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+@keyframes translateCenterToRight {
+    from {
+      transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+@keyframes translateTopToCenter {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0%);
+    }
+}
+@keyframes translateCenterToTop {
+    from {
+      transform: translateY(0);
+    }
+    to {
+        transform: translateY(-100%);
+    }
+}
+@keyframes translateBottomToCenter {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0%);
+    }
+}
+@keyframes translateCenterToBottom {
+    from {
+      transform: translateY(0);
+    }
+    to {
+        transform: translateY(100%);
+    }
+}

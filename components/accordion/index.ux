@@ -8,7 +8,7 @@
           <image class="apex-accordion-thumb" src="{{thumb}}"></image>
         </div>
         <div if="{{title}}">
-          <text class="apex-accordion-title">{{title}}</text>
+          <text class="apex-accordion-title">{{ title }}</text>
         </div>
         <div else>
           <slot name="header"></slot>
@@ -20,7 +20,7 @@
     </div>
     <div class="apex-accordion-bd" if="{{current}}">
       <div class="apex-accordion-content" if="{{content}}">
-        <text>{{content}}</text>
+        <text>{{ content }}</text>
       </div>
       <slot></slot>
     </div>
@@ -32,76 +32,77 @@ export default {
   data() {
     return {
       current: false,
-      index: '0',
+      index: "0",
       clicked: false
-    }
+    };
   },
 
   props: {
     key: {
       type: String,
-      default: '',
+      default: ""
     },
     thumb: {
       type: String,
-      default: '',
+      default: ""
     },
     title: {
       type: String,
-      default: '',
+      default: ""
     },
     content: {
       type: String,
-      default: '',
+      default: ""
     },
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     showArrow: {
       type: Boolean,
-      default: true,
+      default: true
     },
     groupId: {
       type: String,
       required: true,
-      default: ''
-    },
+      default: ""
+    }
   },
 
   computed: {
-    className(){
-      if(this.clicked){
-        return this.current ? 'apex-accordion-current-clicked' : 'apex-accordion-arrow-clicked'
-      }else{
-        return this.current ? 'apex-accordion-current' : 'apex-accordion-arrow'
+    className() {
+      if (this.clicked) {
+        return this.current
+          ? "apex-accordion-current-clicked"
+          : "apex-accordion-arrow-clicked";
+      } else {
+        return this.current ? "apex-accordion-current" : "apex-accordion-arrow";
       }
     }
   },
 
   onReady() {
-    const parent = this.$parent().$child(this.groupId)
-    const temp = parent.accordions
-    const accordions = temp ? [...temp, this] : [this]
-    parent.accordions = accordions
+    const parent = this.$parent().$child(this.groupId);
+    const temp = parent.accordions;
+    const accordions = temp ? [...temp, this] : [this];
+    parent.accordions = accordions;
   },
 
   changeCurrent(current, index) {
-    this.current = current
-    this.index = index
+    this.current = current;
+    this.index = index;
   },
 
   onClick() {
-    const { index, disabled } = this
-    const parent = this.$parent().$child(this.groupId)
-    
-    if (disabled || !parent) return
-    
-    this.clicked = true
-    parent.onClickItem(index)
-  },
+    const { index, disabled } = this;
+    const parent = this.$parent().$child(this.groupId);
 
-}
+    if (disabled || !parent) return;
+
+    this.clicked = true;
+    parent.onClickItem(index);
+  }
+};
 </script>
 
 <style lang="less">
@@ -115,7 +116,7 @@ export default {
     justify-content: space-between;
   }
 
-  &-thumb{
+  &-thumb {
     width: 50px;
     height: 50px;
     object-fit: contain;

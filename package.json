@@ -1,6 +1,6 @@
 {
   "name": "apex-ui",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "apex-ui quickapp components ui suits",
   "author": "vivo",
   "keywords": [
@@ -8,9 +8,14 @@
     "ui",
     "apex"
   ],
+  "scripts": {
+    "prettier": "prettier --write '**/*.ux'"
+  },
   "license": "MIT",
   "devDependencies": {
     "less": "^3.9.0",
-    "less-loader": "^4.1.0"
+    "less-loader": "^4.1.0",
+    "prettier": "^1.19.1",
+    "prettier-plugin-quickapp": "0.1.0"
   }
 }

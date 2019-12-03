@@ -1,106 +1,112 @@
 <template>
-<stack>
+  <stack>
     <div if="{{nested}}">
-        <slot name="nested"></slot>
+      <slot name="nested"></slot>
     </div>
     <div id="apex-spin" if="{{isLoading}}">
-        <div if="{{!custom}}" class="apex-spin">
-            <progress class="apex-spin-{{size}}" type="circular" style="color:{{color}};"></progress>
-            <text class="tip tip-{{size}}" if="{{tip}}" style="color:{{color}};">{{tip}}</text>
-        </div>
-        <div else>
-            <slot name="custom"></slot>
-        </div>
+      <div if="{{!custom}}" class="apex-spin">
+        <progress
+          class="apex-spin-{{size}}"
+          type="circular"
+          style="color:{{color}};"
+        ></progress>
+        <text class="tip tip-{{size}}" if="{{tip}}" style="color:{{color}};">{{
+          tip
+        }}</text>
+      </div>
+      <div else>
+        <slot name="custom"></slot>
+      </div>
     </div>
-</stack>
+  </stack>
 </template>
-  
+
 <style lang="less">
 .apex-spin {
-    flex-direction: column;
-    background-color: rgba(255, 255, 255, 0.75);
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    &-normal {
-        width: 80px;
-        height: 80px;
-    }
-    &-small {
-        width: 50px;
-        height: 50px;
-    }
-    &-large {
-        width: 100px;
-        height: 100px;
-    }
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.75);
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  &-normal {
+    width: 80px;
+    height: 80px;
+  }
+  &-small {
+    width: 50px;
+    height: 50px;
+  }
+  &-large {
+    width: 100px;
+    height: 100px;
+  }
 }
 
 .tip {
-    lines: 1;
-    text-overflow: ellipsis;
-    &-normal {
-        font-size: 40px;
-        margin-top: 10px;
-    }
-    &-small {
-        font-size: 30px;
-        margin-top: 8px;
-    }
-    &-large {
-        font-size: 45px;
-        margin-top: 15px;
-    }
+  lines: 1;
+  text-overflow: ellipsis;
+  &-normal {
+    font-size: 40px;
+    margin-top: 10px;
+  }
+  &-small {
+    font-size: 30px;
+    margin-top: 8px;
+  }
+  &-large {
+    font-size: 45px;
+    margin-top: 15px;
+  }
 }
 </style>
-  
+
 <script>
 export default {
-    data() {
-        return {
-            custom: false,
-            isLoading: this.loading
-        }
-    },
+  data() {
+    return {
+      custom: false,
+      isLoading: this.loading
+    };
+  },
 
-    props: {
-        size: {
-            type: String,
-            default: 'normal'
-        },
-        tip: {
-            type: String,
-            default: ''
-        },
-        color: {
-            type: String,
-            default: '#33b4ff'
-        },
-        nested: {
-            type: Boolean,
-            default: false
-        },
-        loading: {
-            type: Boolean,
-            default: true
-        }
+  props: {
+    size: {
+      type: String,
+      default: "normal"
     },
-
-    onInit() {
-        this.$watch('loading', 'watchLoadingChange')
+    tip: {
+      type: String,
+      default: ""
     },
-
-    onReady() {
-        this.custom = this.calIsCustom()
+    color: {
+      type: String,
+      default: "#33b4ff"
     },
-
-    calIsCustom() {
-        return this.$child('apex-spin')._slot.namedSlotCache.custom !== undefined
+    nested: {
+      type: Boolean,
+      default: false
     },
-
-    watchLoadingChange(newV, oldV) {
-        this.isLoading = newV
+    loading: {
+      type: Boolean,
+      default: true
     }
-}
+  },
+
+  onInit() {
+    this.$watch("loading", "watchLoadingChange");
+  },
+
+  onReady() {
+    this.custom = this.calIsCustom();
+  },
+
+  calIsCustom() {
+    return this.$child("apex-spin")._slot.namedSlotCache.custom !== undefined;
+  },
+
+  watchLoadingChange(newV, oldV) {
+    this.isLoading = newV;
+  }
+};
 </script>

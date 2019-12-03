@@ -2,22 +2,23 @@
 
 <template>
   <div class="{{isShow ? 'apex-gallery':''}}">
-    <swiper 
-      class="apex-gallery-swiper" 
+    <swiper
+      class="apex-gallery-swiper"
       style="{{customStyle}}"
-      indicator="{{indicator}}" 
-      autoplay="{{autoplay}}" 
-      interval="{{ interval }}" 
-      duration="{{ duration }}" 
-      loop="{{ loop }}" 
-      vertical="{{ vertical }}" 
-      index="{{ index }}" 
+      indicator="{{indicator}}"
+      autoplay="{{autoplay}}"
+      interval="{{ interval }}"
+      duration="{{ duration }}"
+      loop="{{ loop }}"
+      vertical="{{ vertical }}"
+      index="{{ index }}"
       if="{{ isShow && srcs.length }}"
-      onchange="handlerChange">
+      onchange="handlerChange"
+    >
       <div class="apex-gallery-img-wrap" for="{{(idx, image) in srcs}}">
-        <image 
-          class="apex-gallery-img" 
-          src="{{image}}" 
+        <image
+          class="apex-gallery-img"
+          src="{{image}}"
           onclick="onClickSwiperImage"
         ></image>
       </div>
@@ -29,27 +30,27 @@
 const defaultData = {
   isShow: false,
   indicator: true,
-  indicatorColor: 'rgba(0, 0, 0, .5)',
-  indicatorSelectedColor: '#33b4ff',
+  indicatorColor: "rgba(0, 0, 0, .5)",
+  indicatorSelectedColor: "#33b4ff",
   autoplay: false,
   interval: 2000,
   duration: 500,
   loop: true,
   vertical: false,
   index: 0,
-  srcs: [],
-}
+  srcs: []
+};
 
 export default {
   data() {
     return {
       ...defaultData
-    }
+    };
   },
 
   computed: {
     customStyle() {
-      return `indicator-color:${this.indicatorColor};indicator-selected-color:${this.indicatorSelectedColor};`
+      return `indicator-color:${this.indicatorColor};indicator-selected-color:${this.indicatorSelectedColor};`;
     }
   },
 
@@ -57,26 +58,26 @@ export default {
     Object.assign(this, {
       ...options,
       isShow: true
-    })
+    });
   },
 
   hideGallery() {
     Object.assign(this, {
       ...defaultData
-    })
+    });
   },
 
   onClickSwiperImage() {
-    this.hideGallery()
+    this.hideGallery();
   },
 
-  handlerChange(e){
-    this.index = e.index
-    this.$emit('change',{
+  handlerChange(e) {
+    this.index = e.index;
+    this.$emit("change", {
       index: e.index
-    })
+    });
   }
-}
+};
 </script>
 
 <style lang="less">

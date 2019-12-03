@@ -1,18 +1,31 @@
 <template>
   <div class="page">
     <div class="page-prev" if="type === 'button'" onclick="clickPage('prev')">
-      <div class="page-btn {{current === 1 ? 'disabled' : ''}}"><text class="{{current === 1 ? 'disabled-text' : ''}}">{{prevText}}</text></div>
+      <div class="page-btn {{current === 1 ? 'disabled' : ''}}">
+        <text class="{{current === 1 ? 'disabled-text' : ''}}">{{
+          prevText
+        }}</text>
+      </div>
     </div>
     <!-- 显示数字 -->
     <div class="page-number" if="type !== 'pointer' && !simple">
-      <text class="current">{{ current }}</text><text>/{{total}}</text>
+      <text class="current">{{ current }}</text
+      ><text>/{{ total }}</text>
     </div>
     <!-- 显示点 -->
     <div class="page-pointer" if="type === 'pointer'">
-      <div class="page-pointer-dot {{ ($idx + 1) === current ? 'current' : '' }}" for="{{totalList}}" key="$idx"></div>
+      <div
+        class="page-pointer-dot {{ ($idx + 1) === current ? 'current' : '' }}"
+        for="{{totalList}}"
+        key="$idx"
+      ></div>
     </div>
     <div class="page-next" if="type === 'button'" onclick="clickPage('next')">
-      <div class="page-btn {{current === total ? 'disabled' : ''}}"><text class="{{current === total ? 'disabled-text' : ''}}">{{nextText}}</text></div>
+      <div class="page-btn {{current === total ? 'disabled' : ''}}">
+        <text class="{{current === total ? 'disabled-text' : ''}}">{{
+          nextText
+        }}</text>
+      </div>
     </div>
   </div>
 </template>
@@ -68,8 +81,8 @@
 export default {
   data() {
     return {
-      totalList: [],
-    }
+      totalList: []
+    };
   },
   props: {
     current: {
@@ -82,16 +95,16 @@ export default {
     },
     prevText: {
       type: String,
-      default: 'Prev'
+      default: "Prev"
     },
     nextText: {
       type: String,
-      default: 'Next'
+      default: "Next"
     },
     // button || number || pointer
     type: {
       type: String,
-      default: 'button'
+      default: "button"
     },
     // 是否隐藏数值
     simple: {
@@ -100,15 +113,15 @@ export default {
     }
   },
   onInit() {
-    this.totalList = Array.from({ length: this.total }, () => '')
+    this.totalList = Array.from({ length: this.total }, () => "");
   },
   clickPage(type) {
-    if(this.current !=1&&type==='prev'){
-      this.$emit('tap',{type})
+    if (this.current != 1 && type === "prev") {
+      this.$emit("tap", { type });
     }
-    if(this.current<this.total&&type==='next'){
-      this.$emit('tap',{type})
+    if (this.current < this.total && type === "next") {
+      this.$emit("tap", { type });
     }
   }
-}
+};
 </script>

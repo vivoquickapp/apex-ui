@@ -5,40 +5,39 @@
 </template>
 
 <style lang="less">
-  @import "../styles/base.less";
+@import "../styles/base.less";
 
-  .apex-radio-group {
-    flex-direction: column;
-  }
-
+.apex-radio-group {
+  flex-direction: column;
+}
 </style>
 
 <script>
-    export default {
-        data() {
-            return {};
-        },
-        props: {
-            current: {
-                default: ''
-            },
-        },
-        onInit() {
-            this.$watch('current', 'changeCurrent');
-        },
-        changeCurrent(val = this.current) {
-            let items = this.$child('radio-group')._parent._childrenVms.filter(item => {
-                return item._type === 'my-radio'
-            })
-            const len = items.length;
-            if (len > 0) {
-                items.forEach(item => {
-                    item.changeCurrent(val === item._attrs.name);
-                });
-            }
-        },
-        emitEvent(params) {
-            this.$emit('change', params);
-        }
-    };
+export default {
+  data() {
+    return {};
+  },
+  props: {
+    current: {
+      default: ""
+    }
+  },
+  onInit() {
+    this.$watch("current", "changeCurrent");
+  },
+  changeCurrent(val = this.current) {
+    let items = this.$child("radio-group")._parent._childrenVms.filter(item => {
+      return item._type === "my-radio";
+    });
+    const len = items.length;
+    if (len > 0) {
+      items.forEach(item => {
+        item.changeCurrent(val === item._attrs.name);
+      });
+    }
+  },
+  emitEvent(params) {
+    this.$emit("change", params);
+  }
+};
 </script>

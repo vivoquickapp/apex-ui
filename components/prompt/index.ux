@@ -2,12 +2,17 @@
   <div>
     <div class="wrap" if="visible">
       <image class="icon" src="{{image}}" if="{{image}}"></image>
-      <text class="apex-title" if="{{title}}">{{title}}</text>
-      <text class="apex-text" if="{{text}}">{{text}}</text>
+      <text class="apex-title" if="{{title}}">{{ title }}</text>
+      <text class="apex-text" if="{{text}}">{{ text }}</text>
       <div class="buttons" if="{{buttons && !!buttons.length}}">
         <block for="button in buttons">
-          <text data-index="{{$idx}}" class="button" onclick="clickHandler" style="font-size: {{button.size}}px;">
-            {{button.text}}
+          <text
+            data-index="{{$idx}}"
+            class="button"
+            onclick="clickHandler"
+            style="font-size: {{button.size}}px;"
+          >
+            {{ button.text }}
           </text>
         </block>
       </div>
@@ -15,70 +20,70 @@
   </div>
 </template>
 <style lang="less">
-  @import '../styles/base.less';
+@import "../styles/base.less";
 
-  .wrap {
+.wrap {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  .icon {
+    height: 150px;
+    object-fit: cover;
+  }
+  .apex-title {
+    color: @title-color;
+    font-size: @size-font-base;
+    margin: 10px 0;
+  }
+  .apex-text {
+    color: @text-color;
+    font-size: @size-font-small;
+    margin: 10px 0;
+  }
+  .buttons {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    .icon {
-      height: 150px;
-      object-fit: cover;
-    }
-    .apex-title {
-      color: @title-color;
-      font-size: @size-font-base;
-      margin: 10px 0;
-    }
-    .apex-text {
-      color: @text-color;
-      font-size: @size-font-small;
-      margin: 10px 0;
-    }
-    .buttons {
-      flex-direction: column;
-      .button {
-        border: 1px solid @border-color-base;
-        padding: 10px 20px;
-        margin: 10px;
-        text-align: center;
-        border-radius: @btn-border-radius;
-      }
+    .button {
+      border: 1px solid @border-color-base;
+      padding: 10px 20px;
+      margin: 10px;
+      text-align: center;
+      border-radius: @btn-border-radius;
     }
   }
+}
 </style>
 <script>
-    export default {
-        props: {
-            image: {
-                type: String,
-                default: ''
-            },
-            title: {
-                type: String,
-                default: ''
-            },
-            text: {
-                type: String,
-                default: ''
-            },
-            buttons: {
-                type: Array,
-                default: []
-            },
-            visible: {
-                type: Boolean,
-                default: true
-            }
-        },
-        clickHandler(e) {
-            const buttons = this.buttons;
-            const index = e.target.dataset.index;
-            const value = buttons[index];
-            const {disabled = false} = value;
-            if (disabled) return;
-            this.$emit('tap', {index, value});
-        }
+export default {
+  props: {
+    image: {
+      type: String,
+      default: ""
+    },
+    title: {
+      type: String,
+      default: ""
+    },
+    text: {
+      type: String,
+      default: ""
+    },
+    buttons: {
+      type: Array,
+      default: []
+    },
+    visible: {
+      type: Boolean,
+      default: true
     }
+  },
+  clickHandler(e) {
+    const buttons = this.buttons;
+    const index = e.target.dataset.index;
+    const value = buttons[index];
+    const { disabled = false } = value;
+    if (disabled) return;
+    this.$emit("tap", { index, value });
+  }
+};
 </script>

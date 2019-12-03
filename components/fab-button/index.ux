@@ -1,0 +1,507 @@
+<import name="my-icon" src="../icon/index"></import>
+<import name="my-button" src="../button/index"></import>
+
+<template>
+  <stack class="fab-button fab-button-{{theme}}">
+    <div
+      class="fab-button-backdrop"
+      show="{{ backdrop && buttonVisible }}"
+    ></div>
+    <block for="{{(index, button) in buttons }}">
+      <div
+        class="fab-button-button-wrap fab-button-button-{{position}} {{buttonStyle[index]}}"
+      >
+        <my-button
+          class="fab-button-button {{ button.disabled ? 'fab-button-button-disabled': ''}}"
+          onclick="handleButtonClick(button)"
+          icon="{{button.icon}}"
+          disabled="{{button.disabled}}"
+          inline="{{true}}"
+          size="small"
+        ></my-button>
+        <text
+          class="fab-button-button-label"
+          if="{{button.label && direction === 'vertical' && buttonVisible}}"
+          >{{ button.label }}</text
+        >
+      </div>
+    </block>
+    <div
+      class="fab-button-action fab-button-{{position}} fab-button-{{clicked}}"
+      onclick="handleClick"
+    >
+      <div if="{{actionButtonIcon}}">
+        <my-icon
+          type="{{actionButtonIcon}}"
+          size="80"
+          color="#ffffff"
+        ></my-icon>
+      </div>
+      <div else>
+        <slot name="action"></slot>
+      </div>
+    </div>
+  </stack>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      buttonVisible: false,
+      notFirst: false
+    };
+  },
+
+  props: {
+    theme: {
+      type: String,
+      default: "balanced"
+    },
+    position: {
+      type: String,
+      default: "center"
+    },
+    actionButtonIcon: {
+      type: String,
+      default: "add"
+    },
+    actionButtonRotate: {
+      type: Boolean,
+      default: true
+    },
+    backdrop: {
+      type: Boolean,
+      default: false
+    },
+    buttons: {
+      type: Array,
+      default: []
+    },
+    direction: {
+      type: String,
+      default: "horizontal"
+    },
+    reverse: {
+      type: Boolean,
+      default: false
+    },
+    sAngle: {
+      type: Number,
+      default: 0
+    },
+    eAngle: {
+      type: Number,
+      default: 360
+    }
+  },
+
+  computed: {
+    clicked() {
+      if (this.notFirst && this.actionButtonRotate) {
+        if (this.buttonVisible) {
+          return "clicked";
+        } else {
+          return "unclick";
+        }
+      } else {
+        return "justopen";
+      }
+    },
+
+    buttonStyle() {
+      const arr = [];
+      if (this.notFirst) {
+        if (this.buttonVisible) {
+          if (this.direction === "horizontal" && !this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-h${index}`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "horizontal" && this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-hr${index}`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "vertical" && !this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-v${index}`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "vertical" && this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-vr${index}`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "circle") {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-c${index}`;
+              arr.push(style);
+            });
+          }
+        } else {
+          if (this.direction === "horizontal" && !this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-h${index}close`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "horizontal" && this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-hr${index}close`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "vertical" && !this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-v${index}close`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "vertical" && this.reverse) {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-vr${index}close`;
+              arr.push(style);
+            });
+          }
+          if (this.direction === "circle") {
+            this.buttons.forEach((button, index) => {
+              let style = `animation-c${index}close`;
+              arr.push(style);
+            });
+          }
+        }
+      }
+      return arr;
+    }
+  },
+
+  handleButtonClick(button) {
+    if (!button.disabled) {
+      button.click();
+    }
+  },
+
+  handleClick() {
+    this.buttonVisible = !this.buttonVisible;
+    this.notFirst = true;
+  }
+};
+</script>
+
+<style lang="less">
+@light: #ddd;
+@stable: #b2b2b2;
+@positive: #387ef5;
+@calm: #11c1f3;
+@balanced: #33cd5f;
+@energized: #ffc900;
+@assertive: #ef473a;
+@royal: #886aea;
+@dark: #444;
+
+.fab-button(@theme, @color) {
+  &-@{theme} &-action,
+  &-@{theme} &-button {
+    background-color: @color;
+  }
+
+  &-@{theme} &-button-disabled {
+    background-color: desaturate(@color, 50%);
+  }
+}
+
+.fab-button {
+  position: fixed;
+
+  &-center {
+    left: 320px;
+    top: 600px;
+  }
+
+  &-topLeft {
+    left: 15px;
+    top: 15px;
+  }
+
+  &-topRight {
+    right: 15px;
+    top: 15px;
+  }
+
+  &-bottomLeft {
+    left: 15px;
+    bottom: 15px;
+  }
+
+  &-bottomRight {
+    right: 15px;
+    bottom: 15px;
+  }
+
+  &-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  &-action {
+    width: 100px;
+    height: 100px;
+    background-color: @balanced;
+    border-radius: 100px;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+  }
+
+  &-button {
+    width: 80px;
+    height: 80px;
+    background-color: @balanced;
+    border-radius: 120px;
+    align-items: center;
+    justify-content: center;
+
+    &-label {
+      height: 50px;
+      margin-left: 20px;
+      font-size: 35px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 0 10px;
+      border-radius: 5px;
+    }
+
+    &-wrap {
+      position: fixed;
+      align-items: center;
+    }
+
+    &-center {
+      left: 330px;
+      top: 610px;
+    }
+
+    &-topLeft {
+      left: 25px;
+      top: 25px;
+    }
+
+    &-topRight {
+      right: 25px;
+      top: 25px;
+    }
+
+    &-bottomLeft {
+      left: 25px;
+      bottom: 25px;
+    }
+
+    &-bottomRight {
+      right: 25px;
+      bottom: 25px;
+    }
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(135deg);
+    }
+  }
+
+  @keyframes rotate2 {
+    from {
+      transform: rotate(135deg);
+    }
+
+    to {
+      transform: rotate(0deg);
+    }
+  }
+
+  &-clicked {
+    animation-name: rotate;
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+  }
+
+  &-unclick {
+    animation-name: rotate2;
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+  }
+
+  .fab-button(light, @light);
+  .fab-button(stable, @stable);
+  .fab-button(positive, @positive);
+  .fab-button(calm, @calm);
+  .fab-button(assertive, @assertive);
+  .fab-button(balanced, @balanced);
+  .fab-button(energized, @energized);
+  .fab-button(royal, @royal);
+  .fab-button(dark, @dark);
+}
+
+.animation(@item) {
+  &-@{item} {
+    animation-name: @item;
+    animation-duration: 0.3s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+  }
+}
+
+.keyframes(@direction, @offset) {
+  @keyframes @direction {
+    from {
+      transform: scale(0) translateX(0px);
+    }
+
+    to {
+      transform: scale(1) translateX(@offset);
+    }
+  }
+}
+
+.keyframes-close(@direction, @offset) {
+  @keyframes @direction {
+    from {
+      transform: scale(1) translateX(@offset);
+    }
+
+    to {
+      transform: scale(0) translateX(0px);
+    }
+  }
+}
+
+.keyframesY(@direction, @offset) {
+  @keyframes @direction {
+    from {
+      transform: scale(0) translateY(0px);
+    }
+
+    to {
+      transform: scale(1) translateY(@offset);
+    }
+  }
+}
+
+.keyframesY-close(@direction, @offset) {
+  @keyframes @direction {
+    from {
+      transform: scale(1) translateY(@offset);
+    }
+
+    to {
+      transform: scale(0) translateY(0px);
+    }
+  }
+}
+
+.animation {
+  .keyframes(h0, 100px);
+  .keyframes(h1, 190px);
+  .keyframes(h2, 280px);
+  .keyframes(h3, 370px);
+  .keyframes-close(h0close, 100px);
+  .keyframes-close(h1close, 190px);
+  .keyframes-close(h2close, 280px);
+  .keyframes-close(h3close, 370px);
+
+  .keyframes(hr0, -100px);
+  .keyframes(hr1, -190px);
+  .keyframes(hr2, -280px);
+  .keyframes(hr3, -370px);
+  .keyframes-close(hr0close, -100px);
+  .keyframes-close(hr1close, -190px);
+  .keyframes-close(hr2close, -280px);
+  .keyframes-close(hr3close, -370px);
+
+  .keyframesY(v0, 100px);
+  .keyframesY(v1, 190px);
+  .keyframesY(v2, 280px);
+  .keyframesY(v3, 370px);
+  .keyframesY-close(v0close, 100px);
+  .keyframesY-close(v1close, 190px);
+  .keyframesY-close(v2close, 280px);
+  .keyframesY-close(v3close, 370px);
+
+  .keyframesY(vr0, -100px);
+  .keyframesY(vr1, -190px);
+  .keyframesY(vr2, -280px);
+  .keyframesY(vr3, -370px);
+  .keyframesY-close(vr0close, -100px);
+  .keyframesY-close(vr1close, -190px);
+  .keyframesY-close(vr2close, -280px);
+  .keyframesY-close(vr3close, -370px);
+
+  .keyframes(c0, 100px);
+  .keyframesY(c1, -100px);
+  .keyframes(c2, -100px);
+  .keyframesY(c3, 100px);
+  .keyframes-close(c0close, 100px);
+  .keyframesY-close(c1close, -100px);
+  .keyframes-close(c2close, -100px);
+  .keyframesY-close(c3close, 100px);
+
+  .animation(h0);
+  .animation(h1);
+  .animation(h2);
+  .animation(h3);
+  .animation(h0close);
+  .animation(h1close);
+  .animation(h2close);
+  .animation(h3close);
+
+  .animation(hr0);
+  .animation(hr1);
+  .animation(hr2);
+  .animation(hr3);
+  .animation(hr0close);
+  .animation(hr1close);
+  .animation(hr2close);
+  .animation(hr3close);
+
+  .animation(v0);
+  .animation(v1);
+  .animation(v2);
+  .animation(v3);
+  .animation(v0close);
+  .animation(v1close);
+  .animation(v2close);
+  .animation(v3close);
+
+  .animation(vr0);
+  .animation(vr1);
+  .animation(vr2);
+  .animation(vr3);
+  .animation(vr0close);
+  .animation(vr1close);
+  .animation(vr2close);
+  .animation(vr3close);
+
+  .animation(c0);
+  .animation(c1);
+  .animation(c2);
+  .animation(c3);
+  .animation(c0close);
+  .animation(c1close);
+  .animation(c2close);
+  .animation(c3close);
+}
+</style>

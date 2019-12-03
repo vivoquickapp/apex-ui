@@ -1,0 +1,84 @@
+<template>
+  <stack class="apex-sticky">
+    <list class="apex-sticky-list">
+      <list-item class="apex-sticky-slot" type="sticky">
+        <slot></slot>
+      </list-item>
+    </list>
+    <div
+      for="titles"
+      class="apex-sticky-mask"
+      show="{{$item.index === currentIndex}}"
+    >
+      <text>{{ $item.title }}</text>
+    </div>
+  </stack>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      currentIndex: 0,
+      titles: []
+    };
+  },
+
+  props: {
+    id: {
+      type: String,
+      default: ""
+    }
+  },
+
+  onReady() {
+    this.updateStickyItem();
+  },
+
+  updateStickyItem() {
+    this.items.forEach((element, index) => {
+      element.update(index);
+    });
+  },
+
+  updateTitles(item = {}) {
+    this.titles.push(item);
+  },
+
+  updateCurrent(index = 0) {
+    this.currentIndex = index;
+  },
+
+  getCurrent() {
+    return this.currentIndex;
+  }
+};
+</script>
+
+<style lang="less">
+.apex-sticky {
+  flex-direction: column;
+  height: 100%;
+
+  &-list {
+    width: 100%;
+    height: 100%;
+    margin-top: 80px;
+  }
+
+  &-slot {
+    flex-direction: column;
+  }
+
+  &-mask {
+    width: 100%;
+    height: 80px;
+    background-color: #eee;
+    padding: 20px 30px;
+
+    text {
+      color: #000000;
+    }
+  }
+}
+</style>

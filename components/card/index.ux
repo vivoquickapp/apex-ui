@@ -1,9 +1,17 @@
 <template>
   <div class="apex-card {{ full ? 'apex-card-full' : '' }}">
-    <div id="apex-card-header" class="apex-card-header" show="{{ isShowHeader }}">
+    <div
+      id="apex-card-header"
+      class="apex-card-header"
+      show="{{ isShowHeader }}"
+    >
       <slot name="title">
         <div class="apex-card-content" if="{{ thumb || title }}">
-          <image class="apex-card-thumb" src="{{ thumb }}" if="{{ thumb }}"></image>
+          <image
+            class="apex-card-thumb"
+            src="{{ thumb }}"
+            if="{{ thumb }}"
+          ></image>
           <text>{{ title }}</text>
         </div>
       </slot>
@@ -20,106 +28,110 @@
   </div>
 </template>
 <style lang="less">
-  @import "../styles/base.less";
+@import "../styles/base.less";
 
-  .apex-card {
-    flex-direction: column;
-    background-color: #fff;
-    margin: 20px;
+.apex-card {
+  flex-direction: column;
+  background-color: #fff;
+  margin: 20px;
+  border: 1px solid @border-color-base;
+  border-radius: 10px;
+
+  &-bordered {
     border: 1px solid @border-color-base;
-    border-radius: 10px;
+  }
 
-    &-bordered {
-      border: 1px solid @border-color-base;
-    }
+  &-full {
+    margin: 20px 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-radius: 0;
+  }
 
-    &-full {
-      margin: 20px 0;
-      border-left-width: 0;
-      border-right-width: 0;
-      border-radius: 0;
-    }
+  &-header {
+    height: 150px;
+    padding: 10px 20px;
+    justify-content: space-between;
+    border-bottom-color: @border-color-base;
+    border-bottom-width: 1px;
+    border-style: solid;
+  }
 
-    &-header {
-      height: 150px;
-      padding: 10px 20px;
-      justify-content: space-between;
-      border-bottom-color: @border-color-base;
-      border-bottom-width: 1px;
-      border-style: solid;
-    }
-
-    &-content {
-      height: 130px;
-      text {
-        font-size: @size-font-base;
-        font-weight: bold;
-        color: @title-color;
-        lines: 2;
-      }
-    }
-
-    &-thumb {
-      object-fit: cover;
-      height: 100%;
-      width: 130px;
-      margin-right: 20px;
-      flex-shrink: 0;
-    }
-
-    &-extra {
-      flex-shrink: 0;
-    }
-
-    &-body {
-      padding: 10px 20px;
-    }
-
-    &-footer {
-      padding: 10px 20px;
-      text {
-        font-size: @size-font-small;
-      }
+  &-content {
+    height: 130px;
+    text {
+      font-size: @size-font-base;
+      font-weight: bold;
+      color: @title-color;
+      lines: 2;
     }
   }
+
+  &-thumb {
+    object-fit: cover;
+    height: 100%;
+    width: 130px;
+    margin-right: 20px;
+    flex-shrink: 0;
+  }
+
+  &-extra {
+    flex-shrink: 0;
+  }
+
+  &-body {
+    padding: 10px 20px;
+  }
+
+  &-footer {
+    padding: 10px 20px;
+    text {
+      font-size: @size-font-small;
+    }
+  }
+}
 </style>
 <script>
 export default {
-  data(){
-    return{
+  data() {
+    return {
       isShowHeader: false
-    }
+    };
   },
   props: {
     full: {
-        default: false,
+      default: false
     },
     title: {
-        type: String,
-        default: '',
+      type: String,
+      default: ""
     },
     thumb: {
-        type: String,
-        default: '',
+      type: String,
+      default: ""
     },
     extra: {
-        type: String,
-        default: '',
+      type: String,
+      default: ""
     },
     footer: {
-        type: String,
-        default: ''
-    },
+      type: String,
+      default: ""
+    }
   },
 
   onReady() {
-    this.isShowHeader = this.calIsShowHeader()
+    this.isShowHeader = this.calIsShowHeader();
   },
 
-  calIsShowHeader(){
-    let hasTitleSlot = this.$child('apex-card-header')._slot.namedSlotCache.title !== undefined
-    let hasExtraSlot = this.$child('apex-card-header')._slot.namedSlotCache.extra !== undefined
-    return this.thumb || this.title || this.extra || hasTitleSlot || hasExtraSlot
+  calIsShowHeader() {
+    let hasTitleSlot =
+      this.$child("apex-card-header")._slot.namedSlotCache.title !== undefined;
+    let hasExtraSlot =
+      this.$child("apex-card-header")._slot.namedSlotCache.extra !== undefined;
+    return (
+      this.thumb || this.title || this.extra || hasTitleSlot || hasExtraSlot
+    );
   }
-}
+};
 </script>
