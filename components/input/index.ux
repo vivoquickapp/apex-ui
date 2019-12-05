@@ -2,9 +2,7 @@
   <div
     class="apex-input {{ error ? 'apex-input-error' : '' }} {{ mode === 'wrapped' ? 'apex-input-wrapped' : '' }}"
   >
-    <text class="apex-input-title" if="{{!!title}}" class="title">{{
-      title
-    }}</text>
+    <text class="apex-input-title title" if="{{!!title}}">{{ title }}</text>
     <input
       id="input"
       class="apex-input-content {{right === 'true' ? 'apex-input-right': ''}}"
@@ -96,6 +94,10 @@ export default {
     };
   },
 
+  onInit() {
+    this.$watch("value", "watchValue");
+  },
+
   onReady() {
     const focus = this.autofocus.toString() === "true";
     if (!focus) return; // 解决拉不起输入法的问题
@@ -103,9 +105,7 @@ export default {
   },
 
   handleInputChange(event) {
-    const { detail = {} } = event;
-    const { value = "" } = detail;
-    this._data.my_value = value;
+    this.my_value = event.value;
 
     this.$emit("change", event);
   },
@@ -116,6 +116,10 @@ export default {
 
   handleInputBlur(event) {
     this.$emit("blur", event);
+  },
+
+  watchValue(newV) {
+    this.my_value = newV;
   }
 };
 </script>
