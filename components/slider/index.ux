@@ -1,0 +1,203 @@
+<import name="my-mask" src="../mask/index.ux"></import> 
+
+<template>
+    <div class="wrap" style="{{disabled?'opacity: 0.3;':''}}">
+        <div if="{{showMin}}">
+            <text if="{{showMinValue}}">{{min}}</text>
+            <block else>
+                <slot name="min"></slot>
+            </block>
+        </div>
+         
+        <slider class="slider" style="{{styleObject | filterStyle}}" min="{{min}}" max="{{max}}" step="{{step}}" value="{{currentValue}}" onchange="onchange" ontouchstart="touchstartOfSlider" ontouchmove="touchmoveOfSlider" ontouchend="touchendOfSlider" ontouchcancel="touchcancelOfSlider"></slider>
+
+        <div if="{{showMax}}">
+            <text if="{{showMaxValue}}">{{max}}</text>
+            <block else>
+                <slot name="max"></slot>
+            </block>
+        </div>
+
+        <div class="value_tips_wrap" show="{{showTips && showTipsValue}}" ontouchstart="touchstartOfBackdrop">
+            <my-mask id="mask" transparent="{{true}}"></my-mask>
+            <text class="value_tips" style="top: {{tipsTop}}px; left: {{tipsLeft}}px;">{{currentValue | filterCurrentValue}}</text>
+        </div>
+
+        <div class="disabled" if="{{disabled}}"></div>
+    </div>
+</template>
+<style lang="less">
+.wrap {
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+    .value_tips_wrap{
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        .value_tips{
+            lines: 1;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: rgba(0,0,0,.7);
+            color: #fff;
+            position: absolute;
+            z-index: 1000;
+            transform: translate(-50%, -86px);
+        }
+    }
+     
+    .slider{
+        flex: 1;
+    }
+    .disabled{
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+    }
+}
+</style>
+<script>
+export default {
+    props: {
+        min: {
+            default: 0
+        },
+        max: {
+            default: 100
+        },
+        step: {
+            default: 1
+        },
+        defaultValue: {
+            default: 0
+        },
+        disabled: {
+            default: false
+        },
+        valueType: {
+            default: 'none'
+        },
+        tipsFormatter: {
+            default: '{d}'
+        },
+        showTips: {
+            default: true
+        },
+        styleObject: {
+            default: {
+                'color': '#f0f0f0',
+                'selected-color': '#009688',
+                'block-color': '#009688',
+                'padding-left': '32px',
+                'padding-right': '32px'
+            }
+        }    
+    },
+    data(){
+        return {
+            showMin: false,
+            showMax: false,
+            showMinValue: false,
+            showMaxValue: false,
+            showTipsValue: false,
+            tipsTop: 0,
+            tipsLeft: 0,
+            currentValue: 0,
+        }
+    },
+    onInit(){
+        this.currentValue = this.defaultValue
+        this.initValue()
+    },
+    initValue(){
+        if(typeof this.valueType == 'object'){
+            Object.keys(this.valueType).forEach(key=>{
+                if(key=='min' && this.valueType['min']){
+                    switch(this.valueType['min']){
+                        case 'value':
+                            this.showMin = true
+                            this.showMinValue = true
+                            break
+                        case 'custom':
+                            this.showMin = true
+                            this.showMinValue = false
+                            break
+                    }
+                }else if(key=='max' && this.valueType['max']){
+                    switch(this.valueType['max']){
+                        case 'value':
+                            this.showMax = true
+                            this.showMaxValue = true
+                            break
+                        case 'custom':
+                            this.showMax = true
+                            this.showMaxValue = false
+                            break
+                    }
+                }
+            })
+             
+        }else{
+            switch(this.valueType){
+                case 'value':
+                    this.showMin = true
+                    this.showMax = true
+                    this.showMinValue = true
+                    this.showMaxValue = true
+                    break
+                case 'custom':
+                    this.showMin = true
+                    this.showMax = true
+                    this.showMinValue = false
+                    this.showMaxValue = false
+                    break
+            }
+        }
+    },
+    filterStyle(styleObject){
+        return Object.keys(styleObject).map((key)=>{
+            return `${key}: ${styleObject[key]};`
+        }).join(' ')
+    },
+    filterCurrentValue(currentValue){
+        return this.tipsFormatter.replace(/{d}/g, currentValue);
+    },
+    onchange(e){
+        this.currentValue = e.progress
+        this.$emit('change', {currentValue: this.currentValue})
+    },
+    toggleTips(status){
+        if(status=='show'){
+            this.showTipsValue = true
+            this.$child('mask').show()
+        }else{
+            this.showTipsValue = false
+            this.$child('mask').hide()
+            this.$emit('afterChange', {currentValue: this.currentValue})
+        }
+    },
+    touchstartOfSlider(e){
+        this.tipsTop = e['_touches'][0]['clientY']
+        this.tipsLeft = e['_touches'][0]['clientX']
+    },
+    touchmoveOfSlider(e){
+        this.tipsLeft = e['_touches'][0]['clientX']
+        this.toggleTips('show');
+    },
+    touchendOfSlider(e){
+        this.toggleTips('hide');
+    },
+    touchcancelOfSlider(){
+        this.toggleTips('hide');
+    },
+    touchstartOfBackdrop(){
+        this.toggleTips('hide');
+    }
+}
+</script>  
