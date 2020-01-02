@@ -6,7 +6,7 @@
 <style lang="less">
 @font-face {
   font-family: iconfont;
-  src: url("iconfonts.ttf");
+  src: url("./iconfonts.ttf");
 }
 
 .font-icon {

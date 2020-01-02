@@ -82,6 +82,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-index {
   &-list {
     flex-direction: column;
@@ -91,34 +93,34 @@ export default {
     flex-direction: column;
     position: fixed;
     right: 0px;
-    top: 250px;
+    top: 250px * @ratio;
     align-items: center;
     justify-content: center;
 
     &-item {
-      padding: 3px 10px;
+      padding: 3px * @ratio 10px * @ratio;
 
       text {
         color: #000000;
-        font-size: 25px;
+        font-size: 25px * @ratio;
       }
     }
   }
 
   &-indicator {
-    width: 150px;
-    height: 150px;
+    width: 150px * @ratio;
+    height: 150px * @ratio;
     position: fixed;
-    top: 550px;
-    left: 300px;
+    top: 550px * @ratio;
+    left: 300px * @ratio;
     background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 20px;
+    border-radius: 20px * @ratio;
     align-items: center;
     justify-content: center;
 
     text {
       color: #ffffff;
-      font-size: 50px;
+      font-size: 50px * @ratio;
       font-weight: bold;
     }
   }

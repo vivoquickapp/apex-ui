@@ -94,22 +94,30 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-accordion-group {
   flex-direction: column;
   background-color: #eee;
   width: 100%;
 
   &-title {
-    margin: 10px 20px;
+    margin: 10px * @ratio 20px * @ratio;
+    text{
+      font-size: 30px * @ratio;
+    }
   }
 
   &-slot {
     flex-direction: column;
-    border-bottom: 1px solid #d0d0d0;
+    border-bottom: 1px * @ratio solid #d0d0d0;
   }
 
   &-label {
-    margin: 10px 20px;
+    margin: 10px * @ratio 20px * @ratio;
+    text{
+      font-size: 30px * @ratio;
+    }
   }
 }
 </style>

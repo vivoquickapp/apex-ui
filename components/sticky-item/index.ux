@@ -82,6 +82,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-sticky-item {
   flex-direction: column;
 
@@ -96,10 +98,11 @@ export default {
   &-title {
     width: 100%;
     background-color: #eee;
-    padding: 20px 30px;
+    padding: 20px * @ratio 30px * @ratio;
 
     text {
       color: #000000;
+      font-size: 30px * @ratio;
     }
   }
 

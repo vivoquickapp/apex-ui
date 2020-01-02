@@ -1,5 +1,5 @@
-<import name="my-button" src="apex-ui/components/button/index"></import>
-<import name="my-icon" src="apex-ui/components/icon/index"></import>
+<import name="my-button" src="../button/index"></import>
+<import name="my-icon" src="../icon/index"></import>
 <template>
   <div class="apex-wrap">
     <div class="content-wrap">

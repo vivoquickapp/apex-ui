@@ -34,16 +34,20 @@
 @import "../styles/base.less";
 .page {
   justify-content: space-between;
-  margin: 10px 0;
+  margin: 10px * @ratio 0;
 
   &-btn {
-    padding: 20px 25px;
+    padding: 20px * @ratio 25px * @ratio;
     border: 1px solid @border-color-base;
   }
   .disabled {
     background-color: @btn-disable-bg;
+    text {
+      font-size: 30px * @ratio;
+    }
     &-text {
       color: @btn-disable-color;
+      font-size: 30px * @ratio;
     }
   }
   &-number {
@@ -64,10 +68,10 @@
     margin: 0 auto;
     justify-content: center;
     &-dot {
-      width: 16px;
-      height: 16px;
-      margin: 0 4px;
-      border-radius: 8px;
+      width: 16px * @ratio;
+      height: 16px * @ratio;
+      margin: 0 4px * @ratio;
+      border-radius: 8px * @ratio;
       background-color: @btn-disable-color;
     }
     .current {

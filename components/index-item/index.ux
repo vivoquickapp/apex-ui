@@ -49,6 +49,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-index-item {
   flex-direction: column;
 
@@ -58,11 +60,11 @@ export default {
 
   &-hd {
     background-color: #eee;
-    padding: 10px 25px;
+    padding: 10px * @ratio 25px * @ratio;
 
     .name {
       color: #000000;
-      font-size: 40px;
+      font-size: 40px * @ratio;
       font-weight: bold;
     }
   }

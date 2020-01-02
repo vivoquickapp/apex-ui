@@ -2,25 +2,9 @@
 
 <template>
   <div class="{{isShow ? 'apex-gallery':''}}">
-    <swiper
-      class="apex-gallery-swiper"
-      style="{{customStyle}}"
-      indicator="{{indicator}}"
-      autoplay="{{autoplay}}"
-      interval="{{ interval }}"
-      duration="{{ duration }}"
-      loop="{{ loop }}"
-      vertical="{{ vertical }}"
-      index="{{ index }}"
-      if="{{ isShow && srcs.length }}"
-      onchange="handlerChange"
-    >
+    <swiper class="apex-gallery-swiper" style="{{customStyle}}" indicator="{{indicator}}" autoplay="{{autoplay}}" interval="{{ interval }}" duration="{{ duration }}" loop="{{ loop }}" vertical="{{ vertical }}" index="{{ index }}" if="{{ isShow && srcs.length }}" onchange="handlerChange">
       <div class="apex-gallery-img-wrap" for="{{(idx, image) in srcs}}">
-        <image
-          class="apex-gallery-img"
-          src="{{image}}"
-          onclick="onClickSwiperImage"
-        ></image>
+        <image class="apex-gallery-img" src="{{image}}" onclick="onClickSwiperImage"></image>
       </div>
     </swiper>
   </div>
@@ -81,6 +65,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-gallery {
   position: fixed;
   top: 0;
@@ -89,9 +75,10 @@ export default {
   left: 0;
   background-color: #eee;
 
-  &-swipe {
+  &-swiper {
     width: 100%;
     height: 100%;
+    indicator-size: 20px * @ratio;
   }
 
   &-img-wrap {

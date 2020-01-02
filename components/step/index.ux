@@ -1,30 +1,17 @@
 <import name="my-icon" src="../icon/index"></import>
 
 <template>
-  <div
-    class="apex-step"
-    style="width: {{width}};flex-direction: {{direction === 'horizontal' ? 'row' : 'column'}}"
-  >
-    <div
-      class="apex-step-wrap"
-      style="flex-direction: {{direction === 'horizontal' ? 'column' : 'row'}};width: {{direction === 'horizontal' ? '80%' : '100%'}};"
-    >
+  <div class="apex-step" style="width: {{width}};flex-direction: {{direction === 'horizontal' ? 'row' : 'column'}}">
+    <div class="apex-step-wrap" style="flex-direction: {{direction === 'horizontal' ? 'column' : 'row'}};width: {{direction === 'horizontal' ? '80%' : '100%'}};">
       <div class="apex-step-hd  {{className}}">
         <div class="apex-step-icon" if="{{!hasIcon}}">
           <text style="color: {{iconColor}};">{{ index + 1 }}</text>
         </div>
         <div class="apex-step-icon" else>
-          <my-icon
-            type="{{thumb}}"
-            size="50"
-            color="{{iconColor}}"
-            if="{{thumb}}"
-          ></my-icon>
+          <my-icon type="{{thumb}}" size="50" color="{{iconColor}}" if="{{thumb}}"></my-icon>
         </div>
       </div>
-      <div
-        class="apex-step-bd {{direction === 'horizontal' ? 'apex-step-bd-horizontal' : 'apex-step-bd-vertical'}}"
-      >
+      <div class="apex-step-bd {{direction === 'horizontal' ? 'apex-step-bd-horizontal' : 'apex-step-bd-vertical'}}">
         <div class="apex-step-title" if="{{ title }}">
           <text>{{ title }}</text>
         </div>
@@ -133,10 +120,10 @@ export default {
       index !== -1
         ? defaultStatus[index]
         : opts.index < opts.current
-        ? "finish"
-        : opts.index === opts.current
-        ? "process"
-        : "";
+          ? "finish"
+          : opts.index === opts.current
+            ? "process"
+            : "";
     const className = `apex-step-${myStatus}`;
     Object.assign(this._data, {
       ...opts,
@@ -151,38 +138,46 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-step {
   &-wrap {
     align-items: center;
-    padding: 10px;
+    padding: 10px * @ratio;
   }
 
   &-hd {
-    width: 70px;
-    height: 70px;
+    width: 70px * @ratio;
+    height: 70px * @ratio;
     background-color: #fff;
-    border: 3px solid #dddee1;
-    border-radius: 60px;
+    border: 3px * @ratio solid #dddee1;
+    border-radius: 60px * @ratio;
     justify-content: center;
+  }
+
+  &-icon {
+    text {
+      font-size: 30px * @ratio;
+    }
   }
 
   &-bd {
     flex-direction: column;
     &-horizontal {
       align-items: center;
-      margin-top: 10px;
+      margin-top: 10px * @ratio;
     }
     &-vertical {
       align-items: flex-start;
-      margin-top: 20px;
-      margin-left: 20px;
+      margin-top: 20px * @ratio;
+      margin-left: 20px * @ratio;
     }
   }
 
   &-title {
     text {
       color: #000;
-      font-size: 45px;
+      font-size: 45px * @ratio;
       font-weight: bold;
       lines: 1;
       text-overflow: ellipsis;
@@ -191,7 +186,7 @@ export default {
 
   &-content {
     text {
-      font-size: 30px;
+      font-size: 30px * @ratio;
       color: #dddee1;
       lines: 2;
       text-overflow: ellipsis;
@@ -200,43 +195,43 @@ export default {
 
   &-process {
     background-color: #2d8cf0;
-    border: 3px solid #2d8cf0;
+    border: 3px * @ratio solid #2d8cf0;
   }
 
   &-finish {
-    border: 3px solid #2d8cf0;
+    border: 3px * @ratio solid #2d8cf0;
   }
 
   &-error {
-    border: 3px solid #ed3f14;
+    border: 3px * @ratio solid #ed3f14;
   }
 
   &-horizontal-unfinish {
     width: 20%;
-    height: 5px;
+    height: 5px * @ratio;
     background-color: #dddee1;
-    margin-top: 40px;
+    margin-top: 40px * @ratio;
   }
 
   &-horizontal-finish {
     width: 20%;
-    height: 5px;
+    height: 5px * @ratio;
     background-color: #2d8cf0;
-    margin-top: 40px;
+    margin-top: 40px * @ratio;
   }
 
   &-vertical-unfinish {
-    width: 5px;
-    height: 50px;
+    width: 5px * @ratio;
+    height: 50px * @ratio;
     background-color: #dddee1;
-    margin-left: 40px;
+    margin-left: 40px * @ratio;
   }
 
   &-vertical-finish {
-    width: 5px;
-    height: 50px;
+    width: 5px * @ratio;
+    height: 50px * @ratio;
     background-color: #2d8cf0;
-    margin-left: 40px;
+    margin-left: 40px * @ratio;
   }
 }
 </style>
