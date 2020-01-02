@@ -27,14 +27,14 @@
 @import "../styles/base.less";
 
 .wrap {
-  padding-bottom: (108 * @base-ratio)+0px;
+  padding-bottom: 108px * @ratio;
 }
 
 .tab-bar {
   .shadow {
     position: fixed;
-    bottom: (108 * @base-ratio)+0px;
-    height: (9 * @base-ratio)+0px;
+    bottom: 108px * @ratio;
+    height: 9px * @ratio;
     width: 100%;
     background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.09));
   }
@@ -44,7 +44,7 @@
     position: fixed;
     bottom: 0;
     flex-direction: row;
-    height: (108 * @base-ratio)+0px;
+    height: 108px * @ratio;
     width: 100%;
     justify-content: space-around;
 
@@ -55,12 +55,12 @@
     }
 
     image {
-      width: (58 * @base-ratio)+0px;
-      height: (58 * @base-ratio)+0px;
+      width: 58px * @ratio;
+      height: 58px * @ratio;
     }
 
     text {
-      font-size: 30px;
+      font-size: 30px * @ratio;
     }
   }
 

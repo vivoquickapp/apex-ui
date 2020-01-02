@@ -1,4 +1,4 @@
-<import name="my-icon" src="apex-ui/components/icon/index"></import>
+<import name="my-icon" src="../icon/index"></import>
 <template>
   <div class="apex-select">
     <div class="mask" if="{{visible}}"></div>

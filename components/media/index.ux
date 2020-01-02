@@ -1,11 +1,6 @@
 <template>
   <div class="apex-media">
-    <image
-      class="apex-media-image"
-      src="{{thumb}}"
-      style="{{thumbStyle}}"
-      if="{{thumb}}"
-    ></image>
+    <image class="apex-media-image" src="{{thumb}}" style="{{thumbStyle}}" if="{{thumb}}"></image>
     <div class="apex-media-wrap">
       <div class="apex-media-hd">
         <div class="apex-media-title" if="{{ title }}">
@@ -44,26 +39,28 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-media {
   flex-direction: row;
-  padding: 10px 20px;
+  padding: 10px * @ratio 20px * @ratio;
 
   &-image {
-    width: 150px;
-    height: 150px;
+    width: 150px * @ratio;
+    height: 150px * @ratio;
     object-fit: contain;
   }
 
   &-wrap {
     width: 100%;
     flex-direction: column;
-    margin-left: 20px;
+    margin-left: 20px * @ratio;
   }
 
   &-hd {
     flex-direction: column;
     width: 100%;
-    height: 150px;
+    height: 150px * @ratio;
   }
 
   &-title {
@@ -72,7 +69,7 @@ export default {
       lines: 1;
       text-overflow: ellipsis;
       color: #000;
-      font-size: 45px;
+      font-size: 45px * @ratio;
       font-weight: 400;
     }
   }
@@ -83,7 +80,7 @@ export default {
       lines: 2;
       text-overflow: ellipsis;
       color: #808080;
-      font-size: 30px;
+      font-size: 30px * @ratio;
     }
   }
 }

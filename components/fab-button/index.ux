@@ -194,6 +194,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 @light: #ddd;
 @stable: #b2b2b2;
 @positive: #387ef5;
@@ -219,28 +221,28 @@ export default {
   position: fixed;
 
   &-center {
-    left: 320px;
-    top: 600px;
+    left: 320px * @ratio;
+    top: 600px * @ratio;
   }
 
   &-topLeft {
-    left: 15px;
-    top: 15px;
+    left: 15px * @ratio;
+    top: 15px * @ratio;
   }
 
   &-topRight {
-    right: 15px;
-    top: 15px;
+    right: 15px * @ratio;
+    top: 15px * @ratio;
   }
 
   &-bottomLeft {
-    left: 15px;
-    bottom: 15px;
+    left: 15px * @ratio;
+    bottom: 15px * @ratio;
   }
 
   &-bottomRight {
-    right: 15px;
-    bottom: 15px;
+    right: 15px * @ratio;
+    bottom: 15px * @ratio;
   }
 
   &-backdrop {
@@ -253,31 +255,31 @@ export default {
   }
 
   &-action {
-    width: 100px;
-    height: 100px;
+    width: 100px * @ratio;
+    height: 100px * @ratio;
     background-color: @balanced;
-    border-radius: 100px;
+    border-radius: 100px * @ratio;
     align-items: center;
     justify-content: center;
     position: fixed;
   }
 
   &-button {
-    width: 80px;
-    height: 80px;
+    width: 80px * @ratio;
+    height: 80px * @ratio;
     background-color: @balanced;
-    border-radius: 120px;
+    border-radius: 120px * @ratio;
     align-items: center;
     justify-content: center;
 
     &-label {
-      height: 50px;
-      margin-left: 20px;
-      font-size: 35px;
+      height: 50px * @ratio;
+      margin-left: 20px * @ratio;
+      font-size: 35px * @ratio;
       color: #fff;
       background-color: rgba(0, 0, 0, 0.4);
-      padding: 0 10px;
-      border-radius: 5px;
+      padding: 0 10px * @ratio;
+      border-radius: 5px * @ratio;
     }
 
     &-wrap {
@@ -286,28 +288,28 @@ export default {
     }
 
     &-center {
-      left: 330px;
-      top: 610px;
+      left: 330px * @ratio;
+      top: 610px * @ratio;
     }
 
     &-topLeft {
-      left: 25px;
-      top: 25px;
+      left: 25px * @ratio;
+      top: 25px * @ratio;
     }
 
     &-topRight {
-      right: 25px;
-      top: 25px;
+      right: 25px * @ratio;
+      top: 25px * @ratio;
     }
 
     &-bottomLeft {
-      left: 25px;
-      bottom: 25px;
+      left: 25px * @ratio;
+      bottom: 25px * @ratio;
     }
 
     &-bottomRight {
-      right: 25px;
-      bottom: 25px;
+      right: 25px * @ratio;
+      bottom: 25px * @ratio;
     }
   }
 
@@ -414,50 +416,50 @@ export default {
 }
 
 .animation {
-  .keyframes(h0, 100px);
-  .keyframes(h1, 190px);
-  .keyframes(h2, 280px);
-  .keyframes(h3, 370px);
-  .keyframes-close(h0close, 100px);
-  .keyframes-close(h1close, 190px);
-  .keyframes-close(h2close, 280px);
-  .keyframes-close(h3close, 370px);
+  .keyframes(h0, 100px * @ratio);
+  .keyframes(h1, 190px * @ratio);
+  .keyframes(h2, 280px * @ratio);
+  .keyframes(h3, 370px * @ratio);
+  .keyframes-close(h0close, 100px * @ratio);
+  .keyframes-close(h1close, 190px * @ratio);
+  .keyframes-close(h2close, 280px * @ratio);
+  .keyframes-close(h3close, 370px * @ratio);
 
-  .keyframes(hr0, -100px);
-  .keyframes(hr1, -190px);
-  .keyframes(hr2, -280px);
-  .keyframes(hr3, -370px);
-  .keyframes-close(hr0close, -100px);
-  .keyframes-close(hr1close, -190px);
-  .keyframes-close(hr2close, -280px);
-  .keyframes-close(hr3close, -370px);
+  .keyframes(hr0, -100px * @ratio);
+  .keyframes(hr1, -190px * @ratio);
+  .keyframes(hr2, -280px * @ratio);
+  .keyframes(hr3, -370px * @ratio);
+  .keyframes-close(hr0close, -100px * @ratio);
+  .keyframes-close(hr1close, -190px * @ratio);
+  .keyframes-close(hr2close, -280px * @ratio);
+  .keyframes-close(hr3close, -370px * @ratio);
 
-  .keyframesY(v0, 100px);
-  .keyframesY(v1, 190px);
-  .keyframesY(v2, 280px);
-  .keyframesY(v3, 370px);
-  .keyframesY-close(v0close, 100px);
-  .keyframesY-close(v1close, 190px);
-  .keyframesY-close(v2close, 280px);
-  .keyframesY-close(v3close, 370px);
+  .keyframesY(v0, 100px * @ratio);
+  .keyframesY(v1, 190px * @ratio);
+  .keyframesY(v2, 280px * @ratio);
+  .keyframesY(v3, 370px * @ratio);
+  .keyframesY-close(v0close, 100px * @ratio);
+  .keyframesY-close(v1close, 190px * @ratio);
+  .keyframesY-close(v2close, 280px * @ratio);
+  .keyframesY-close(v3close, 370px * @ratio);
 
-  .keyframesY(vr0, -100px);
-  .keyframesY(vr1, -190px);
-  .keyframesY(vr2, -280px);
-  .keyframesY(vr3, -370px);
-  .keyframesY-close(vr0close, -100px);
-  .keyframesY-close(vr1close, -190px);
-  .keyframesY-close(vr2close, -280px);
-  .keyframesY-close(vr3close, -370px);
+  .keyframesY(vr0, -100px * @ratio);
+  .keyframesY(vr1, -190px * @ratio);
+  .keyframesY(vr2, -280px * @ratio);
+  .keyframesY(vr3, -370px * @ratio);
+  .keyframesY-close(vr0close, -100px * @ratio);
+  .keyframesY-close(vr1close, -190px * @ratio);
+  .keyframesY-close(vr2close, -280px * @ratio);
+  .keyframesY-close(vr3close, -370px * @ratio);
 
-  .keyframes(c0, 100px);
-  .keyframesY(c1, -100px);
-  .keyframes(c2, -100px);
-  .keyframesY(c3, 100px);
-  .keyframes-close(c0close, 100px);
-  .keyframesY-close(c1close, -100px);
-  .keyframes-close(c2close, -100px);
-  .keyframesY-close(c3close, 100px);
+  .keyframes(c0, 100px * @ratio);
+  .keyframesY(c1, -100px * @ratio);
+  .keyframes(c2, -100px * @ratio);
+  .keyframesY(c3, 100px * @ratio);
+  .keyframes-close(c0close, 100px * @ratio);
+  .keyframesY-close(c1close, -100px * @ratio);
+  .keyframes-close(c2close, -100px * @ratio);
+  .keyframesY-close(c3close, 100px * @ratio);
 
   .animation(h0);
   .animation(h1);

@@ -82,9 +82,9 @@ export default {
 }
 
 .btn {
-  border-radius: 6px;
-  margin: 10px;
-  padding: 0 20px;
+  border-radius: 6px * @ratio;
+  margin: 10px * @ratio;
+  padding: 0 20px * @ratio;
   justify-content: center;
   height: @btn-circle-size;
   line-height: @btn-circle-size;
@@ -96,6 +96,8 @@ export default {
 
   .content {
     color: @text-color;
+    font-size: 30px * @ratio;
+    font-weight: @btn-font-weight;
   }
   &-hover {
     opacity: 0.9;
@@ -155,12 +157,12 @@ export default {
   }
 
   &-loading-inner {
-    width: 36px;
-    height: 36px;
+    width: 36px * @ratio;
+    height: 36px * @ratio;
     align-self: center;
-    margin-right: 28px;
+    margin-right: 28px * @ratio;
     color: #ffffff;
-    stroke-width: 4px;
+    stroke-width: 4px * @ratio;
   }
 
   &-disabled {

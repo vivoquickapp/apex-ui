@@ -4,12 +4,8 @@
   <div class="apex-accordion">
     <div class="apex-accordion-hd" onclick="onClick">
       <div class="apex-accordion-hd-left">
-        <div if="{{thumb}}">
-          <image class="apex-accordion-thumb" src="{{thumb}}"></image>
-        </div>
-        <div if="{{title}}">
-          <text class="apex-accordion-title">{{ title }}</text>
-        </div>
+        <image class="apex-accordion-thumb" src="{{thumb}}" if="{{thumb}}"></image>
+        <text class="apex-accordion-title" if="{{title}}">{{ title }}</text>
         <div else>
           <slot name="header"></slot>
         </div>
@@ -106,25 +102,30 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-accordion {
   flex-direction: column;
   background-color: #fff;
-  border-top: 1px solid #d0d0d0;
+  border-top: 1px * @ratio solid #d0d0d0;
 
   &-hd {
-    padding: 25px;
+    width: 100%;
+    height: 100px * @ratio;
+    padding: 25px * @ratio;
     justify-content: space-between;
   }
 
   &-thumb {
-    width: 50px;
-    height: 50px;
+    width: 50px * @ratio;
+    height: 50px * @ratio;
     object-fit: contain;
-    margin-right: 10px;
+    margin-right: 10px * @ratio;
   }
 
   &-title {
-    font-size: 35px;
+    font-size: 35px * @ratio;
+    line-height: 35px * @ratio;
     color: #000;
     lines: 1;
     text-overflow: ellipsis;
@@ -133,6 +134,7 @@ export default {
   &-content {
     text {
       color: #000;
+      font-size: 30px * @ratio;
     }
   }
 
@@ -173,7 +175,7 @@ export default {
   }
 
   &-bd {
-    padding: 30px;
+    padding: 30px * @ratio;
     border-top: 1px solid#D0D0D0;
   }
 }

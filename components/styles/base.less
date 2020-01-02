@@ -1,4 +1,4 @@
-@base-ratio: 1; // your designWidth / 750
+@ratio: 400/750; // your designWidth / 750
 // Color
 @primary-color: #2d8cf0;
 @info-color: #2db7f5;
@@ -23,19 +23,19 @@
 @border-color-split: #e9eaec; // inside
 
 // Size
-@size-grid-icon: 40px;
-@size-font-base: 30px;
-@size-font-small: 24px;
+@size-grid-icon: 40px * @ratio;
+@size-font-base: 30px * @ratio;
+@size-font-small: 24px * @ratio;
 
 // Button
 @btn-font-weight: normal;
-@btn-padding-base: 6px 15px;
-@btn-padding-large: 6px 15px 7px 15px;
-@btn-padding-small: 2px 7px;
-@btn-font-size: 12px;
-@btn-font-size-large: 14px;
-@btn-border-radius: 4px;
-@btn-border-radius-small: 3px;
+@btn-padding-base: 6px * @ratio 15px * @ratio;
+@btn-padding-large: 6px * @ratio 15px * @ratio 7px * @ratio 15px * @ratio;
+@btn-padding-small: 2px * @ratio 7px * @ratio;
+@btn-font-size: 12px * @ratio;
+@btn-font-size-large: 14px * @ratio;
+@btn-border-radius: 4px * @ratio;
+@btn-border-radius-small: 3px * @ratio;
 @btn-group-border: shade(@primary-color, 5%);
 
 @btn-disable-color: #bbbec4;
@@ -53,9 +53,9 @@
 @btn-ghost-bg: transparent;
 @btn-ghost-border: @border-color-base;
 
-@btn-circle-size-large: 96px;
-@btn-circle-size: 88px;
-@btn-circle-size-small: 80px;
+@btn-circle-size-large: 96px * @ratio;
+@btn-circle-size: 88px * @ratio;
+@btn-circle-size-small: 80px * @ratio;
 
 // Animation
 @animation-time: .3s;
@@ -64,11 +64,11 @@
 
 //Switch组件
 @themeColor: #2d8cf0;
-@SwitchWidth: 100;
-@SwitchHeight: 48;
-@SwitchPadding: 4;
-@SwitchCircleSize: 40;
-@SwitchCircleTranslateX: @SwitchWidth - @SwitchCircleSize - @SwitchPadding * 2 + 0px;
+@SwitchWidth: 100px;
+@SwitchHeight: 48px;
+@SwitchPadding: 4px;
+@SwitchCircleSize: 40px;
+@SwitchCircleTranslateX: (@SwitchWidth - @SwitchCircleSize - @SwitchPadding * 2) * @ratio;
 @SwitchCircleColor: #FFFFFF;
 @SwitchOnColor: @themeColor; //使用全局变量,也可以自己定义.
 @SwitchOffColor: #D8D8D8;
@@ -76,19 +76,19 @@
 @SwitchDisabledOffColor: #F3F3F3;
 
 //CheckBox组件
-@checkbox-size: 46px;
+@checkbox-size: 46px * @ratio;
 
 // Avatar
 @avatar-bg: #ccc;
 @avatar-color: #fff;
-@avatar-size-base: 100px;
-@avatar-size-lg: 120px;
-@avatar-size-sm: 80px;
-@avatar-font-size-base: 50px;
-@avatar-font-size-lg: 60px;
-@avatar-font-size-sm: 40px;
+@avatar-size-base: 100px * @ratio;
+@avatar-size-lg: 120px * @ratio;
+@avatar-size-sm: 80px * @ratio;
+@avatar-font-size-base: 50px * @ratio;
+@avatar-font-size-lg: 60px * @ratio;
+@avatar-font-size-sm: 40px * @ratio;
 @avatar-border-radius: @border-radius-small;
-@border-radius-small: 4px;
+@border-radius-small: 4px * @ratio;
 
 // Animation 样式
 .hide {
@@ -97,7 +97,7 @@
 .show {
     display: flex;
 }
- 
+
 
 .opacity-hide-to-show {
     animation-name: opacityHideToShow;
