@@ -11,6 +11,7 @@
 </template>
 
 <style lang="less">
+@import "../styles/base.less";
 .rating {
   flex-direction: row;
 }
@@ -23,6 +24,7 @@
 .font-icon {
   font-family: iconfont;
   text-align: center;
+  font-size: @text-size;
 }
 </style>
 

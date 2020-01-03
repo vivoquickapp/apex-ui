@@ -25,13 +25,10 @@
         </block>
       </div>
 
-      <div class="popup-close" show="{{closable}}">
-        <my-icon
-          type="close"
-          size="70"
-          color="#888888"
-          onclick="handleClickClose"
-        ></my-icon>
+      <div class="popup-close" show="{{closable}}" onclick="handleClickClose">
+        <slot name="close">
+          <text class="popup-close-icon">×</text>
+        </slot>
       </div>
     </div>
   </div>
@@ -59,9 +56,9 @@
     .popup-header {
       .popup-header-text {
         flex: 1;
-        padding: 30px 70px 30px;
+        padding: 30px * @ratio 70px * @ratio 30px * @ratio;
         text-align: center;
-        font-size: 30px;
+        font-size: 30px * @ratio;
         font-weight: bold;
       }
     }
@@ -70,13 +67,13 @@
       .popup-body-text {
         flex: 1;
         text-align: center;
-        padding: 15px 70px 60px;
+        padding: 15px * @ratio 70px * @ratio 60px * @ratio;
       }
     }
     .popup-footer {
       .popup-footer-text {
         flex: 1;
-        padding: 30px 70px 30px;
+        padding: 30px * @ratio 70px * @ratio 30px * @ratio;
         text-align: center;
       }
     }
@@ -84,6 +81,12 @@
       position: absolute;
       top: 0;
       right: 0;
+      &-icon {
+        font-size: 50px * @ratio;
+        font-weight: bold;
+        padding-top: 16px * @ratio;
+        padding-right: 35px * @ratio;
+      }
     }
     &-center {
       width: 80%;

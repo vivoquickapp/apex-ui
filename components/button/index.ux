@@ -4,9 +4,7 @@
     class="btn-{{type}} btn-{{size}} btn-{{shape}} {{ disabled ? 'btn-disabled' : ''}} {{ inline ? 'inline' : ''}} {{ loading ? 'btn-loading' : '' }} btn"
     onclick="clickHandler"
   >
-    <progress class="btn-loading-inner" type="circular" if="loading"
-      >></progress
-    >
+    <progress class="btn-loading-inner" type="circular" if="loading"></progress>
     <text class="content">
       <slot></slot>
     </text>

@@ -24,7 +24,7 @@
   width: 100%;
   justify-content: center;
   background-color: @primary-color;
-  height: 60px;
+  height: 60px * @ratio;
   opacity: 1;
 
   text {
@@ -32,7 +32,7 @@
     text-align: center;
     font-size: @size-font-small;
     lines: 1;
-    padding: 0 20px;
+    padding: 0 20px * @ratio;
     text-overflow: ellipsis;
   }
 
@@ -52,14 +52,14 @@
     opacity: 0;
   }
   to {
-    height: 60px;
+    height: 60px * @ratio;
     opacity: 1;
   }
 }
 
 @keyframes hide {
   from {
-    height: 60px;
+    height: 60px * @ratio;
     opacity: 1;
   }
   to {

@@ -5,7 +5,7 @@
     </div>
     <div class="title">
       <block if="{{ title }}">
-        <text>{{ title }}</text>
+        <text class="text">{{ title }}</text>
       </block>
       <block if="{{ !title }}">
         <slot></slot>
@@ -23,13 +23,21 @@
   justify-content: space-between;
   width: 100%;
   padding: 10px * @ratio;
-  text {
+  .text {
     color: #ffffff;
+  }
+  .left,
+  .right,
+  .title {
+    .text {
+      font-size: @text-size;
+    }
   }
   &-light {
     background-color: #ffffff;
-    text {
+    .text {
       color: @text-color;
+      font-size: @text-size;
     }
   }
   &-dark {

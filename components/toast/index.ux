@@ -77,31 +77,31 @@
   align-items: center;
   background-color: rgba(0, 0, 0, 0.7);
   margin: 0 auto;
-  padding: 10px 18px;
-  border-radius: 8px;
+  padding: 10px * @ratio 18px * @ratio;
+  border-radius: 8px * @ratio;
 
   text {
     color: #fff;
     text-align: center;
     font-size: @size-font-small;
     lines: 1;
-    padding: 0 20px;
+    padding: 0 20px * @ratio;
     text-overflow: ellipsis;
   }
 
   .loading {
     color: #ffffff;
-    height: 60px;
-    width: 60px;
+    height: 60px * @ratio;
+    width: 60px * @ratio;
   }
 
   .custom-icon {
-    margin: 15px;
+    margin: 15px * @ratio;
   }
 
   &-type {
     justify-content: center;
-    margin: 15px;
+    margin: 15px * @ratio;
   }
 
   &-mask {
@@ -113,15 +113,15 @@
   }
 
   &-icon {
-    font-size: 38px;
-    margin-bottom: 6px;
+    font-size: 38px * @ratio;
+    margin-bottom: 6px * @ratio;
   }
 
   &-image {
-    width: 100px;
-    height: 100px;
+    width: 100px * @ratio;
+    height: 100px * @ratio;
     object-fit: cover;
-    margin: 15px;
+    margin: 15px * @ratio;
   }
 }
 </style>

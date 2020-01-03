@@ -28,25 +28,25 @@
   justify-content: center;
   width: 100%;
   .icon {
-    height: 150px;
+    height: 150px * @ratio;
     object-fit: cover;
   }
   .apex-title {
     color: @title-color;
     font-size: @size-font-base;
-    margin: 10px 0;
+    margin: 10px * @ratio 0;
   }
   .apex-text {
     color: @text-color;
     font-size: @size-font-small;
-    margin: 10px 0;
+    margin: 10px * @ratio 0;
   }
   .buttons {
     flex-direction: column;
     .button {
       border: 1px solid @border-color-base;
-      padding: 10px 20px;
-      margin: 10px;
+      padding: 10px * @ratio 20px * @ratio;
+      margin: 10px * @ratio;
       text-align: center;
       border-radius: @btn-border-radius;
     }

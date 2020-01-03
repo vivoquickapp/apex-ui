@@ -48,26 +48,29 @@
   </div>
 </template>
 <style lang="less">
+@import "../styles/base.less";
+
 .calendar {
   position: fixed;
   bottom: -50px;
   left: 0;
   width: 100%;
-  height: 1400px;
-  padding-top: 50px;
-  border-radius: 50px;
+  height: 1400px * @ratio;
+  padding-top: 50px * @ratio;
+  border-radius: 50px * @ratio;
   z-index: 9;
   flex-direction: column;
   .message {
-    height: 60px;
+    height: 60px * @ratio;
     text-align: center;
     background-color: bisque;
+    font-size: @text-size;
   }
 
   .weekday {
     flex-direction: row;
     justify-content: space-around;
-    padding: 10px 0;
+    padding: 10px * @ratio 0;
   }
 
   .red {
@@ -77,19 +80,19 @@
   .calendar-data {
     .outer-list {
       flex-direction: column;
-      padding-bottom: 70px;
+      padding-bottom: 70px * @ratio;
 
       .date {
-        height: 60px;
-        padding: 20px 40px;
+        height: 60px * @ratio;
+        padding: 20px * @ratio 40px * @ratio;
       }
 
       .inner-list {
         flex-wrap: wrap;
 
         .list-item {
-          height: 107px;
-          width: 100px;
+          height: 107px * @ratio;
+          width: 100px * @ratio;
           justify-content: center;
           align-content: center;
           flex-grow: 1;
@@ -105,12 +108,12 @@
 
     .top {
       flex-direction: column;
-      height: 60px;
+      height: 60px * @ratio;
       width: 100%;
 
       .date {
-        height: 60px;
-        padding: 20px 40px;
+        height: 60px * @ratio;
+        padding: 20px * @ratio 40px * @ratio;
       }
     }
   }
@@ -124,6 +127,9 @@
   z-index: 1;
   height: 100%;
   width: 100%;
+}
+text {
+  font-size: @text-size;
 }
 </style>
 <script>

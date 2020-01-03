@@ -2,24 +2,43 @@
   <div class="apex-image">
     <stack>
       <div class="image-wrap">
-        <image class="apex-image-{{shape}}" style="width:{{width}};height:{{height}}" src="{{src}}" oncomplete="handleLoadedImage" onerror="handleError" if="{{src}}"></image>
+        <image
+          class="apex-image-{{shape}}"
+          style="width:{{width}};height:{{height}}"
+          src="{{src}}"
+          oncomplete="handleLoadedImage"
+          onerror="handleError"
+          if="{{src}}"
+        ></image>
         <div else>
           <slot></slot>
         </div>
       </div>
-      <div class="empty" style="width:{{width}};height:{{height}}" if="{{ status === 'empty' }}">
+      <div
+        class="empty"
+        style="width:{{width}};height:{{height}}"
+        if="{{ status === 'empty' }}"
+      >
         <text if="{{empty}}">{{ empty }}</text>
         <div else>
           <slot name="empty"></slot>
         </div>
       </div>
-      <div class="loading" style="width:{{width}};height:{{height}}" elif="{{ status === 'loading' }}">
+      <div
+        class="loading"
+        style="width:{{width}};height:{{height}}"
+        elif="{{ status === 'loading' }}"
+      >
         <text class="loading-text" if="{{loading}}">{{ loading }}</text>
         <div else>
           <slot name="loading"></slot>
         </div>
       </div>
-      <div class="error" style="width:{{width}};height:{{height}}" elif="{{ status === 'error' }}">
+      <div
+        class="error"
+        style="width:{{width}};height:{{height}}"
+        elif="{{ status === 'error' }}"
+      >
         <text class="error-text" if="{{error}}">{{ error }}</text>
         <div else>
           <slot name="error"></slot>

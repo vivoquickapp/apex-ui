@@ -227,6 +227,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
+
 .mask {
   position: fixed;
   flex: 1;
@@ -253,16 +255,16 @@ export default {
       flex-direction: column;
       .top {
         width: 100%;
-        padding: 30px;
-        padding-bottom: 15px;
+        padding: 30px * @ratio;
+        padding-bottom: 15px * @ratio;
         justify-content: space-between;
         .title {
           text-align: center;
           color: #000;
-          font-size: 32px;
+          font-size: 32px * @ratio;
           &-close {
             width: 95%;
-            margin-left: 25px;
+            margin-left: 25px * @ratio;
           }
           &-none {
             width: 100%;
@@ -270,40 +272,40 @@ export default {
         }
         .close {
           width: 5%;
-          margin-top: -20px;
+          margin-top: -20px * @ratio;
           text {
             text-align: center;
             width: 100%;
-            font-size: 50px;
+            font-size: 50px * @ratio;
           }
         }
       }
       .content {
-        padding: 30px;
-        padding-top: 15px;
-        font-size: 28px;
+        padding: 30px * @ratio;
+        padding-top: 15px * @ratio;
+        font-size: 28px * @ratio;
         color: #a0a0a0;
         text-align: center;
       }
       input {
-        font-size: 28px;
+        font-size: 28px * @ratio;
         border: 1px solid #e7e7e7;
         width: 100%;
-        margin: 30px;
-        height: 60px;
-        line-height: 60px;
-        margin-top: 0px;
-        padding-left: 16px;
+        margin: 30px * @ratio;
+        height: 60px * @ratio;
+        line-height: 60px * @ratio;
+        margin-top: 0;
+        padding-left: 16px * @ratio;
       }
     }
     .btn {
       .btnbox {
-        padding: 24px;
+        padding: 24px * @ratio;
         border-top: 1px solid #e7e7e7;
         text {
           width: 100%;
           text-align: center;
-          font-size: 32px;
+          font-size: 32px * @ratio;
           color: #000000;
         }
       }

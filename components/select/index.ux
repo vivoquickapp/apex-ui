@@ -24,19 +24,15 @@
           for="{{options}}"
           onclick="bindChange($idx,$item)"
         >
-          <div class="checkBox">
+          <div class="checkbox">
             <div
               class="circle  {{$item.status?'circle-active':'circle-none'}}"
               if="{{type==='checkBox'}}"
             >
               <my-icon type="checkmark" color="#ffffff" size="56"></my-icon>
             </div>
-            <text if="{{$item.name}}" style="margin-left:20px;">{{
-              $item.name
-            }}</text>
-            <text if="{{!$item.name}}" style="margin-left:20px;">{{
-              $item
-            }}</text>
+            <text if="{{$item.name}}">{{ $item.name }}</text>
+            <text if="{{!$item.name}}">{{ $item }}</text>
           </div>
           <div class="radio" if="{{type==='radio' && $item.status}}">
             <my-icon type="checkmark" color="#32cd32" size="56"></my-icon>
@@ -137,47 +133,55 @@ export default {
 </script>
 
 <style lang="less">
+@import "../styles/base.less";
 .mask {
   background-color: rgba(0, 0, 0, 0.3);
   position: fixed;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 .select-body {
   background-color: rgb(255, 255, 255);
   width: 100%;
   height: 35%;
   position: fixed;
-  bottom: 0px;
-  left: 0px;
+  bottom: 0;
+  left: 0;
   flex-direction: column;
   .title {
     width: 100%;
-    height: 100px;
+    height: 100px * @ratio;
     background-color: #f6f6f6;
-    padding: 20px;
+    padding: 20px * @ratio;
     border-bottom: 1px solid #e4e4e4;
     justify-content: space-between;
     .btn {
       width: 10%;
     }
+    text {
+      font-size: @text-size;
+    }
   }
   .opt-list {
     width: 100%;
-    padding: 0 20px;
+    padding: 0 20px * @ratio;
     align-content: space-around;
+    .checkbox > text {
+      margin-left: 20px * @ratio;
+      font-size: @text-size;
+    }
     list-item {
       flex: 1;
-      height: 80px;
+      height: 80px * @ratio;
       border-bottom: 1px solid #e4e4e4;
       justify-content: space-between;
       align-items: center;
       .circle {
-        width: 50px;
-        height: 50px;
-        border-radius: 25px;
+        width: 50px * @ratio;
+        height: 50px * @ratio;
+        border-radius: 25px * @ratio;
         border: 1px solid #32cd32;
         background-color: #ffffff;
         &-active {

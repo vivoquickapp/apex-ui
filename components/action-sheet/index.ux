@@ -47,6 +47,8 @@
   </my-popup>
 </template>
 <style lang="less">
+@import "../styles/base.less";
+
 .default-sheet {
   flex-direction: column;
   background-color: #efeff4;
@@ -54,7 +56,8 @@
     flex-direction: column;
     background-color: #ffffff;
     .default-sheet-title-text {
-      padding: 30px 20px;
+      padding: 30px * @ratio 20px * @ratio;
+      font-size: 30px * @ratio;
       font-weight: bold;
       text-align: center;
       border-bottom: 1px solid #d9d9d9;
@@ -65,7 +68,7 @@
     flex: 1;
     flex-direction: row;
     justify-content: center;
-    padding: 30px 20px;
+    padding: 30px * @ratio 20px * @ratio;
     text-align: center;
     &:active {
       border-color: #d1d3d6;
@@ -74,25 +77,28 @@
   }
 
   .default-sheet-btn {
-    border-bottom: 1px solid #d9d9d9;
+    border-bottom: 1px * @ratio solid #d9d9d9;
     .default-sheet-btn-text {
       color: #495060;
-      margin: 0 10px;
+      font-size: 30px * @ratio;
+      margin: 0 10px * @ratio;
     }
   }
   .default-sheet-btn-delete {
-    border-top: 1px solid #d9d9d9;
+    border-top: 1px * @ratio solid #d9d9d9;
     border-bottom: 0;
     .default-sheet-btn-delete-text {
       color: #ff3b30;
+      font-size: 30px * @ratio;
     }
   }
   .default-sheet-btn-cancel {
     border-top: 0;
-    margin-top: 20px;
+    margin-top: 20px * @ratio;
     background-color: #ffffff;
     .default-sheet-btn-cancel-text {
       color: #495060;
+      font-size: 30px * @ratio;
     }
   }
 }
@@ -100,16 +106,17 @@
 .iOS-sheet {
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.4);
-  padding: 0 20px 20px;
+  padding: 0 20px * @ratio 20px * @ratio;
   .iOS-sheet-options-wrap {
     flex-direction: column;
     background-color: #f1f2f3;
-    border-radius: 10px;
+    border-radius: 10px * @ratio;
     .iOS-sheet-title-text {
-      padding: 30px 20px;
+      padding: 30px * @ratio 20px * @ratio;
+      font-size: 30px * @ratio;
       font-weight: bold;
       text-align: center;
-      border-bottom: 1px solid #d9d9d9;
+      border-bottom: 1px * @ratio solid #d9d9d9;
     }
   }
 
@@ -117,7 +124,7 @@
     flex: 1;
     flex-direction: row;
     justify-content: center;
-    padding: 23px 20px;
+    padding: 23px * @ratio 20px * @ratio;
     text-align: center;
     &:active {
       border-color: #d1d3d6;
@@ -126,31 +133,31 @@
   }
 
   .iOS-sheet-btn {
-    border-bottom: 1px solid #d9d9d9;
+    border-bottom: 1px * @ratio solid #d9d9d9;
     .iOS-sheet-btn-text {
       color: #007aff;
-      margin: 0 10px;
-      font-size: 42px;
+      margin: 0 10px * @ratio;
+      font-size: 42px * @ratio;
       font-weight: 500;
     }
   }
   .iOS-sheet-btn-delete {
-    border-top: 1px solid #d9d9d9;
+    border-top: 1px * @ratio solid #d9d9d9;
     border-bottom: 0;
     .iOS-sheet-btn-delete-text {
       color: #ff3b30;
-      font-size: 42px;
+      font-size: 42px * @ratio;
       font-weight: 500;
     }
   }
 
   .iOS-sheet-btn-cancel {
-    margin-top: 20px;
-    border-radius: 10px;
+    margin-top: 20px * @ratio;
+    border-radius: 10px * @ratio;
     background-color: #ffffff;
     .iOS-sheet-btn-cancel-text {
       color: #007aff;
-      font-size: 42px;
+      font-size: 42px * @ratio;
       font-weight: 500;
     }
   }
