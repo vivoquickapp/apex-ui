@@ -42,35 +42,37 @@
   </div>
 </template>
 <style lang="less">
+@import "../styles/base.less";
+
 .apex-wrap {
-  padding: 0 10px;
+  padding: 0 10px * @ratio;
 
   .files {
     flex-wrap: wrap;
 
     .file {
-      height: 160px;
-      width: 160px;
-      margin: 10px;
-      padding: 5px;
-      border: 2px solid #dcdcdc;
-      border-radius: 5px;
+      height: 160px * @ratio;
+      width: 160px * @ratio;
+      margin: 10px * @ratio;
+      padding: 5px * @ratio;
+      border: 2px * @ratio solid #dcdcdc;
+      border-radius: 5px * @ratio;
 
       stack {
         flex-direction: row-reverse;
 
         .thumb {
-          height: 160px;
-          width: 160px;
+          height: 160px * @ratio;
+          width: 160px * @ratio;
         }
 
         .remove {
           align-self: flex-start;
 
           image {
-            height: 30px;
-            width: 30px;
-            margin: 5px;
+            height: 30px * @ratio;
+            width: 30px * @ratio;
+            margin: 5px * @ratio;
           }
         }
       }
@@ -78,11 +80,11 @@
   }
 
   .button {
-    height: 160px;
-    width: 160px;
-    margin: 10px;
-    border: 2px dashed #dedede;
-    border-radius: 5px;
+    height: 160px * @ratio;
+    width: 160px * @ratio;
+    margin: 10px * @ratio;
+    border: 2px * @ratio dashed #dedede;
+    border-radius: 5px * @ratio;
     justify-content: center;
     align-content: center;
   }

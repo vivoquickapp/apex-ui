@@ -1,4 +1,4 @@
-@ratio: 400/750; // your designWidth / 750
+@ratio: 360/750; // your designWidth / 750
 // Color
 @primary-color: #2d8cf0;
 @info-color: #2db7f5;
@@ -15,6 +15,7 @@
 
 @title-color: #1c2438;
 @text-color: #495060;
+@text-size: 30px * @ratio;
 
 @background-color-base: #f7f7f7; // base
 
@@ -64,11 +65,11 @@
 
 //Switch组件
 @themeColor: #2d8cf0;
-@SwitchWidth: 100px;
-@SwitchHeight: 48px;
-@SwitchPadding: 4px;
-@SwitchCircleSize: 40px;
-@SwitchCircleTranslateX: (@SwitchWidth - @SwitchCircleSize - @SwitchPadding * 2) * @ratio;
+@SwitchWidth: 100px * @ratio;
+@SwitchHeight: 48px * @ratio;
+@SwitchPadding: 4px * @ratio;
+@SwitchCircleSize: 40px * @ratio;
+@SwitchCircleTranslateX: @SwitchWidth - @SwitchCircleSize - @SwitchPadding * 2;
 @SwitchCircleColor: #FFFFFF;
 @SwitchOnColor: @themeColor; //使用全局变量,也可以自己定义.
 @SwitchOffColor: #D8D8D8;

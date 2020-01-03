@@ -39,11 +39,12 @@
   </div>
 </template>
 <style lang="less">
+@import "../styles/base";
 .apex-wrap {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30px;
+  padding: 0 30px * @ratio;
 
   .content-wrap {
     flex-direction: column;
@@ -51,7 +52,7 @@
     width: 100%;
 
     .header {
-      margin: 80px;
+      margin: 80px * @ratio;
     }
 
     .body {
@@ -60,15 +61,15 @@
 
       .title {
         text-align: center;
-        font-size: 50px;
+        font-size: 50px * @ratio;
         font-weight: bold;
-        margin-bottom: 20px;
+        margin-bottom: 20px * @ratio;
       }
 
       .desc {
         text-align: center;
-        font-size: 30px;
-        margin-bottom: 50px;
+        font-size: 30px * @ratio;
+        margin-bottom: 50px * @ratio;
       }
 
       .buttons {
@@ -78,7 +79,10 @@
   }
 
   .footer {
-    margin: 30px 0;
+    margin: 30px * @ratio 0;
+    text {
+      font-size: @text-size;
+    }
   }
 }
 
@@ -89,7 +93,7 @@
   width: 100%;
   justify-content: center;
   align-content: center;
-  padding: 30px 0;
+  padding: 30px * @ratio 0;
 }
 </style>
 <script>

@@ -33,24 +33,24 @@
 .apex-card {
   flex-direction: column;
   background-color: #fff;
-  margin: 20px;
+  margin: 20px * @ratio;
   border: 1px solid @border-color-base;
-  border-radius: 10px;
+  border-radius: 10px * @ratio;
 
   &-bordered {
     border: 1px solid @border-color-base;
   }
 
   &-full {
-    margin: 20px 0;
+    margin: 20px * @ratio 0;
     border-left-width: 0;
     border-right-width: 0;
     border-radius: 0;
   }
 
   &-header {
-    height: 150px;
-    padding: 10px 20px;
+    height: 150px * @ratio;
+    padding: 10px * @ratio 20px * @ratio;
     justify-content: space-between;
     border-bottom-color: @border-color-base;
     border-bottom-width: 1px;
@@ -58,7 +58,7 @@
   }
 
   &-content {
-    height: 130px;
+    height: 130px * @ratio;
     text {
       font-size: @size-font-base;
       font-weight: bold;
@@ -70,8 +70,8 @@
   &-thumb {
     object-fit: cover;
     height: 100%;
-    width: 130px;
-    margin-right: 20px;
+    width: 130px * @ratio;
+    margin-right: 20px * @ratio;
     flex-shrink: 0;
   }
 
@@ -80,11 +80,11 @@
   }
 
   &-body {
-    padding: 10px 20px;
+    padding: 10px * @ratio 20px * @ratio;
   }
 
   &-footer {
-    padding: 10px 20px;
+    padding: 10px * @ratio 20px * @ratio;
     text {
       font-size: @size-font-small;
     }

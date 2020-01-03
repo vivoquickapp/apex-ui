@@ -1,5 +1,7 @@
 <template>
-  <text class="font-icon" style="font-size: {{size}}px;color: {{color}};"
+  <text
+    class="font-icon"
+    style="font-size: {{size*ratio/750}}px;color: {{color}};"
     >{{ unescapeFontIconCode(iconMap[type]) }}
   </text>
 </template>
@@ -32,6 +34,9 @@ export default {
     },
     color: {
       default: ""
+    },
+    ratio: {
+      default: 750
     }
   },
   unescapeFontIconCode(iconCode = "") {

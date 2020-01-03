@@ -39,6 +39,9 @@
   &-btn {
     padding: 20px * @ratio 25px * @ratio;
     border: 1px solid @border-color-base;
+    text {
+      font-size: @text-size;
+    }
   }
   .disabled {
     background-color: @btn-disable-bg;
@@ -56,9 +59,11 @@
     text {
       color: #000000;
       font-weight: bold;
+      font-size: @text-size;
     }
     .current {
       color: @primary-color;
+      font-size: @text-size;
     }
   }
   &-pointer {
@@ -76,6 +81,7 @@
     }
     .current {
       background-color: @subsidiary-color;
+      font-size: @text-size;
     }
   }
 }

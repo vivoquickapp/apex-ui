@@ -1,17 +1,30 @@
 <import name="my-icon" src="../icon/index"></import>
 
 <template>
-  <div class="apex-step" style="width: {{width}};flex-direction: {{direction === 'horizontal' ? 'row' : 'column'}}">
-    <div class="apex-step-wrap" style="flex-direction: {{direction === 'horizontal' ? 'column' : 'row'}};width: {{direction === 'horizontal' ? '80%' : '100%'}};">
+  <div
+    class="apex-step"
+    style="width: {{width}};flex-direction: {{direction === 'horizontal' ? 'row' : 'column'}}"
+  >
+    <div
+      class="apex-step-wrap"
+      style="flex-direction: {{direction === 'horizontal' ? 'column' : 'row'}};width: {{direction === 'horizontal' ? '80%' : '100%'}};"
+    >
       <div class="apex-step-hd  {{className}}">
         <div class="apex-step-icon" if="{{!hasIcon}}">
           <text style="color: {{iconColor}};">{{ index + 1 }}</text>
         </div>
         <div class="apex-step-icon" else>
-          <my-icon type="{{thumb}}" size="50" color="{{iconColor}}" if="{{thumb}}"></my-icon>
+          <my-icon
+            type="{{thumb}}"
+            size="50"
+            color="{{iconColor}}"
+            if="{{thumb}}"
+          ></my-icon>
         </div>
       </div>
-      <div class="apex-step-bd {{direction === 'horizontal' ? 'apex-step-bd-horizontal' : 'apex-step-bd-vertical'}}">
+      <div
+        class="apex-step-bd {{direction === 'horizontal' ? 'apex-step-bd-horizontal' : 'apex-step-bd-vertical'}}"
+      >
         <div class="apex-step-title" if="{{ title }}">
           <text>{{ title }}</text>
         </div>
@@ -120,10 +133,10 @@ export default {
       index !== -1
         ? defaultStatus[index]
         : opts.index < opts.current
-          ? "finish"
-          : opts.index === opts.current
-            ? "process"
-            : "";
+        ? "finish"
+        : opts.index === opts.current
+        ? "process"
+        : "";
     const className = `apex-step-${myStatus}`;
     Object.assign(this._data, {
       ...opts,

@@ -45,38 +45,38 @@
 .dot-class {
   background-color: @error-color;
   border-radius: 50px * @ratio;
-  width: 18px* @ratio;
-  height: 18px* @ratio;
+  width: 18px * @ratio;
+  height: 18px * @ratio;
   align-self: flex-end;
-  border: 2px* @ratio solid #ffffff;
+  border: 2px * @ratio solid #ffffff;
 }
 
 .count-class-more-then-ten {
   background-color: @error-color;
   justify-content: center;
-  border-radius: 20px* @ratio;
+  border-radius: 20px * @ratio;
   align-self: flex-end;
-  height: 45px* @ratio;
-  border: 2px* @ratio solid #ffffff;
+  height: 45px * @ratio;
+  border: 2px * @ratio solid #ffffff;
   text {
     color: #ffffff;
-    font-size: 23px* @ratio;
-    margin: 10px* @ratio 20px* @ratio;
+    font-size: 23px * @ratio;
+    margin: 10px * @ratio 20px * @ratio;
   }
 }
 
 .count-class {
   background-color: @error-color;
   justify-content: center;
-  border-radius: 50px* @ratio;
+  border-radius: 50px * @ratio;
   align-self: flex-end;
-  height: 45px* @ratio;
-  width: 45px* @ratio;
-  border: 2px* @ratio solid #ffffff;
+  height: 45px * @ratio;
+  width: 45px * @ratio;
+  border: 2px * @ratio solid #ffffff;
   text {
     color: #ffffff;
-    font-size: 25px* @ratio;
-    margin: 10px* @ratio;
+    font-size: 25px * @ratio;
+    margin: 10px * @ratio;
   }
 }
 </style>

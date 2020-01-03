@@ -57,7 +57,7 @@
 
 .wrap {
   align-self: baseline;
-  padding: 10px;
+  padding: 10px * @ratio;
   text {
     color: #ffffff;
   }
@@ -65,16 +65,19 @@
 
 .apex-alert {
   width: 100%;
-  padding: 16px;
+  padding: 16px * @ratio;
   font-size: @size-font-base;
-  border-radius: 2px;
+  border-radius: 2px * @ratio;
   justify-content: space-between;
   .content {
     flex-direction: column;
     flex-grow: 1;
+    text {
+      font-size: @text-size;
+    }
   }
   &-with-icon {
-    padding: 8px 48px 8px 38px;
+    padding: 8px * @ratio 48px * @ratio 8px * @ratio 38px * @ratio;
   }
   &-info {
     .bg-color(@info-color);
@@ -89,13 +92,13 @@
     .bg-color(@error-color);
   }
   &-icon {
-    margin: 0 16px;
+    margin: 0 16px * @ratio;
   }
   &-desc text {
     font-size: @size-font-small;
   }
   &-with-icon {
-    padding: 16px;
+    padding: 16px * @ratio;
   }
   &-close {
     font-size: @size-font-small;

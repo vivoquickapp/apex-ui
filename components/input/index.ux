@@ -27,20 +27,20 @@
 .apex-input {
   flex-direction: row;
   background-color: #ffffff;
-  padding: 20px;
+  padding: 20px * @ratio;
   &-title {
     font-size: @size-font-base;
-    margin-right: 20px;
+    margin-right: 20px * @ratio;
   }
   &-content {
     flex-grow: 1;
     font-size: @size-font-base;
   }
   &-wrapped {
-    margin: 10px 15px;
+    margin: 10px * @ratio 15px * @ratio;
     background-color: #fff;
     border: 1px solid @border-color-base;
-    border-radius: 8px;
+    border-radius: 8px * @ratio;
   }
   &-right {
     text-align: right;

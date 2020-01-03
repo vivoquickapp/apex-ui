@@ -4,7 +4,11 @@
   <div class="apex-accordion">
     <div class="apex-accordion-hd" onclick="onClick">
       <div class="apex-accordion-hd-left">
-        <image class="apex-accordion-thumb" src="{{thumb}}" if="{{thumb}}"></image>
+        <image
+          class="apex-accordion-thumb"
+          src="{{thumb}}"
+          if="{{thumb}}"
+        ></image>
         <text class="apex-accordion-title" if="{{title}}">{{ title }}</text>
         <div else>
           <slot name="header"></slot>

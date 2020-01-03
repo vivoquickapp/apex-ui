@@ -103,7 +103,7 @@ export default {
 
   &-title {
     margin: 10px * @ratio 20px * @ratio;
-    text{
+    text {
       font-size: 30px * @ratio;
     }
   }
@@ -115,7 +115,7 @@ export default {
 
   &-label {
     margin: 10px * @ratio 20px * @ratio;
-    text{
+    text {
       font-size: 30px * @ratio;
     }
   }

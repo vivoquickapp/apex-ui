@@ -28,18 +28,18 @@
 }
 
 .wrap {
-  width: @SwitchWidth + 0px;
-  height: @SwitchHeight + 0px;
-  border-radius: @SwitchCircleSize + 0px;
+  width: @SwitchWidth;
+  height: @SwitchHeight;
+  border-radius: @SwitchCircleSize;
   .open-text {
     color: #ffffff;
-    font-size: 20px;
-    padding-left: 10px;
+    font-size: 20px * @ratio;
+    padding-left: 10px * @ratio;
   }
   .close-text {
     color: #ffffff;
-    font-size: 20px;
-    padding-left: 45px;
+    font-size: 20px * @ratio;
+    padding-left: 45px * @ratio;
   }
 }
 
@@ -99,9 +99,9 @@ stack {
 }
 
 .circle {
-  width: @SwitchCircleSize + 0px;
-  height: @SwitchCircleSize + 0px;
-  border-radius: @SwitchCircleSize + 0px;
+  width: @SwitchCircleSize;
+  height: @SwitchCircleSize;
+  border-radius: @SwitchCircleSize;
   background-color: @SwitchCircleColor;
 }
 

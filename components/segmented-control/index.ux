@@ -43,6 +43,7 @@
       background-color: @color;
       &-text {
         color: #fff;
+        font-size: @text-size;
       }
     }
   }
@@ -55,7 +56,7 @@
   width: 100%;
   display: flex;
   opacity: 1;
-  margin: 10px 0;
+  margin: 10px * @ratio 0;
 
   &-disabled {
     opacity: 0.5;
@@ -65,22 +66,22 @@
     justify-content: center;
     align-items: center;
     color: @balanced;
-    font-size: 14px;
-    padding: 10px 0;
+    font-size: 14px * @ratio;
+    padding: 10px * @ratio 0;
     border: 1px solid @balanced;
     border-left-width: 0;
 
     &-left {
       border-left-width: 1px;
-      border-top-left-radius: 8px;
-      border-bottom-left-radius: 8px;
+      border-top-left-radius: 8px * @ratio;
+      border-bottom-left-radius: 8px * @ratio;
     }
 
     &-right {
       border-left-width: 1px;
       // border-right-width: 1px;
-      border-top-right-radius: 8px;
-      border-bottom-right-radius: 8px;
+      border-top-right-radius: 8px * @ratio;
+      border-bottom-right-radius: 8px * @ratio;
     }
     /* 同时设定最右的圆角和左边为0，则边框不显示，故hock */
     &-right2 {
@@ -90,6 +91,10 @@
     &-current {
       background-color: @balanced;
       color: #fff;
+    }
+
+    text {
+      font-size: @text-size;
     }
   }
 

@@ -3,16 +3,33 @@
 <template>
   <div class="apex-textarea" style="{{ textareaStyle }}">
     <div class="apex-textarea-wrap">
-      <div class="apex-textarea-label {{disabled? 'disabled' : ''}}" if="{{ label }}">
+      <div
+        class="apex-textarea-label {{disabled? 'disabled' : ''}}"
+        if="{{ label }}"
+      >
         <text class="{{disabled? 'disabled' : ''}}">{{ label }}</text>
       </div>
       <div else>
         <slot name="label"></slot>
       </div>
       <div class="apex-textarea-textarea-wrap">
-        <textarea id="apex-textarea" class="apex-textarea-textarea {{disabled? 'disabled' : ''}}" style="{{ textareaStyle }}" placeholder="{{ placeholder }}" disabled="{{ disabled }}" maxlength="{{ maxlength }}" onchange="onChange" onfocus="onFocus">{{ inputValue }}</textarea>
+        <textarea
+          id="apex-textarea"
+          class="apex-textarea-textarea {{disabled? 'disabled' : ''}}"
+          style="{{ textareaStyle }}"
+          placeholder="{{ placeholder }}"
+          disabled="{{ disabled }}"
+          maxlength="{{ maxlength }}"
+          onchange="onChange"
+          onfocus="onFocus"
+          >{{ inputValue }}</textarea
+        >
       </div>
-      <div class="apex-textarea-clear" onclick="onClear" if="{{clear && !disable && inputValue && inputValue.length > 0 }}">
+      <div
+        class="apex-textarea-clear"
+        onclick="onClear"
+        if="{{clear && !disable && inputValue && inputValue.length > 0 }}"
+      >
         <my-icon type="close-circle" color="#B2B2B2" size="40"></my-icon>
       </div>
       <div class="apex-textarea-extra" if="{{extra}}">
@@ -23,7 +40,9 @@
       </div>
     </div>
     <div class="apex-textarea-count" if="{{hasCount}}">
-      <text>{{ inputValue.length }}/{{ maxlength === -1 ? "∞" : maxlength }}</text>
+      <text
+        >{{ inputValue.length }}/{{ maxlength === -1 ? "∞" : maxlength }}</text
+      >
     </div>
   </div>
 </template>
@@ -81,9 +100,9 @@ export default {
       type: Boolean,
       default: false
     },
-    height:{
-      type:Number,
-      default:48
+    height: {
+      type: Number,
+      default: 48
     }
   },
 
@@ -173,7 +192,7 @@ export default {
   &-count {
     justify-content: flex-end;
     margin-right: 20px * @ratio;
-    text{
+    text {
       font-size: 30px * @ratio;
     }
   }

@@ -1,6 +1,11 @@
 <template>
   <div class="apex-media">
-    <image class="apex-media-image" src="{{thumb}}" style="{{thumbStyle}}" if="{{thumb}}"></image>
+    <image
+      class="apex-media-image"
+      src="{{thumb}}"
+      style="{{thumbStyle}}"
+      if="{{thumb}}"
+    ></image>
     <div class="apex-media-wrap">
       <div class="apex-media-hd">
         <div class="apex-media-title" if="{{ title }}">

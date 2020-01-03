@@ -19,24 +19,24 @@
 @import "../styles/base.less";
 
 .apex-checkbox {
-  padding: 20px;
+  padding: 20px * @ratio;
   background-color: #ffffff;
-  height: 86px;
+  height: 86px * @ratio;
 
   &-checked {
     height: @checkbox-size;
     width: @checkbox-size;
     justify-content: center;
     border-radius: @checkbox-size;
-    border: 2px solid @border-color-base;
-    margin-right: 10px;
+    border: 2px * @ratio solid @border-color-base;
+    margin-right: 10px * @ratio;
   }
 
   &-icon {
     width: @checkbox-size / 2;
     height: @checkbox-size / 3.6;
     border-style: solid;
-    border-width: 0 0 2px 2px;
+    border-width: 0 0 2px * @ratio 2px * @ratio;
     transform: rotate(-45deg);
     margin-top: @checkbox-size / 3;
     border-color: #ffffff;
@@ -56,7 +56,11 @@
   }
 
   &-square {
-    border-radius: 5px;
+    border-radius: 5px * @ratio;
+  }
+
+  text {
+    font-size: @text-size;
   }
 }
 </style>
