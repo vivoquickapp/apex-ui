@@ -1,13 +1,7 @@
 <template>
   <div class="apex-radio apex-radio-{{position}}" onclick="clickHandler">
-    <div
-      class="apex-radio-checked {{my_checked?'apex-radio-active':''}} apex-radio-{{shape}}"
-      style="background-color: {{(my_checked||disabled)?my_color:''}}"
-    >
-      <div
-        class="apex-radio-icon {{disabled?'apex-radio-disabled':''}}"
-        show="{{my_checked}}"
-      ></div>
+    <div class="apex-radio-checked {{my_checked?'apex-radio-active':''}} apex-radio-{{shape}}" style="background-color: {{(my_checked||disabled)?my_color:''}}">
+      <div class="apex-radio-icon {{disabled?'apex-radio-disabled':''}}" show="{{my_checked}}"></div>
     </div>
     <div class="apex-radio-content">
       <text>{{ value }}</text>
@@ -74,6 +68,7 @@ export default {
       my_color: this.color
     };
   },
+
   props: {
     checked: {
       default: false
@@ -97,22 +92,33 @@ export default {
       default: "circle" // circle square
     }
   },
+
   onInit() {
     this.$watch("disabled", "handleDisabled");
     this.$watch("checked", "changeChecked");
+    if (this.group) {
+      const parent = this.$parent().$child(this.group);
+      const temp = parent.radios;
+      const radios = temp ? [...temp, this] : [this];
+      parent.radios = radios;
+    }
   },
+
   changeChecked() {
     this.my_checked = this.checked;
   },
+
   changeCurrent(current) {
     this.my_checked = current;
   },
+
   clickHandler() {
     if (this.disabled) return;
     const item = { current: !this.checked, value: this.value };
     const parent = this.$parent().$child(this.group);
     parent ? parent.emitEvent(item) : this.$emit("change", item);
   },
+
   handleDisabled(e) {
     if (e) {
       this.my_color = "#bbbec4";
