@@ -97,7 +97,6 @@ export default {
     };
   },
   handler(evt) {
-    console.log("安康大哥大哥", evt.touches[0]);
     let height = this.size[1]; // slot自定义元素的高
     let hori;
     if (this.popoverColor) {
@@ -211,7 +210,6 @@ export default {
     this.boxStyle.width = `${this.boxWidth}px`;
     this.styleObj.backgroundColor = this.normal;
     this.getOrientation();
-    console.log("阿卡多杭打工", this.boxStyle);
     this.visible = true;
   },
   showMask() {
