@@ -97,6 +97,7 @@ export default {
     };
   },
   handler(evt) {
+    console.log("安康大哥大哥", evt.touches[0]);
     let height = this.size[1]; // slot自定义元素的高
     let hori;
     if (this.popoverColor) {
@@ -148,8 +149,21 @@ export default {
       this.boxClassY = "box-vertical-down";
     }
     if (this.orientation === "top" || this.orientation === "bottom") {
-      this.boxStyle.right = `${this.left}px`;
-      this.boxStyle.left = `${this.right}px`;
+      let width = this.size[0];
+      if (width <= this.bodyWidth) {
+        this.left =
+          parseInt(evt.touches[0].clientX) -
+          parseInt(evt.touches[0].offsetX) -
+          (this.bodyWidth - width) / 2 -
+          20;
+      } else {
+        this.left =
+          parseInt(evt.touches[0].clientX) -
+          parseInt(evt.touches[0].offsetX) +
+          (width - this.bodyWidth) / 2 -
+          20;
+      }
+      this.boxStyle.left = `${this.left}px`;
     }
     // 左上,左下,右上,右下
     if (
@@ -197,6 +211,7 @@ export default {
     this.boxStyle.width = `${this.boxWidth}px`;
     this.styleObj.backgroundColor = this.normal;
     this.getOrientation();
+    console.log("阿卡多杭打工", this.boxStyle);
     this.visible = true;
   },
   showMask() {
