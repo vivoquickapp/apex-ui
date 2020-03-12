@@ -1,6 +1,6 @@
 <template>
   <stack style="{{style}}">
-    <canvas id="canvasId"></canvas>
+    <canvas id="{{id}}"></canvas>
     <div class="slot">
       <slot></slot>
     </div>
@@ -64,6 +64,10 @@ export default {
     anticlockwise: {
       type: Boolean,
       default: false
+    },
+    id: {
+      type: String,
+      default: "canvasId"
     }
   },
 
@@ -78,7 +82,7 @@ export default {
     this.$watch("percent", "watchPercentChange");
 
     setTimeout(() => {
-      const canvas = this.$element("canvasId");
+      const canvas = this.$element(this.id);
       this.ctx = canvas.getContext("2d");
       this.draw();
     }, 0);

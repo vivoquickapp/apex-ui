@@ -15,8 +15,7 @@
 <script>
 export default {
   data() {
-    return {
-    };
+    return {};
   },
 
   props: {
@@ -35,7 +34,7 @@ export default {
   },
 
   changeCurrent(val = this.current) {
-    const radios = this.radios
+    const radios = this.radios;
     if (radios && radios.length > 0) {
       radios.forEach(item => {
         item.changeCurrent(val === item.value);

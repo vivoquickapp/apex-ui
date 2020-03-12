@@ -1,6 +1,6 @@
 <template>
   <canvas
-    id="canvasId"
+    id="{{id}}"
     style="height:{{height}}px;width:{{width}}px;align-self: center;"
     onclick="draw()"
   ></canvas>
@@ -32,6 +32,9 @@ export default {
     },
     hasLine: {
       default: true
+    },
+    id: {
+      default: "canvasId"
     }
   },
   onInit() {
@@ -40,7 +43,7 @@ export default {
     }, 0);
   },
   draw() {
-    const canvas = this.$element("canvasId");
+    const canvas = this.$element(this.id);
     const ctx = canvas.getContext("2d");
 
     ctx.clearRect(0, 0, this.width, this.height);
