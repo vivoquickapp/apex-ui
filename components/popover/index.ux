@@ -31,7 +31,7 @@
         if="{{flag===true}}"
       ></div>
     </div>
-    <div onclick="handler" style="{{pixStyle}}">
+    <div ontouchstart="handler" style="{{pixStyle}}">
       <slot></slot>
     </div>
   </div>
@@ -96,7 +96,7 @@ export default {
       marginTop: top
     };
   },
-  handler($evt) {
+  handler(evt) {
     let height = this.size[1]; // slot自定义元素的高
     let hori;
     if (this.popoverColor) {
@@ -113,24 +113,36 @@ export default {
     }
     // 上左,下左,上右,下右
     if (this.orientation.indexOf("Right") !== -1) {
-      this.left = parseInt($evt.clientX) - parseInt($evt.offsetX) - 20;
+      this.left =
+        parseInt(evt.touches[0].clientX) -
+        parseInt(evt.touches[0].offsetX) -
+        20;
       this.styleObj = { marginRight: `-${this.bodyWidth - 80}px` };
       this.boxStyle.right = `${this.left}px`;
     }
     if (this.orientation.indexOf("Left") !== -1) {
-      this.right = parseInt($evt.clientX) - parseInt($evt.offsetX) - 20;
+      this.right =
+        parseInt(evt.touches[0].clientX) -
+        parseInt(evt.touches[0].offsetX) -
+        20;
       this.styleObj = { marginLeft: `-${this.bodyWidth - 80}px` };
       this.boxStyle.left = `${this.right}px`;
     }
     if (this.orientation.indexOf("top") !== -1) {
       hori =
-        parseInt($evt.clientY) - parseInt($evt.offsetY) - this.bodyHeight - 40;
+        parseInt(evt.touches[0].clientY) -
+        parseInt(evt.touches[0].offsetY) -
+        this.bodyHeight -
+        40;
       this.boxStyle.top = `${hori}px`;
       this.arrowsClass = "arrows-top";
       this.boxClassY = "box-vertical-up";
     }
     if (this.orientation.indexOf("bottom") !== -1) {
-      hori = parseInt($evt.clientY) - parseInt($evt.offsetY) + height;
+      hori =
+        parseInt(evt.touches[0].clientY) -
+        parseInt(evt.touches[0].offsetY) +
+        height;
       this.boxStyle.top = `${hori}px`;
       this.arrowsClass = "arrows-bottom";
       this.boxClassY = "box-vertical-down";
@@ -155,25 +167,26 @@ export default {
       }
       this.bodyHeight < height
         ? (hori =
-            parseInt($evt.clientY) -
-            parseInt($evt.offsetY) +
+            parseInt(evt.touches[0].clientY) -
+            parseInt(evt.touches[0].offsetY) +
             (height - this.bodyHeight) / 2)
         : (hori =
-            parseInt($evt.clientY) -
-            parseInt($evt.offsetY) -
+            parseInt(evt.touches[0].clientY) -
+            parseInt(evt.touches[0].offsetY) -
             this.bodyHeight / 2);
       this.boxStyle.top = `${hori}px`;
     }
     if (this.orientation.indexOf("Top") !== -1) {
-      hori = parseInt($evt.clientY) - parseInt($evt.offsetY);
+      hori =
+        parseInt(evt.touches[0].clientY) - parseInt(evt.touches[0].offsetY);
       this.boxStyle.top = `${hori}px`;
       this.styleObj.marginTop = "40px";
       this.styleObj.alignSelf = "flex-start";
     }
     if (this.orientation.indexOf("Bottom") !== -1) {
       hori =
-        parseInt($evt.clientY) -
-        parseInt($evt.offsetY) -
+        parseInt(evt.touches[0].clientY) -
+        parseInt(evt.touches[0].offsetY) -
         this.bodyHeight +
         height / 2;
       this.boxStyle.top = `${hori}px`;

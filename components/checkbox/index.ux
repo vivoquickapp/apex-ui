@@ -100,6 +100,12 @@ export default {
   onInit() {
     this.$watch("disabled", "handleDisabled");
     this.$watch("checked", "changeChecked");
+    if (this.group) {
+      const parent = this.$parent().$child(this.group);
+      const temp = parent.checkboxes;
+      const checkboxes = temp ? [...temp, this] : [this];
+      parent.checkboxes = checkboxes;
+    }
   },
   changeChecked() {
     this.my_checked = this.checked;

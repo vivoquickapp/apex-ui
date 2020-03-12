@@ -1,7 +1,13 @@
 <template>
   <div class="apex-radio apex-radio-{{position}}" onclick="clickHandler">
-    <div class="apex-radio-checked {{my_checked?'apex-radio-active':''}} apex-radio-{{shape}}" style="background-color: {{(my_checked||disabled)?my_color:''}}">
-      <div class="apex-radio-icon {{disabled?'apex-radio-disabled':''}}" show="{{my_checked}}"></div>
+    <div
+      class="apex-radio-checked {{my_checked?'apex-radio-active':''}} apex-radio-{{shape}}"
+      style="background-color: {{(my_checked||disabled)?my_color:''}}"
+    >
+      <div
+        class="apex-radio-icon {{disabled?'apex-radio-disabled':''}}"
+        show="{{my_checked}}"
+      ></div>
     </div>
     <div class="apex-radio-content">
       <text>{{ value }}</text>

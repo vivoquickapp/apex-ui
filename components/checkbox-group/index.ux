@@ -20,6 +20,11 @@ export default {
   props: {
     current: {
       default: []
+    },
+    id: {
+      type: String,
+      required: true,
+      default: ""
     }
   },
   onInit() {
@@ -29,15 +34,10 @@ export default {
     this.changeCurrent();
   },
   changeCurrent(val = this.current) {
-    let items = this.$child("checkbox-group")._parent._childrenVms.filter(
-      item => {
-        return item._type === "my-checkbox";
-      }
-    );
-    const len = items.length;
-    if (len > 0) {
-      items.forEach(item => {
-        item.changeCurrent(val.indexOf(item._attrs.name) !== -1);
+    const checkboxes = this.checkboxes;
+    if (checkboxes && checkboxes.length > 0) {
+      checkboxes.forEach(item => {
+        item.changeCurrent(val.includes(item.value));
       });
     }
   },

@@ -125,18 +125,18 @@ export default {
   },
 
   calIsShowHeader() {
-    if(this.$child("apex-card-header")._slot){
+    if (this.$child("apex-card-header")._slot) {
       let hasTitleSlot =
-        this.$child("apex-card-header")._slot.namedSlotCache.title !== undefined;
+        this.$child("apex-card-header")._slot.namedSlotCache.title !==
+        undefined;
       let hasExtraSlot =
-        this.$child("apex-card-header")._slot.namedSlotCache.extra !== undefined;
+        this.$child("apex-card-header")._slot.namedSlotCache.extra !==
+        undefined;
       return (
         this.thumb || this.title || this.extra || hasTitleSlot || hasExtraSlot
       );
-    }else{
-      return (
-        this.thumb || this.title || this.extra
-      );
+    } else {
+      return this.thumb || this.title || this.extra;
     }
   }
 };
