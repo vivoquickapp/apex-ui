@@ -18,9 +18,13 @@
               type="province"
               onclick="chooseProvince($item)"
             >
-              <text class="content">{{ $item.label }}</text>
+              <text
+                class="content"
+                style="color: {{$item.value === currentProvince.value ? '#ff2828' : '666666'}};"
+                >{{ $item.label }}</text
+              >
               <my-icon
-                if="{{$item.value === currentProvince.value}}"
+                show="{{$item.value === currentProvince.value}}"
                 color="#ff2828"
                 size="40"
                 type="checkmark"
@@ -31,9 +35,13 @@
         <list id="city" class="city" if="{{level > 1}}">
           <block for="citys">
             <list-item class="item" type="city" onclick="choseCity($item)">
-              <text class="content">{{ $item.label }}</text>
+              <text
+                class="content"
+                style="color: {{$item.value === currentCity.value ? '#ff2828' : '666666'}};"
+                >{{ $item.label }}</text
+              >
               <my-icon
-                if="{{$item.value === currentCity.value}}"
+                show="{{$item.value === currentCity.value}}"
                 color="#ff2828"
                 size="40"
                 type="checkmark"
@@ -49,9 +57,13 @@
         >
           <block for="areas">
             <list-item class="item" type="area" onclick="choseArea($item)">
-              <text class="content">{{ $item.label }}</text>
+              <text
+                class="content"
+                style="color: {{$item.value === currentArea.value ? '#ff2828' : '666666'}};"
+                >{{ $item.label }}</text
+              >
               <my-icon
-                if="{{$item.value === currentArea.value}}"
+                show="{{$item.value === currentArea.value}}"
                 color="#ff2828"
                 size="40"
                 type="checkmark"
@@ -275,7 +287,6 @@ export default {
   border-bottom: 1px * @ratio solid #dddddd;
   justify-content: space-between;
   .content {
-    color: #666666;
     font-size: 25px * @ratio;
   }
 }
