@@ -23,12 +23,9 @@
                 style="color: {{$item.value === currentProvince.value ? '#ff2828' : '666666'}};"
                 >{{ $item.label }}</text
               >
-              <my-icon
-                show="{{$item.value === currentProvince.value}}"
-                color="#ff2828"
-                size="40"
-                type="checkmark"
-              ></my-icon>
+              <div show="{{$item.value === currentProvince.value}}">
+                <my-icon color="#ff2828" size="40" type="checkmark"></my-icon>
+              </div>
             </list-item>
           </block>
         </list>
@@ -40,12 +37,9 @@
                 style="color: {{$item.value === currentCity.value ? '#ff2828' : '666666'}};"
                 >{{ $item.label }}</text
               >
-              <my-icon
-                show="{{$item.value === currentCity.value}}"
-                color="#ff2828"
-                size="40"
-                type="checkmark"
-              ></my-icon>
+              <div show="{{$item.value === currentCity.value}}">
+                <my-icon color="#ff2828" size="40" type="checkmark"></my-icon>
+              </div>
             </list-item>
           </block>
         </list>
@@ -62,12 +56,9 @@
                 style="color: {{$item.value === currentArea.value ? '#ff2828' : '666666'}};"
                 >{{ $item.label }}</text
               >
-              <my-icon
-                show="{{$item.value === currentArea.value}}"
-                color="#ff2828"
-                size="40"
-                type="checkmark"
-              ></my-icon>
+              <div show="{{$item.value === currentArea.value}}">
+                <my-icon color="#ff2828" size="40" type="checkmark"></my-icon>
+              </div>
             </list-item>
           </block>
         </list>
