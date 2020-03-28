@@ -222,7 +222,7 @@ export default {
         value: item.value
       };
       this.checked.pop();
-      this.checked.push(this.currentCity.label);
+      this.checked.push(this.currentArea.label);
       this.emitEvent();
     }
   },
