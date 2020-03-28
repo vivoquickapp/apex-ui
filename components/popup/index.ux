@@ -2,11 +2,12 @@
 <import name="my-icon" src="../icon/index"></import>
 
 <template>
-  <div class="wrap {{isVisible?'show':isAnimationEnd?'hide':''}}">
+  <div class="wrap {{isVisible?'show':isAnimationEnd?'hide':''}}" style="z-index: {{zIndex}}">
     <my-mask id="mask" z-index="{{zIndex}}" onclick="handleClickMask"></my-mask>
 
     <div
       class="popup {{`popup-${position}`}} {{isAnimationEnd?'hide':animationClass()}}"
+      style="z-index: {{zIndex}}"
     >
       <div class="popup-header" show="{{hasHeader}}">
         <text class="popup-header-text" if="{{title}}">{{ title }}</text>
