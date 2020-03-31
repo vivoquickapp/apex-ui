@@ -5,7 +5,6 @@
 
 ## 使用
 - [Apex-UI组件库官方文档](https://vivoquickapp.github.io/apex-ui-docs/)
-- [Apex-UI组件库示例源码](https://github.com/vivoquickapp/apex-ui-sample)
 - 使用[快应用开发工具](https://www.quickapp.cn/docCenter/IDEPublicity)打开该示例代码。
 
 ## 贡献
