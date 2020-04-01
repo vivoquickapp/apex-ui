@@ -28,6 +28,9 @@
 <script>
 export default {
   props: {
+    animation: {
+      default: true
+    },
     transparent: {
       default: false
     },
@@ -43,10 +46,14 @@ export default {
     };
   },
   animationClass() {
-    if (this.isVisible) {
-      return "opacity-hide-to-show";
-    } else {
-      return "opacity-show-to-hide";
+    if(this.animation){
+      if (this.isVisible) {
+        return "opacity-hide-to-show";
+      } else {
+        return "opacity-show-to-hide";
+      }
+    }else{
+      return ''
     }
   },
   show() {

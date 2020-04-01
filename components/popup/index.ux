@@ -1,247 +1,215 @@
-<import name="my-mask" src="../mask/index"></import>
+<import name="my-popup" src="../popup/index"></import>
+<import name="my-button" src="../button/index"></import>
 <import name="my-icon" src="../icon/index"></import>
 
 <template>
-  <div class="wrap {{isVisible?'show':isAnimationEnd?'hide':''}}" style="z-index: {{zIndex}}">
-    <my-mask id="mask" z-index="{{zIndex}}" onclick="handleClickMask"></my-mask>
+  <my-popup id="popup" background="transparent" position="bottom" onclose="cancel">
+    <div class="{{theme}}-sheet">
+      <div class="{{theme}}-sheet-options-wrap">
+        <text class="{{theme}}-sheet-title-text">{{ titleText }}</text>
+        <div
+          class="{{theme}}-sheet-btn {{$item.disabled?'sheet-btn-disabled':''}}"
+          for="{{buttons}}"
+          onclick="handleClickBtn('btn',$idx,$item)"
+        >
+          <my-icon
+            type="{{$item.icon.type || 'share-alt'}}"
+            size="{{$item.icon.size || 40}}"
+            color="{{$item.icon.color || theme=='default'?'#495060':'#007aff'}}"
+            if="{{$item.icon && (!$item.icon.position || $item.icon.position == 'left')}}"
+          ></my-icon>
+          <text class="{{theme}}-sheet-btn-text">{{ $item.text }}</text>
+          <my-icon
+            type="{{$item.icon.type || 'share-alt'}}"
+            size="{{$item.icon.size || 40}}"
+            color="{{$item.icon.color || theme=='default'?'#495060':'#007aff'}}"
+            if="{{$item.icon && $item.icon.position == 'right'}}"
+          ></my-icon>
+        </div>
+        <div
+          class="{{theme}}-sheet-btn {{theme}}-sheet-btn-delete"
+          onclick="handleClickBtn('delete')"
+          if="{{destructiveText}}"
+        >
+          <text class="{{theme}}-sheet-btn-delete-text">{{
+            destructiveText
+          }}</text>
+        </div>
+      </div>
 
-    <div
-      class="popup {{`popup-${position}`}} {{isAnimationEnd?'hide':animationClass()}}"
-      style="z-index: {{zIndex}}"
-    >
-      <div class="popup-header" show="{{hasHeader}}">
-        <text class="popup-header-text" if="{{title}}">{{ title }}</text>
-        <block else>
-          <slot name="header"></slot>
-        </block>
-      </div>
-      <div class="popup-body">
-        <text class="popup-body-text" if="{{content}}">{{ content }}</text>
-        <slot name="default"></slot>
-      </div>
-      <div class="popup-footer" show="{{hasFooter}}">
-        <text class="popup-footer-text" if="{{extra}}">{{ extra }}</text>
-        <block else>
-          <slot name="footer"></slot>
-        </block>
-      </div>
-
-      <div class="popup-close" show="{{closable}}" onclick="handleClickClose">
-        <slot name="close">
-          <text class="popup-close-icon">×</text>
-        </slot>
+      <div
+        class="{{theme}}-sheet-btn {{theme}}-sheet-btn-cancel"
+        onclick="handleClickBtn('cancel')"
+      >
+        <text class="{{theme}}-sheet-btn-cancel-text">{{ cancelText }}</text>
       </div>
     </div>
-  </div>
+  </my-popup>
 </template>
 <style lang="less">
 @import "../styles/base.less";
 
-.wrap {
+.default-sheet {
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  .popup {
+  background-color: #efeff4;
+  .default-sheet-options-wrap {
     flex-direction: column;
-    background-color: #fff;
-
-    animation-duration: 200ms;
-    animation-timing-function: linear;
-    animation-fill-mode: forwards;
-    .popup-header {
-      .popup-header-text {
-        flex: 1;
-        padding: 30px * @ratio 70px * @ratio 30px * @ratio;
-        text-align: center;
-        font-size: 30px * @ratio;
-        font-weight: bold;
-      }
-    }
-    .popup-body {
-      flex-direction: column;
-      .popup-body-text {
-        flex: 1;
-        text-align: center;
-        padding: 15px * @ratio 70px * @ratio 60px * @ratio;
-      }
-    }
-    .popup-footer {
-      .popup-footer-text {
-        flex: 1;
-        padding: 30px * @ratio 70px * @ratio 30px * @ratio;
-        text-align: center;
-      }
-    }
-    .popup-close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      &-icon {
-        font-size: 50px * @ratio;
-        font-weight: bold;
-        padding-top: 16px * @ratio;
-        padding-right: 35px * @ratio;
-      }
-    }
-    &-center {
-      width: 80%;
-    }
-
-    &-left {
-      width: 80%;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-    }
-
-    &-right {
-      width: 80%;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-    }
-
-    &-top {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-    }
-
-    &-bottom {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+    background-color: #ffffff;
+    .default-sheet-title-text {
+      padding: 30px * @ratio 20px * @ratio;
+      font-size: 30px * @ratio;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid #d9d9d9;
     }
   }
+
+  .default-sheet-btn {
+    flex: 1;
+    flex-direction: row;
+    justify-content: center;
+    padding: 30px * @ratio 20px * @ratio;
+    text-align: center;
+    &:active {
+      border-color: #d1d3d6;
+      background-color: #e4e5e7;
+    }
+  }
+
+  .default-sheet-btn {
+    border-bottom: 1px * @ratio solid #d9d9d9;
+    .default-sheet-btn-text {
+      color: #495060;
+      font-size: 30px * @ratio;
+      margin: 0 10px * @ratio;
+    }
+  }
+  .default-sheet-btn-delete {
+    border-top: 1px * @ratio solid #d9d9d9;
+    border-bottom: 0;
+    .default-sheet-btn-delete-text {
+      color: #ff3b30;
+      font-size: 30px * @ratio;
+    }
+  }
+  .default-sheet-btn-cancel {
+    border-top: 0;
+    margin-top: 20px * @ratio;
+    background-color: #ffffff;
+    .default-sheet-btn-cancel-text {
+      color: #495060;
+      font-size: 30px * @ratio;
+    }
+  }
+}
+
+.iOS-sheet {
+  flex-direction: column;
+  padding: 0 20px * @ratio 20px * @ratio;
+  .iOS-sheet-options-wrap {
+    flex-direction: column;
+    background-color: #f1f2f3;
+    border-radius: 10px * @ratio;
+    .iOS-sheet-title-text {
+      padding: 30px * @ratio 20px * @ratio;
+      font-size: 30px * @ratio;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px * @ratio solid #d9d9d9;
+    }
+  }
+
+  .iOS-sheet-btn {
+    flex: 1;
+    flex-direction: row;
+    justify-content: center;
+    padding: 23px * @ratio 20px * @ratio;
+    text-align: center;
+    &:active {
+      border-color: #d1d3d6;
+      background-color: #e4e5e7;
+    }
+  }
+
+  .iOS-sheet-btn {
+    border-bottom: 1px * @ratio solid #d9d9d9;
+    .iOS-sheet-btn-text {
+      color: #007aff;
+      margin: 0 10px * @ratio;
+      font-size: 42px * @ratio;
+      font-weight: 500;
+    }
+  }
+  .iOS-sheet-btn-delete {
+    border-top: 1px * @ratio solid #d9d9d9;
+    border-bottom: 0;
+    .iOS-sheet-btn-delete-text {
+      color: #ff3b30;
+      font-size: 42px * @ratio;
+      font-weight: 500;
+    }
+  }
+
+  .iOS-sheet-btn-cancel {
+    margin-top: 20px * @ratio;
+    border-radius: 10px * @ratio;
+    background-color: #ffffff;
+    .iOS-sheet-btn-cancel-text {
+      color: #007aff;
+      font-size: 42px * @ratio;
+      font-weight: 500;
+    }
+  }
+}
+
+.sheet-btn-disabled {
+  opacity: 0.3;
+  border-bottom: 0;
 }
 </style>
 <script>
 export default {
-  props: {
-    title: {
-      default: ""
-    },
-    content: {
-      default: ""
-    },
-    extra: {
-      default: ""
-    },
-    position: {
-      default: "center"
-    },
-    closable: {
-      default: false
-    },
-    mask: {
-      default: true
-    },
-    maskClosable: {
-      default: true
-    },
-    zIndex: {
-      default: 1000
-    },
-    hasHeader: {
-      default: true
-    },
-    hasFooter: {
-      default: true
-    }
-  },
+  props: {},
   data() {
     return {
-      isAnimationEnd: true,
-      isVisible: false,
-      timerOfAnimation: null
+      theme: "default",
+      titleText: null,
+      buttons: [],
+      cancelText: "取消",
+      cancel() {},
+      destructiveText: null,
+      destructiveButtonClicked() {}
     };
   },
-  animationClass() {
-    if (this.isVisible) {
-      switch (this.position) {
-        case "center":
-          return "opacity-hide-to-show";
-          break;
-        case "left":
-          return "translate-left-to-center";
-          break;
-        case "right":
-          return "translate-right-to-center";
-          break;
-        case "top":
-          return "translate-top-to-center";
-          break;
-        case "bottom":
-          return "translate-bottom-to-center";
-          break;
-        default:
-          return "";
-      }
+  showSheet(options = {}) {
+    Object.keys(options).forEach(key => {
+      this[key] = options[key];
+    });
+
+    this.$child("popup").show();
+  },
+  hideSheet() {
+    this.$child("popup").hide();
+  },
+  closeSheet() {
+    this.$child("popup").handleClickClose();
+  },
+  handleClickBtn(type, index, item) {
+    let isHideSheet;
+
+    if (type == "cancel") {
+      this.closeSheet();
+    } else if (type == "delete") {
+      isHideSheet = this.destructiveButtonClicked();
+
+      if (isHideSheet) this.hideSheet();
     } else {
-      switch (this.position) {
-        case "center":
-          return "opacity-show-to-hide";
-          break;
-        case "left":
-          return "translate-center-to-left";
-          break;
-        case "right":
-          return "translate-center-to-right";
-          break;
-        case "top":
-          return "translate-center-to-top";
-          break;
-        case "bottom":
-          return "translate-center-to-bottom";
-          break;
-        default:
-          return "";
-      }
-    }
-  },
-  toggleMask(fn) {
-    if (this.mask) {
-      this.$child("mask")[fn]();
-    }
-  },
-  show() {
-    if (this.timerOfAnimation) return;
-    this.isVisible = true;
-    this.isAnimationEnd = false;
+      if (item.disabled) return;
 
-    this.toggleMask("show");
-  },
-  hide() {
-    if (this.timerOfAnimation) return;
-    this.isVisible = false;
+      isHideSheet = this.buttonClicked(index, item);
 
-    this.toggleMask("hide");
-
-    this.timerOfAnimation = setTimeout(() => {
-      this.isAnimationEnd = true;
-      this.$emit("closed");
-      this.timerOfAnimation = null;
-    }, 200);
-  },
-  handleClickMask() {
-    if (this.maskClosable) {
-      this.hide();
-      this.$emit("close");
+      if (isHideSheet) this.hideSheet();
     }
-  },
-  handleClickClose() {
-    this.hide();
-    this.$emit("close");
   }
 };
 </script>
