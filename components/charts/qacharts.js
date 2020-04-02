@@ -130,7 +130,7 @@ var Config = {
       show: true,
       textStyle: {
         fontSize: 15,
-        color: '#666',
+        color: '#666666',
         margin: 10,
       },
     },
@@ -138,7 +138,7 @@ var Config = {
       show: true,
       lineStyle: {
         lineWidth: 1,
-        color: '#ccc',
+        color: '#cccccc',
         opacity: 1,
       },
     },
@@ -146,7 +146,7 @@ var Config = {
       show: true,
       lineStyle: {
         lineWidth: 1,
-        color: '#ccc',
+        color: '#cccccc',
         opacity: 1,
       },
     },
@@ -171,9 +171,8 @@ var Config = {
       text: 'x轴名称',
       gap: 10,
       textStyle: {
-        color: '#666',
+        color: '#666666',
         fontSize: 15,
-        align: 'center',
       },
     },
     axisLabel: {
@@ -182,7 +181,7 @@ var Config = {
       rotate: 0,
       gap: 5,
       textStyle: {
-        color: '#666',
+        color: '#666666',
         fontSize: 12,
       },
     },
@@ -193,14 +192,14 @@ var Config = {
       length: 5,
       lineStyle: {
         lineWidth: 1,
-        color: '#666',
+        color: '#666666',
       },
     },
     axisLine: {
       show: true,
       lineStyle: {
         lineWidth: 1,
-        color: '#666',
+        color: '#666666',
       },
     },
     axisSplitLine: {
@@ -208,7 +207,7 @@ var Config = {
       showIndex: [], // 控制显示的下标数组
       lineStyle: {
         lineWidth: 1,
-        color: '#ddd',
+        color: '#dddddd',
       },
     },
   },
@@ -222,7 +221,7 @@ var Config = {
       text: 'y轴名称',
       gap: 10,
       textStyle: {
-        color: '#666',
+        color: '#666666',
         fontSize: 15,
         align: 'center',
       },
@@ -231,7 +230,7 @@ var Config = {
       show: true,
       gap: 5,
       textStyle: {
-        color: '#666',
+        color: '#666666',
         fontSize: 12,
       },
     },
@@ -240,21 +239,21 @@ var Config = {
       length: 5,
       lineStyle: {
         lineWidth: 1,
-        color: '#666',
+        color: '#666666',
       },
     },
     axisLine: {
       show: true,
       lineStyle: {
         lineWidth: 1,
-        color: '#666',
+        color: '#666666',
       },
     },
     axisSplitLine: {
       show: true,
       lineStyle: {
         lineWidth: 1,
-        color: '#ddd',
+        color: '#dddddd',
       },
     },
   },
@@ -496,6 +495,24 @@ class Animation {
 
     let { type, animation, animationDuration, animationTiming, onProcess, onAnimationFinish } = opts;
 
+    let createAnimationFrame = function() {
+      if (typeof requestAnimationFrame !== 'undefined') {
+        return requestAnimationFrame
+      } else if (typeof setTimeout !== 'undefined') {
+        return function(step) {
+          setTimeout(function() {
+            let timeStamp = +new Date();
+            step(timeStamp);
+          }, 17);
+        }
+      } else {
+        return function(step) {
+          step(null);
+        }
+      }
+    };
+    let animationFrame = createAnimationFrame();
+
     if (animation) {
       if (animationTiming == 'default') {
         switch (type) {
@@ -526,7 +543,7 @@ class Animation {
           let process = (timeStamp - startTimeStamp) / animationDuration;
           process = timingFunction(process);
           opts.onProcess(process);
-          requestAnimationFrame(step);
+          animationFrame(step);
         } else {
           onProcess(1);
           onAnimationFinish();
@@ -534,7 +551,7 @@ class Animation {
       };
       step = step.bind(this);
 
-      requestAnimationFrame(step);
+      animationFrame(step);
     } else {
       onProcess(1);
       onAnimationFinish();
@@ -1539,6 +1556,7 @@ function drawLegend() {
       startX += shapeWidth + padding;
 
       context.save();
+      context.textAlign = 'left';
       context.textBaseline = 'middle';
       context.font = `${fontSize}px`;
       context.fillStyle = color;
@@ -1777,6 +1795,7 @@ function drawAxisY() {
       context.save();
       context.font = `${xAxisNameFontSize}px`;
       context.fillStyle = xAxisNameColor;
+      context.textAlign = 'left';
       context.textBaseline = 'middle';
       context.fillText(xAxisNamePoint.text, xAxisNamePoint.x, xAxisNamePoint.y);
       context.restore();
