@@ -45,7 +45,7 @@ var Config = {
     show: true,
     fontSize: 15,
     color: 'auto',
-    margin: 2,
+    margin: 5,
   },
   legend: {
     show: true,
@@ -79,10 +79,14 @@ var Config = {
       length2: 15,
     },
   },
+  scatter: {
+    color: 'auto',
+    radius: 10,
+    opacity: 1,
+  },
   line: {
-    showIndex: [], // 控制显示的下标数组
-    smooth: false, // 是否显示曲线
-    connectNulls: false, // 是否连接空值数据
+    smooth: false,
+    connectNulls: false,
     line: {
       show: true,
       lineWidth: 2,
@@ -102,16 +106,16 @@ var Config = {
     },
   },
   radar: {
-    area: {
-      show: true,
-      color: 'auto',
-      opacity: 0.5,
-    },
     line: {
       show: true,
       lineWidth: 1,
       color: 'auto',
       opacity: 1,
+    },
+    area: {
+      show: false,
+      color: 'auto',
+      opacity: 0.5,
     },
     symbol: {
       show: true,
@@ -153,31 +157,34 @@ var Config = {
     splitArea: {
       odd: {
         show: true,
-        color: '#f5f5f5', // 奇数区域颜色与背景色相同
+        color: '#f5f5f5',
         opacity: 1,
       },
       even: {
         show: true,
-        color: '#e6e6e6', // 奇数区域颜色与背景色相同
+        color: '#e6e6e6',
         opacity: 1,
       },
     },
   },
-  xAxis: {
+  yAxis: {
     show: true,
-    boundaryGap: true, // boundaryGap为true时, 这时候刻度只是作为分隔线，标签和数据点都会在两个刻度之间的带(band)中间
+    type: 'value', // category, value
+    max: 'auto',
+    min: 'auto',
+    splitNumber: 4,
     axisName: {
       show: true,
-      text: 'x轴名称',
+      text: '轴线名称',
       gap: 10,
       textStyle: {
         color: '#666666',
         fontSize: 15,
+        align: 'center',
       },
     },
     axisLabel: {
       show: true,
-      showIndex: [], // 控制显示的下标数组
       rotate: 0,
       gap: 5,
       textStyle: {
@@ -187,7 +194,51 @@ var Config = {
     },
     axisTick: {
       show: true,
-      showIndex: [], // 控制显示的下标数组
+      length: 5,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#666666',
+      },
+    },
+    axisLine: {
+      show: true,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#666666',
+      },
+    },
+    axisSplitLine: {
+      show: true,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#dddddd',
+      },
+    },
+  },
+  xAxis: {
+    show: true,
+    type: 'category', // category, value
+    boundaryGap: true, // boundaryGap为true时, 这时候刻度只是作为分隔线，标签和数据点都会在两个刻度之间的带(band)中间
+    axisName: {
+      show: true,
+      text: '轴线名称',
+      gap: 10,
+      textStyle: {
+        color: '#666666',
+        fontSize: 15,
+      },
+    },
+    axisLabel: {
+      show: true,
+      rotate: 0,
+      gap: 5,
+      textStyle: {
+        color: '#666666',
+        fontSize: 12,
+      },
+    },
+    axisTick: {
+      show: true,
       alignWithLabel: false, // alignWithLabel为true时，刻度线与标签对齐
       length: 5,
       lineStyle: {
@@ -204,53 +255,7 @@ var Config = {
     },
     axisSplitLine: {
       show: true,
-      showIndex: [], // 控制显示的下标数组
-      lineStyle: {
-        lineWidth: 1,
-        color: '#dddddd',
-      },
-    },
-  },
-  yAxis: {
-    show: true,
-    max: 'auto',
-    min: 'auto',
-    splitNumber: 4,
-    axisName: {
-      show: true,
-      text: 'y轴名称',
-      gap: 10,
-      textStyle: {
-        color: '#666666',
-        fontSize: 15,
-        align: 'center',
-      },
-    },
-    axisLabel: {
-      show: true,
-      gap: 5,
-      textStyle: {
-        color: '#666666',
-        fontSize: 12,
-      },
-    },
-    axisTick: {
-      show: true,
-      length: 5,
-      lineStyle: {
-        lineWidth: 1,
-        color: '#666666',
-      },
-    },
-    axisLine: {
-      show: true,
-      lineStyle: {
-        lineWidth: 1,
-        color: '#666666',
-      },
-    },
-    axisSplitLine: {
-      show: true,
+      alignWithLabel: false, // alignWithLabel为true时，网格线与标签对齐
       lineStyle: {
         lineWidth: 1,
         color: '#dddddd',
@@ -393,7 +398,6 @@ function replenishData(key, sources, target, isCover = false) {
  */
 function calOptions() {
   let { config, opts } = this;
-
   replenishData('animation', config, opts);
   replenishData('animationDuration', config, opts);
   replenishData('animationTiming', config, opts);
@@ -404,15 +408,35 @@ function calOptions() {
 
   switch (opts.type) {
     case 'bar':
-      replenishData('yAxis', config, opts);
-      replenishData('xAxis', config, opts);
-      break
     case 'line':
-      replenishData('yAxis', config, opts);
-      replenishData('xAxis', config, opts);
-      break
-    case 'pie':
-      break
+    case 'scatter':
+      if (opts.yAxis && opts.yAxis.type == 'category') {
+        replenishData('show', config.xAxis, opts.yAxis);
+        replenishData('type', config.xAxis, opts.yAxis);
+        replenishData('boundaryGap', config.xAxis, opts.yAxis);
+        replenishData('axisName', config.xAxis, opts.yAxis);
+        replenishData('axisLabel', config.xAxis, opts.yAxis);
+        replenishData('axisTick', config.xAxis, opts.yAxis);
+        replenishData('axisLine', config.xAxis, opts.yAxis);
+        replenishData('axisSplitLine', config.xAxis, opts.yAxis);
+      } else {
+        replenishData('yAxis', config, opts);
+      }
+
+      if (opts.xAxis && opts.xAxis.type == 'value') {
+        replenishData('show', config.yAxis, opts.xAxis);
+        replenishData('type', config.yAxis, opts.xAxis);
+        replenishData('max', config.yAxis, opts.xAxis);
+        replenishData('min', config.yAxis, opts.xAxis);
+        replenishData('splitNumber', config.yAxis, opts.xAxis);
+        replenishData('axisName', config.yAxis, opts.xAxis);
+        replenishData('axisLabel', config.yAxis, opts.xAxis);
+        replenishData('axisTick', config.yAxis, opts.xAxis);
+        replenishData('axisLine', config.yAxis, opts.xAxis);
+        replenishData('axisSplitLine', config.yAxis, opts.xAxis);
+      } else {
+        replenishData('xAxis', config, opts);
+      }
     case 'radar':
       replenishData('radarAxis', config, opts);
       break
@@ -447,6 +471,14 @@ function calSeries() {
         replenishData('line', config.line, seriesItem);
         replenishData('symbol', config.line, seriesItem);
         replenishData('area', config.line, seriesItem);
+      });
+      break
+    case 'scatter':
+      opts.series.forEach(seriesItem => {
+        replenishData('label', config, seriesItem);
+        replenishData('color', config.scatter, seriesItem);
+        replenishData('radius', config.scatter, seriesItem);
+        replenishData('opacity', config.scatter, seriesItem);
       });
       break
     case 'pie':
@@ -505,10 +537,6 @@ class Animation {
             step(timeStamp);
           }, 17);
         }
-      } else {
-        return function(step) {
-          step(null);
-        }
       }
     };
     let animationFrame = createAnimationFrame();
@@ -518,6 +546,7 @@ class Animation {
         switch (type) {
           case 'bar':
           case 'line':
+          case 'scatter':
             animationTiming = 'easeIn';
             break
           case 'pie':
@@ -578,6 +607,14 @@ function calSeriesColor() {
           dataItem.itemStyle.color = colors[dataIndex % colorsLength];
         }
       });
+    });
+  }
+  if (this.opts.type == 'scatter') {
+    this.opts.series.forEach((seriesItem, seriesIndex) => {
+      seriesItem.itemStyle = seriesItem.itemStyle || {};
+      if (!seriesItem.itemStyle.color) {
+        seriesItem.itemStyle.color = seriesItem.color !== 'auto' ? seriesItem.color : colors[seriesIndex % colorsLength];
+      }
     });
   } else {
     this.opts.series.forEach((seriesItem, seriesIndex) => {
@@ -654,24 +691,32 @@ function calLegendData() {
 
 function calAxisYData() {
   let { context, opts, legendData, chartData } = this;
-  let { width, height, xAxis, yAxis, padding, categories, series } = opts;
+  let { width, height, padding, xAxis, yAxis, series } = opts;
 
   let {
     show: xAxisShow,
+    type: xAxisType,
+    data: xAxisData,
+    boundaryGap: xAxisBoundaryGap,
+    max: xAxisMax,
+    min: xAxisMin,
+    splitNumber: xAxisSplitNumber,
     format: xAxisFormat,
     axisName: xAxisName,
     axisLabel: xAxisLabel,
     axisTick: xAxisTick,
     axisLine: xAxisLine,
     axisSplitLine: xAxisSplitLine,
-    boundaryGap,
   } = xAxis;
 
   let {
     show: yAxisShow,
-    max,
-    min,
-    splitNumber,
+    type: yAxisType,
+    data: yAxisData,
+    boundaryGap: yAxisBoundaryGap,
+    max: yAxisMax,
+    min: yAxisMin,
+    splitNumber: yAxisSplitNumber,
     format: yAxisFormat,
     axisName: yAxisName,
     axisLabel: yAxisLabel,
@@ -680,17 +725,17 @@ function calAxisYData() {
     axisSplitLine: yAxisSplitLine,
   } = yAxis;
 
-  let { show: xAxisNameShow, text: xAxisNameText, gap: xAxisNameGap, textStyle: xAxisNameTextStyle } = xAxisName;
-  let { show: xAxisLabelShow, gap: xAxisLabelGap, rotate: xAxisLabelRotate, textStyle: xAxisLabelTextStyle } = xAxisLabel;
-  let { show: xAxisTickShow, length: xAxisTickLength, lineStyle: xAxisTickStyle, alignWithLabel } = xAxisTick;
+  let { show: xAxisNameShow, textStyle: xAxisNameTextStyle, gap: xAxisNameGap, text: xAxisNameText } = xAxisName;
+  let { show: xAxisLabelShow, textStyle: xAxisLabelTextStyle, gap: xAxisLabelGap, rotate: xAxisLabelRotate, showIndex: xAxisLabelShowIndex } = xAxisLabel;
+  let { show: xAxisTickShow, lineStyle: xAxisTickStyle, length: xAxisTickLength, alignWithLabel: xAxisTickAlign, showIndex: xAxisTickShowIndex } = xAxisTick;
   let { show: xAxisLineShow, lineStyle: xAxisLineStyle } = xAxisLine;
-  let { show: xAxisSplitLineShow, lineStyle: xAxisSplitLineStyle } = xAxisSplitLine;
+  let { show: xAxisSplitLineShow, lineStyle: xAxisSplitLineStyle, alignWithLabel: xAxisSplitLineAlign, showIndex: xAxisSplitLineShowIndex } = xAxisSplitLine;
 
-  let { show: yAxisNameShow, text: yAxisNameText, gap: yAxisNameGap, textStyle: yAxisNameTextStyle } = yAxisName;
-  let { show: yAxisLabelShow, gap: yAxisLabelGap, textStyle: yAxisLabelTextStyle } = yAxisLabel;
-  let { show: yAxisTickShow, length: yAxisTickLength, lineStyle: yAxisTickStyle } = yAxisTick;
+  let { show: yAxisNameShow, textStyle: yAxisNameTextStyle, gap: yAxisNameGap, text: yAxisNameText } = yAxisName;
+  let { show: yAxisLabelShow, textStyle: yAxisLabelTextStyle, gap: yAxisLabelGap, showIndex: yAxisLabelShowIndex } = yAxisLabel;
+  let { show: yAxisTickShow, lineStyle: yAxisTickStyle, length: yAxisTickLength, alignWithLabel: yAxisTickAlign, showIndex: yAxisTickShowIndex } = yAxisTick;
   let { show: yAxisLineShow, lineStyle: yAxisLineStyle } = yAxisLine;
-  let { show: yAxisSplitLineShow, lineStyle: yAxisSplitLineStyle } = yAxisSplitLine;
+  let { show: yAxisSplitLineShow, lineStyle: yAxisSplitLineStyle, alignWithLabel: yAxisSplitLineAlign, showIndex: yAxisSplitLineShowIndex } = yAxisSplitLine;
 
   let { fontSize: xAxisNameFontSize } = xAxisNameTextStyle;
   let { fontSize: xAxisLabelFontSize } = xAxisLabelTextStyle;
@@ -709,56 +754,61 @@ function calAxisYData() {
   let xEnd = width - padding[1]; // x方向终点
   let yStart = height - padding[2] - legendData.legendHeight; // y方向起点
   let yEnd = padding[0]; // y方向终点
-
   let xStartInit = xStart;
   let yStartInit = yStart;
 
-  let xSpacingNumber = boundaryGap ? categories.length : categories.length - 1;
-  let xSpacing = 0;
-  let xEachSpacing = 0;
-  let xAxisLabelMaxHeight = 0;
-  let xAxisLabelMaxWidht = 0;
-  let xAxisNameTextWidth = 0;
+  let yIsSamePart = true, // y轴是否同时为正数或负数，为false时同时存在正负数
+    xIsSamePart = true, // x轴是否同时为正数或负数，为false时同时存在正负数
+    yZero, // y轴零线的y坐标
+    yPlusSpacing,
+    yMinusSpacing,
+    ySpacing,
+    yEachSpacing,
+    xZero, // x轴零线的x坐标
+    xPlusSpacing,
+    xMinusSpacing,
+    xSpacing,
+    xEachSpacing,
+    yMaxData,
+    yMinData,
+    yDataRange,
+    xMaxData,
+    xMinData,
+    xDataRange;
 
-  let isSamePart = true; // 是否同时为正数或负数，为false时同时存在正负数
-  let yZero = 0;
-  let plusSpacing = 0;
-  let minusSpacing = 0;
-  let yAxisLabelText = [];
-  let yAxisLabelMaxWidth = 0;
-  let ySpacing = 0;
-  let yEachSpacing = 0;
-  let maxData = 0;
-  let minData = 0;
-  let dataRange = 0;
-  let dataEachRange = 0;
+  chartData.axisData = {
+    xStart: null,
+    xEnd: null,
+    yStart: null,
+    yEnd: null,
 
-  let limit = 0;
-  let multiple = 1;
+    yIsSamePart: null,
+    xIsSamePart: null,
 
-  chartData.xAxis = {
-    xAxisLabelMaxHeight: 0,
-    xStart: 0,
-    xEnd: 0,
-    xSpacing: 0,
-    xEachSpacing: 0,
+    yZero: null,
+    yPlusSpacing: null,
+    yMinusSpacing: null,
+    ySpacing: null,
+    yEachSpacing: null,
+    xZero: null,
+    xPlusSpacing: null,
+    xMinusSpacing: null,
+    xSpacing: null,
+    xEachSpacing: null,
+
+    yMaxData: null,
+    yMinData: null,
+    yDataRange: null,
+    xMaxData: null,
+    xMinData: null,
+    xDataRange: null,
+
     xAxisLabelPoint: [],
     xAxisTickPoint: [],
     xAxisLinePoint: {},
     xAxisSplitLinePoint: [],
     xAxisNamePoint: {},
-  };
-  chartData.yAxis = {
-    isSamePart: true,
-    yAxisLabelMaxWidth: 0,
-    yStart: 0,
-    yEnd: 0,
-    ySpacing: 0,
-    yEachSpacing: 0,
-    maxData: 0,
-    minData: 0,
-    dataRange: 0,
-    dataEachRange: 0,
+
     yAxisLabelPoint: [],
     yAxisTickPoint: [],
     yAxisLinePoint: {},
@@ -766,401 +816,1192 @@ function calAxisYData() {
     yAxisNamePoint: {},
   };
 
-  // 计算y轴数据的最大值最小值
-  let allDataArr = series.reduce((allDataArr, seriesItem) => {
-    return allDataArr.concat(seriesItem.data)
+  function calAxisValue(axis = 'x') {
+    let allDataArr = [];
+    if (xAxisType == 'value' && yAxisType == 'value') {
+      allDataArr = series.reduce((allDataArr, seriesItem) => {
+        let dataArr = seriesItem.data.reduce((dataArr, dataItem) => {
+          dataArr.push(dataItem[axis]);
+          return dataArr
+        }, []);
+        return allDataArr.concat(dataArr)
+      }, []);
+    } else {
+      allDataArr = series.reduce((allDataArr, seriesItem) => {
+        return allDataArr.concat(seriesItem.data)
+      }, []);
+    }
+
+    let axisLabelDataArr = [];
+    let splitNumber = axis == 'x' ? xAxisSplitNumber : yAxisSplitNumber;
+    let max = axis == 'x' ? xAxisMax : yAxisMax;
+    let min = axis == 'x' ? xAxisMin : yAxisMin;
+    let maxData = Math.max(...allDataArr);
+    let minData = Math.min(...allDataArr);
+    let dataRange = 0;
+    let dataEachRange = 0;
+    let limit = 1;
+    let multiple = 1;
+    console.log(`首次获取${axis}轴数据, maxData: ${maxData}, minData: ${minData}, dataRange: ${dataRange}`, allDataArr);
+
+    max = max == 'auto' ? max : Number(max);
+    min = min == 'auto' ? min : Number(min);
+
+    // 判断是否传入max,min
+    if (max == 'auto' || min == 'auto') {
+      if (max == 'auto') {
+        maxData = maxData <= 0 && minData <= 0 ? 0 : maxData;
+      } else {
+        maxData = max;
+      }
+      if (min == 'auto') {
+        minData = maxData >= 0 && minData >= 0 ? 0 : minData;
+      } else {
+        minData = min;
+      }
+      dataRange = maxData - minData;
+      console.log(`修正数据, max: ${max}, min: ${min}, maxData = ${maxData}, minData = ${minData}`);
+      console.log(`修正数据范围, dataRange = ${dataRange}`);
+    } else {
+      maxData = max;
+      minData = min;
+      dataRange = maxData - minData;
+      console.log(`修正数据, max: ${max}, min: ${min}, maxData: ${maxData}, minData: ${minData}`);
+      console.log(`固定数据范围, dataRange = ${dataRange}`);
+    }
+
+    // 是否同时为正数或负数，为false时同时存在正负数
+    let isSamePart = maxData > 0 && minData < 0 ? false : true;
+
+    if (dataRange >= 10000) {
+      limit = 1000;
+      console.log(`dataRange>=10000`);
+    } else if (dataRange >= 1000) {
+      limit = 100;
+      console.log(`dataRange>=1000`);
+    } else if (dataRange >= 100) {
+      limit = 10;
+      console.log(`dataRange>=100`);
+    } else if (dataRange >= 10) {
+      limit = 5;
+      console.log(`dataRange>=10`);
+    } else if (dataRange >= 1) {
+      limit = 0.1;
+      console.log(`dataRange>=1`);
+    } else if (dataRange >= 0.1) {
+      limit = 0.01;
+      console.log(`dataRange>=0.1`);
+    } else if (dataRange >= 0.01) {
+      limit = 0.001;
+      console.log(`dataRange>=0.01`);
+    } else if (dataRange >= 0.001) {
+      limit = 0.0001;
+      console.log(`dataRange>=0.001`);
+    } else {
+      limit = 0.00001;
+      console.log(`dataRange<0.0001`);
+    }
+
+    while (limit < 1) {
+      limit *= 10;
+      multiple *= 10;
+      console.log(`limit<1, limit: ${limit}, multiple: ${multiple}`);
+    }
+    console.log(`limit = ${limit}, multiple = ${multiple}`);
+
+    if (max == 'auto' && min == 'auto') {
+      if (maxData >= 0 && minData >= 0) {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.ceil(dataRange / splitNumber);
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        dataRange = dataEachRange * splitNumber;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        maxData = minData + dataRange;
+        console.log(`同为正数且 max: auto, min: auto, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else if (maxData <= 0 && minData <= 0) {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.floor(dataRange / splitNumber);
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        dataRange = dataEachRange * splitNumber;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        minData = maxData - dataRange;
+        console.log(`同为负数且 max: auto, min: auto, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.ceil(dataRange / splitNumber);
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+
+        axisLabelDataArr.push(0);
+
+        let data = 0;
+        while (data < maxData) {
+          data += dataEachRange;
+          axisLabelDataArr.push(data);
+        }
+        maxData = data;
+
+        data = 0;
+        while (data > minData) {
+          data -= dataEachRange;
+          axisLabelDataArr.unshift(data);
+        }
+        minData = data;
+        dataRange = maxData - minData;
+        console.log(`修正数据, maxData = ${maxData}, minData = ${minData}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        console.log(`正负数且 max: auto, min: auto, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      }
+    }
+
+    if (max == 'auto' && typeof min == 'number') {
+      if (maxData >= 0 && minData >= 0) {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.ceil(dataRange / splitNumber);
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        dataRange = dataEachRange * splitNumber;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        maxData = minData + dataRange;
+        console.log(`同为正数且 max: auto, min: ${min}, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else if (maxData <= 0 && minData <= 0) {
+        dataRange = dataRange * multiple;
+        dataEachRange = Number((dataRange / splitNumber).toFixed(2));
+        dataEachRange = dataEachRange / multiple;
+        dataRange = dataEachRange * splitNumber;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        console.log(`同为负数且 max: auto, min: ${min}, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.ceil(dataRange / splitNumber);
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+
+        axisLabelDataArr.push(0);
+
+        let data = 0;
+        while (data < maxData) {
+          data += dataEachRange;
+          axisLabelDataArr.push(data);
+        }
+        maxData = data;
+
+        data = 0;
+        while (data - dataEachRange > minData) {
+          data -= dataEachRange;
+          axisLabelDataArr.unshift(data);
+        }
+        axisLabelDataArr.unshift(minData);
+
+        dataRange = maxData - minData;
+        console.log(`修正数据, maxData = ${maxData}, minData = ${minData}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        console.log(`正负数且 max: auto, min: ${min}, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      }
+    }
+
+    if (typeof max == 'number' && min == 'auto') {
+      console.log(`max: ${max}, min: auto`);
+
+      if (maxData >= 0 && minData >= 0) {
+        dataRange = dataRange * multiple;
+        dataEachRange = Number((dataRange / splitNumber).toFixed(2));
+        dataEachRange = dataEachRange / multiple;
+        dataRange = dataEachRange * splitNumber;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        console.log(`同为正数且 max: ${max}, min: auto, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else if (maxData <= 0 && minData <= 0) {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.floor(dataRange / splitNumber);
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        dataRange = dataEachRange * splitNumber;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        minData = maxData - dataRange;
+        console.log(`同为负数且 max: ${max}, min: auto, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.ceil(dataRange / splitNumber);
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+
+        axisLabelDataArr.push(0);
+
+        let data = 0;
+        while (data + dataEachRange < maxData) {
+          data += dataEachRange;
+          axisLabelDataArr.push(data);
+        }
+        axisLabelDataArr.push(maxData);
+
+        data = 0;
+        while (data > minData) {
+          data -= dataEachRange;
+          axisLabelDataArr.unshift(data);
+        }
+        minData = data;
+
+        dataRange = maxData - minData;
+        console.log(`修正数据, maxData = ${maxData}, minData = ${minData}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        console.log(`正负数且 max: ${max}, min: auto, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      }
+    }
+
+    if (typeof max == 'number' && typeof min == 'number') {
+      console.log(`max: ${max}, min: ${min}`);
+
+      if (maxData >= 0 && minData >= 0) {
+        dataEachRange = Number((dataRange / splitNumber).toFixed(2));
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`同为正数且 max: ${max}, min: ${min}, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else if (maxData <= 0 && minData <= 0) {
+        dataEachRange = Number((dataRange / splitNumber).toFixed(2));
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+        console.log(`同为负数且 max: ${max}, min: ${min}, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      } else {
+        dataRange = dataRange * multiple;
+        dataEachRange = Math.ceil(dataRange / splitNumber);
+
+        while (dataEachRange % limit !== 0) {
+          dataEachRange += 1;
+        }
+        dataEachRange = dataEachRange / multiple;
+        console.log(`修正数据间隔, dataEachRange = ${dataEachRange}, splitNumber = ${splitNumber}`);
+
+        axisLabelDataArr.push(0);
+
+        let data = 0;
+        while (data + dataEachRange < maxData) {
+          data += dataEachRange;
+          axisLabelDataArr.push(data);
+        }
+        axisLabelDataArr.push(maxData);
+
+        data = 0;
+        while (data - dataEachRange > minData) {
+          data -= dataEachRange;
+          axisLabelDataArr.unshift(data);
+        }
+        axisLabelDataArr.unshift(minData);
+
+        dataRange = maxData - minData;
+        console.log(`修正数据, maxData = ${maxData}, minData = ${minData}`);
+        console.log(`修正数据范围, dataRange = ${dataRange}`);
+        console.log(`正负数且 max: ${max}, min: ${min}, dataRange = ${dataRange}, dataEachRange = ${dataEachRange}, maxData: ${maxData}, minData: ${minData}`);
+      }
+    }
+
+    if (isSamePart) {
+      for (let i = 0; i <= splitNumber; i++) {
+        let data = minData + dataEachRange * i;
+        data = data.toFixed(multiple.toString().length - 1);
+        axisLabelDataArr.push(Number(data));
+      }
+    }
+
+    if (axis == 'x') {
+      xDataRange = dataRange;
+      xMaxData = maxData;
+      xMinData = minData;
+      xIsSamePart = isSamePart;
+    } else {
+      yDataRange = dataRange;
+      yMaxData = maxData;
+      yMinData = minData;
+      yIsSamePart = isSamePart;
+    }
+
+    console.log(`complete calAxisValue ${axis}`, axisLabelDataArr);
+
+    return axisLabelDataArr
+  }
+
+  // 计算xAxisLabelDataArr, yAxisLabelDataArr
+  let xAxisLabelDataArr = xAxisType == 'category' ? xAxisData : calAxisValue('x');
+  let yAxisLabelDataArr = yAxisType == 'category' ? yAxisData : calAxisValue('y');
+
+  // 计算 xAxisLabelTextArr, xAxisLabelMaxHeight
+  context.font = `${xAxisLabelFontSize}px`;
+  let xAxisLabelMaxWidth = 0;
+  let xAxisLabelMaxHeight = 0;
+  let xAxisLabelTextArr = xAxisLabelDataArr.reduce((xAxisLabelTextArr, dataItem, dataIndex) => {
+    let text = xAxisFormat ? xAxisFormat(dataItem) : dataItem;
+    xAxisLabelMaxWidth = Math.max(context.measureText(text).width, xAxisLabelMaxWidth);
+    xAxisLabelTextArr.push(text);
+    return xAxisLabelTextArr
   }, []);
-  maxData = Math.max(...allDataArr);
-  minData = Math.min(...allDataArr);
 
-  if (maxData >= 0 && minData >= 0) {
-    minData = typeof min === 'number' ? min : 0;
-  } else if (maxData <= 0 && minData <= 0) {
-    maxData = typeof max === 'number' ? max : 0;
+  xAxisLabelRotate = Number(xAxisLabelRotate);
+
+  if (xAxisLabelRotate == 0) {
+    xAxisLabelMaxHeight = xAxisLabelFontSize;
   } else {
-    maxData = typeof max === 'number' ? max : maxData;
-    minData = typeof min === 'number' ? max : minData;
+    console.log(123, xAxisLabelRotate, Math.sin((xAxisLabelRotate * Math.PI) / 180));
+    xAxisLabelMaxHeight =
+      Math.abs(xAxisLabelMaxWidth * Math.sin((xAxisLabelRotate * Math.PI) / 180)) + Math.abs(xAxisLabelFontSize * Math.cos((xAxisLabelRotate * Math.PI) / 180));
   }
 
-  dataRange = maxData - minData;
-  if (dataRange >= 10000) {
-    limit = 1000;
-  } else if (dataRange >= 1000) {
-    limit = 100;
-  } else if (dataRange >= 100) {
-    limit = 10;
-  } else if (dataRange >= 10) {
-    limit = 5;
-  } else if (dataRange >= 1) {
-    limit = 1;
-  } else if (dataRange >= 0.1) {
-    limit = 0.1;
-  } else if (dataRange >= 0.01) {
-    limit = 0.01;
-  } else if (dataRange >= 0.001) {
-    limit = 0.001;
-  } else {
-    limit = 0.0001;
-  }
-
-  while (limit < 1) {
-    limit *= 10;
-    multiple *= 10;
-  }
-
-  maxData = maxData * multiple;
-  minData = minData * multiple;
-
-  if (max === 'auto') {
-    maxData = Math.ceil(maxData);
-    while (maxData % limit !== 0) {
-      maxData++;
-    }
-  }
-  if (min === 'auto') {
-    minData = Math.floor(minData);
-    while (minData % limit !== 0) {
-      minData--;
-    }
-  }
-
-  // 修正后的 maxData, minData, dataRange, isSamePart
-  maxData = maxData / multiple;
-  minData = minData / multiple;
-  dataRange = maxData - minData;
-  isSamePart = maxData > 0 && minData < 0 ? false : true; // 是否同时为正数或负数，为false时同时存在正负数
-
-  // 计算y轴数据
-  dataEachRange = dataRange / splitNumber;
+  // 计算yAxisLabelTextArr, yAxisLabelMaxWidth
   context.font = `${yAxisLabelFontSize}px`;
-  if (isSamePart) {
-    for (let i = 0; i <= splitNumber; i++) {
-      let num = minData + dataEachRange * i;
-      num = num.toFixed(multiple.toString().length - 1);
-      let text = yAxisFormat ? yAxisFormat(num) : num;
-      yAxisLabelMaxWidth = Math.max(context.measureText(text).width, yAxisLabelMaxWidth);
-      yAxisLabelText.push(text);
-    }
+  let yAxisLabelMaxWidth = 0;
+  let yAxisLabelTextArr = yAxisLabelDataArr.reduce((yAxisLabelTextArr, dataItem, dataIndex) => {
+    let text = yAxisFormat ? yAxisFormat(dataItem) : dataItem;
+    yAxisLabelMaxWidth = Math.max(context.measureText(text).width, xAxisLabelMaxWidth);
+    yAxisLabelTextArr.push(text);
+    return yAxisLabelTextArr
+  }, []);
+
+  let xSpacingNumber = 0;
+  if (xAxisType == 'category') {
+    xSpacingNumber = xAxisBoundaryGap ? xAxisLabelDataArr.length : xAxisLabelDataArr.length - 1;
   } else {
-    yAxisLabelText.push(0);
-
-    let num = 0;
-    while (num < maxData) {
-      num += dataEachRange;
-      yAxisLabelText.push(num);
-    }
-
-    num = 0;
-    while (num > minData) {
-      num -= dataEachRange;
-      yAxisLabelText.unshift(num);
-    }
-
-    yAxisLabelText.forEach(text => {
-      text = yAxisFormat ? yAxisFormat(text) : text;
-      yAxisLabelMaxWidth = Math.max(context.measureText(text).width, yAxisLabelMaxWidth);
-    });
+    xSpacingNumber = xAxisLabelDataArr.length - 1;
   }
 
-  // 修正xStart
-  if (yAxisLabelShow) {
-    xStart += yAxisLabelMaxWidth + yAxisLabelGap;
-  }
-  if (yAxisShow && yAxisTickShow) {
-    xStart += yAxisTickLength;
-  }
-
-  // 修正xEnd
-  if (xAxisShow && xAxisNameShow) {
-    context.font = `${xAxisNameFontSize}px`;
-    xAxisNameTextWidth = context.measureText(xAxisNameText).width;
-    xEnd -= xAxisNameTextWidth + xAxisNameGap;
-    xSpacing = xEnd - xStart;
-    xEachSpacing = Math.floor(xSpacing / xSpacingNumber);
-    xEnd = xStart + xEachSpacing * xSpacingNumber;
+  let ySpacingNumber = 0;
+  if (yAxisType == 'category') {
+    ySpacingNumber = yAxisBoundaryGap ? yAxisLabelDataArr.length : yAxisLabelDataArr.length - 1;
+  } else {
+    ySpacingNumber = yAxisLabelDataArr.length - 1;
   }
 
   // 修正yStart
   if (xAxisShow && xAxisLabelShow) {
-    context.font = `${xAxisLabelFontSize}px`;
-    categories.forEach(item => {
-      item = xAxisFormat ? xAxisFormat(item) : item;
-      xAxisLabelMaxWidht = Math.max(xAxisLabelMaxWidht, context.measureText(item).width);
-    });
-
-    if (xAxisLabelRotate == 0) {
-      xAxisLabelMaxHeight = xAxisLabelFontSize;
-    } else {
-      xAxisLabelMaxHeight =
-        Math.abs(xAxisLabelMaxWidht * Math.sin((xAxisLabelRotate * Math.PI) / 180)) +
-        Math.abs(xAxisLabelFontSize * Math.cos((xAxisLabelRotate * Math.PI) / 180));
-    }
-
     yStart -= xAxisLabelMaxHeight + xAxisLabelGap;
   }
   if (xAxisShow && xAxisTickShow) {
-    if (isSamePart) {
+    if ((yAxisType == 'value' && yIsSamePart) || yAxisType == 'category') {
       yStart -= xAxisTickLength;
+    }
+  }
+  if (yIsSamePart) {
+    if (xAxisShow && xAxisLineShow) {
+      yStart -= xAxisLineWidth / 2;
+    }
+  } else {
+    if (xAxisShow && xAxisSplitLineShow) {
+      yStart -= xAxisSplitLineWidth / 2;
     }
   }
 
   // 修正yEnd
   if (yAxisShow && yAxisNameShow) {
     yEnd += yAxisNameFontSize + yAxisNameGap;
-    ySpacing = yStart - yEnd;
-    yEachSpacing = Math.floor(ySpacing / (yAxisLabelText.length - 1));
-    yEnd = yStart - yEachSpacing * (yAxisLabelText.length - 1); // yEachSpacing经由Math.floor计算后存在误差，需重新计算yEnd
-    ySpacing = yStart - yEnd;
   }
+  ySpacing = yStart - yEnd;
+  console.log(`初始ySpacing数据, yStart = ${yStart}, yEnd = ${yEnd}, ySpacing = ${ySpacing}`);
+  yEachSpacing = Math.floor(ySpacing / ySpacingNumber);
+  yEnd = yStart - yEachSpacing * ySpacingNumber;
+  ySpacing = yStart - yEnd;
+  console.log(`修正ySpacing数据, yStart = ${yStart}, yEnd = ${yEnd}, ySpacing = ${ySpacing}`);
 
-  // 计算 yAxis 各项数据 (先计算y轴再计算x轴)
-  // 计算 yAxisLabelPoint
-  chartData.yAxis.yAxisLabelPoint = yAxisLabelText.reduce((arr, item, index) => {
-    let _xStart = xStartInit;
-
-    arr.push({
-      text: item,
-      x: _xStart + yAxisLabelMaxWidth,
-      y: yStart - xAxisLineWidth / 2 - yEachSpacing * index,
-    });
-
-    if (!isSamePart && item === 0) {
-      yZero = yStart - xAxisLineWidth / 2 - yEachSpacing * index; // 存在正负值时计算0线的y坐标
-      plusSpacing = yZero - yEnd;
-      minusSpacing = yStart - yZero;
-    }
-
-    return arr
-  }, []);
-
-  // 计算 yAxisTickPoint
+  // 修正xStart
+  if (yAxisLabelShow) {
+    xStart += yAxisLabelMaxWidth + yAxisLabelGap;
+  }
   if (yAxisShow && yAxisTickShow) {
-    let _xStart = xStartInit;
-    if (yAxisShow && yAxisLabelShow) {
-      _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+    if ((xAxisType == 'value' && xIsSamePart) || xAxisType == 'category') {
+      xStart += yAxisTickLength;
     }
-
-    chartData.yAxis.yAxisTickPoint = chartData.yAxis.yAxisLabelPoint.reduce((arr, item, index) => {
-      arr.push({
-        startX: _xStart, // 起点x坐标
-        startY: yStart - yAxisTickLineWidth / 2 - yEachSpacing * index, // 起点y坐标
-        endX: _xStart + yAxisTickLength, // 终点x坐标
-        endY: yStart - yAxisTickLineWidth / 2 - yEachSpacing * index, // 终点y坐标
-      });
-      return arr
-    }, []);
   }
-
-  // 计算 yAxisSplitLinePoint
-  if (yAxisShow && yAxisSplitLineShow) {
-    let _xStart = xStartInit;
-    if (yAxisShow && yAxisLabelShow) {
-      _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
-    }
-    if (yAxisShow && yAxisTickShow) {
-      _xStart += yAxisTickLength; // 更新_xStart数据
-    }
-
-    chartData.yAxis.yAxisSplitLinePoint = chartData.yAxis.yAxisLabelPoint.reduce((arr, item, index) => {
-      arr.push({
-        startX: _xStart, // 起点x坐标 ps: 这里应该是不用加yAxisLineWidth的
-        startY: yStart - yAxisSplitLineWidth / 2 - yEachSpacing * index, // 起点y坐标
-        endX: xEnd, // 终点x坐标
-        endY: yStart - yAxisSplitLineWidth / 2 - yEachSpacing * index, // 终点y坐标
-      });
-      return arr
-    }, []);
-  }
-
-  // 计算 yAxisLinePoint
-  if (yAxisShow && yAxisLineShow) {
-    let _xStart = xStartInit;
-    if (yAxisShow && yAxisLabelShow) {
-      _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
-    }
-    if (yAxisShow && yAxisTickShow) {
-      _xStart += yAxisTickLength; // 更新_xStart数据
-    }
-
-    chartData.yAxis.yAxisLinePoint = {
-      startX: _xStart + yAxisLineWidth / 2, // 起点x坐标
-      startY: yStart, // 起点y坐标
-      endX: _xStart + yAxisLineWidth / 2, // 终点x坐标
-      endY: yEnd - yAxisTickLineWidth, // 终点y坐标
-    };
-  }
-
-  // 计算 yAxisNamePoint
-  if (yAxisShow && yAxisNameShow) {
-    let _xStart = xStartInit;
-    if (yAxisShow && yAxisLabelShow) {
-      _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
-    }
-    if (yAxisShow && yAxisTickShow) {
-      _xStart += yAxisTickLength; // 更新_xStart数据
-    }
+  if (xIsSamePart) {
     if (yAxisShow && yAxisLineShow) {
-      _xStart += yAxisLineWidth / 2; // 更新_xStart数据
+      xStart += yAxisLineWidth / 2;
+    }
+  } else {
+    if (yAxisShow && yAxisSplitLineShow) {
+      xStart += yAxisSplitLineWidth / 2;
+    }
+  }
+
+  // 修正xEnd
+  if (xAxisShow && xAxisNameShow) {
+    context.font = `${xAxisNameFontSize}px`;
+    let xAxisNameTextWidth = context.measureText(xAxisNameText).width;
+    xEnd -= xAxisNameTextWidth + xAxisNameGap;
+  }
+  xSpacing = xEnd - xStart;
+  console.log(`初始xSpacing数据, xStart = ${xStart}, xEnd = ${xEnd}, xSpacing = ${xSpacing}`);
+  xEachSpacing = Math.floor(xSpacing / xSpacingNumber);
+  xEnd = xStart + xEachSpacing * xSpacingNumber;
+  xSpacing = xEnd - xStart;
+  console.log(`修正xSpacing数据, xStart = ${xStart}, xEnd = ${xEnd}, xSpacing = ${xSpacing}`);
+
+  // 计算yZero
+  if (yAxisType == 'value' && !yIsSamePart) {
+    yAxisLabelDataArr.reduce((arr, item, index) => {
+      if (index == 0) {
+        arr.push({
+          y: yStart,
+        });
+      } else {
+        let spacing = (Math.abs(yAxisLabelDataArr[index - 1] - yAxisLabelDataArr[index]) * ySpacing) / yDataRange;
+
+        arr.push({
+          y: arr[index - 1].y - spacing,
+        });
+      }
+
+      if (item == 0) {
+        yZero = arr[index].y; // 存在正负值时计算0线的y坐标
+        console.log(`yZero = ${yZero}`);
+      }
+
+      if (index + 1 == yAxisLabelDataArr.length) {
+        yEnd = arr[index].y;
+        ySpacing = yStart - yEnd;
+        console.log(`修正yEnd, yEnd = ${yEnd}`);
+        console.log(`修正ySpacing, ySpacing = ${ySpacing}`);
+        yPlusSpacing = yZero - yEnd;
+        yMinusSpacing = yStart - yZero;
+      }
+
+      return arr
+    }, []);
+  }
+
+  // 计算xZero
+  if (xAxisType == 'value' && !xIsSamePart) {
+    xAxisLabelDataArr.reduce((arr, item, index) => {
+      if (index == 0) {
+        arr.push({
+          x: xStart,
+        });
+      } else {
+        let spacing = (Math.abs(xAxisLabelDataArr[index] - xAxisLabelDataArr[index - 1]) * xSpacing) / xDataRange;
+        arr.push({
+          x: arr[index - 1].x + spacing,
+        });
+      }
+
+      if (item == 0) {
+        xZero = arr[index].x; // 存在正负值时计算0线的x坐标
+        console.log(`xZero = ${xZero}`);
+      }
+
+      if (index + 1 == xAxisLabelDataArr.length) {
+        xEnd = arr[index].x;
+        xSpacing = xEnd - xStart;
+        console.log(`修正xEnd, xEnd = ${xEnd}`);
+        console.log(`修正xSpacing, xSpacing = ${xSpacing}`);
+        xPlusSpacing = xEnd - xZero;
+        xMinusSpacing = xZero - xStart;
+      }
+
+      return arr
+    }, []);
+  }
+
+  // 计算 yAxis 各项数据
+  if (yAxisType == 'value') {
+    let _xStart = xStartInit;
+    if (yAxisShow && yAxisLabelShow) {
+      _xStart += yAxisLabelMaxWidth; // 更新_xStart数据
     }
 
-    chartData.yAxis.yAxisNamePoint = {
-      text: yAxisNameText,
-      x: _xStart,
-      y: yEnd - yAxisNameGap,
-    };
+    // 计算 yAxisLabelPoint
+    chartData.axisData.yAxisLabelPoint = yAxisLabelTextArr.reduce((yAxisLabelPoint, item, index) => {
+      if (index == 0) {
+        yAxisLabelPoint.push({
+          text: item,
+          x: _xStart,
+          y: yStart,
+        });
+      } else {
+        let spacing = (Math.abs(yAxisLabelDataArr[index - 1] - yAxisLabelDataArr[index]) * ySpacing) / yDataRange;
+
+        yAxisLabelPoint.push({
+          text: item,
+          x: _xStart,
+          y: yAxisLabelPoint[index - 1].y - spacing,
+        });
+      }
+
+      return yAxisLabelPoint
+    }, []);
+
+    // 计算 yAxisSplitLinePoint
+    if (yAxisShow && yAxisSplitLineShow) {
+      let _xStart = xStartInit;
+      if (yAxisShow && yAxisLabelShow) {
+        _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+      }
+      if (yAxisShow && yAxisTickShow) {
+        if (xIsSamePart) {
+          _xStart += yAxisTickLength; // 更新_xStart数据
+        }
+      }
+
+      chartData.axisData.yAxisSplitLinePoint = chartData.axisData.yAxisLabelPoint.reduce((yAxisSplitLinePoint, item, index) => {
+        yAxisSplitLinePoint.push({
+          startX: _xStart, // 起点x坐标
+          startY: item.y, // 起点y坐标
+          endX: xEnd, // 终点x坐标
+          endY: item.y, // 终点y坐标
+        });
+        return yAxisSplitLinePoint
+      }, []);
+    }
+
+    // 计算 yAxisTickPoint
+    if (yAxisShow && yAxisTickShow) {
+      let _xStart = xStartInit;
+
+      if (xIsSamePart) {
+        if (yAxisShow && yAxisLabelShow) {
+          _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+        }
+      } else {
+        _xStart = xZero - xAxisLineWidth / 2 - yAxisTickLength;
+      }
+
+      chartData.axisData.yAxisTickPoint = chartData.axisData.yAxisLabelPoint.reduce((yAxisTickPoint, item, index) => {
+        yAxisTickPoint.push({
+          startX: _xStart, // 起点x坐标
+          startY: item.y, // 起点y坐标
+          endX: _xStart + yAxisTickLength, // 终点x坐标
+          endY: item.y, // 终点y坐标
+        });
+        return yAxisTickPoint
+      }, []);
+    }
+
+    // 计算 yAxisLinePoint
+    if (yAxisShow && yAxisLineShow) {
+      let _xStart = xStartInit;
+      if (xIsSamePart) {
+        if (yAxisShow && yAxisLabelShow) {
+          _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+        }
+        if (yAxisShow && yAxisTickShow) {
+          _xStart += yAxisTickLength; // 更新_xStart数据
+        }
+        _xStart += yAxisLineWidth / 2;
+      } else {
+        _xStart = xZero;
+      }
+
+      chartData.axisData.yAxisLinePoint = {
+        startX: _xStart, // 起点x坐标
+        startY: yStart, // 起点y坐标
+        endX: _xStart, // 终点x坐标
+        endY: yEnd - yAxisTickLineWidth / 2, // 终点y坐标
+      };
+    }
+
+    // 计算 yAxisNamePoint
+    if (yAxisShow && yAxisNameShow) {
+      let _xStart = xStartInit;
+      if (xIsSamePart) {
+        if (yAxisShow && yAxisLabelShow) {
+          _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+        }
+        if (yAxisShow && yAxisTickShow) {
+          _xStart += yAxisTickLength; // 更新_xStart数据
+        }
+        if (yAxisShow && yAxisLineShow) {
+          _xStart += yAxisLineWidth / 2; // 更新_xStart数据
+        }
+      } else {
+        _xStart = xZero;
+      }
+
+      chartData.axisData.yAxisNamePoint = {
+        text: yAxisNameText,
+        x: _xStart,
+        y: yEnd - yAxisNameGap,
+      };
+    }
   }
 
   // 计算 xAxis 各项数据
-  // 计算 xAxisLabelPoint
-  chartData.xAxis.xAxisLabelPoint = categories.reduce((arr, item, index) => {
-    let _yStart = yStartInit;
-
-    if (boundaryGap) {
-      arr.push({
-        text: item,
-        x: xStart + xEachSpacing * (index + 1) - xEachSpacing / 2,
-        y: _yStart - xAxisLabelMaxHeight,
-      });
-    } else {
-      arr.push({
-        text: item,
-        x: xStart + xEachSpacing * index,
-        y: _yStart - xAxisLabelMaxHeight,
-      });
-    }
-    return arr
-  }, []);
-
-  // 计算 xAxisSplitLinePoint
-  if (xAxisShow && xAxisSplitLineShow) {
+  if (xAxisType == 'value') {
     let _yStart = yStartInit;
     if (xAxisShow && xAxisLabelShow) {
-      _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新yStart数据
-    }
-    if (xAxisShow && xAxisTickShow) {
-      if (isSamePart) {
-        _yStart -= xAxisTickLength; // 更新yStart数据
-      }
+      _yStart -= xAxisLabelMaxHeight; // 更新_yStart数据
     }
 
-    for (let index = 0, xAxisSplitLineNumber = boundaryGap ? categories.length + 1 : categories.length; index < xAxisSplitLineNumber; index++) {
-      chartData.xAxis.xAxisSplitLinePoint.push({
-        startX: xStart + xAxisSplitLineWidth / 2 + xEachSpacing * index,
-        startY: _yStart,
-        endX: xStart + xAxisSplitLineWidth / 2 + xEachSpacing * index,
-        endY: yEnd,
-      });
-    }
-  }
-
-  // 计算 xAxisTickPoint
-  if (xAxisShow && xAxisTickShow) {
-    let _yStart = yStartInit;
-
-    if (isSamePart) {
-      if (xAxisShow && xAxisLabelShow) {
-        _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新yStart数据
-      }
-      _yStart -= xAxisTickLength;
-    } else {
-      _yStart = yZero;
-    }
-
-    // alignWithLabel为true时，刻度线与标签对齐
-    let xAxisTickNumber = 0;
-    if (boundaryGap) {
-      xAxisTickNumber = alignWithLabel ? categories.length : categories.length + 1;
-    } else {
-      xAxisTickNumber = categories.length;
-    }
-
-    for (let index = 0; index < xAxisTickNumber; index++) {
-      if (boundaryGap && alignWithLabel) {
-        chartData.xAxis.xAxisTickPoint.push({
-          startX: xStart + xAxisTickLineWidth / 2 + xEachSpacing * index + xEachSpacing / 2,
-          startY: _yStart,
-          endX: xStart + xAxisTickLineWidth / 2 + xEachSpacing * index + xEachSpacing / 2,
-          endY: _yStart + xAxisTickLength,
+    // 计算 xAxisLabelPoint
+    chartData.axisData.xAxisLabelPoint = xAxisLabelTextArr.reduce((xAxisLabelPoint, item, index) => {
+      if (index == 0) {
+        xAxisLabelPoint.push({
+          text: item,
+          x: xStart,
+          y: _yStart,
         });
       } else {
-        chartData.xAxis.xAxisTickPoint.push({
-          startX: xStart + xAxisTickLineWidth / 2 + xEachSpacing * index,
-          startY: _yStart,
-          endX: xStart + xAxisTickLineWidth / 2 + xEachSpacing * index,
-          endY: _yStart + xAxisTickLength,
+        let spacing = (Math.abs(xAxisLabelDataArr[index] - xAxisLabelDataArr[index - 1]) * xSpacing) / xDataRange;
+
+        xAxisLabelPoint.push({
+          text: item,
+          x: xAxisLabelPoint[index - 1].x + spacing,
+          y: _yStart,
         });
       }
-    }
-  }
 
-  // 计算 xAxisLinePoint
-  if (xAxisShow && xAxisLineShow) {
-    let _yStart = yStartInit;
-    if (isSamePart) {
+      return xAxisLabelPoint
+    }, []);
+
+    // 计算 xAxisSplitLinePoint
+    if (xAxisShow && xAxisSplitLineShow) {
+      let _yStart = yStartInit;
       if (xAxisShow && xAxisLabelShow) {
-        _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新yStart数据
+        _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
       }
       if (xAxisShow && xAxisTickShow) {
-        _yStart -= xAxisTickLength; // 更新yStart数据
+        if (yIsSamePart) {
+          _yStart -= xAxisTickLength; // 更新_yStart数据
+        }
       }
-      _yStart -= xAxisLineWidth / 2;
-    } else {
-      _yStart = yZero;
+
+      chartData.axisData.xAxisSplitLinePoint = chartData.axisData.xAxisLabelPoint.reduce((xAxisSplitLinePoint, item, index) => {
+        xAxisSplitLinePoint.push({
+          startX: item.x, // 起点x坐标
+          startY: _yStart, // 起点y坐标
+          endX: item.x, // 终点x坐标
+          endY: yEnd, // 终点y坐标
+        });
+        return xAxisSplitLinePoint
+      }, []);
     }
 
-    chartData.xAxis.xAxisLinePoint = {
-      startX: xStart,
-      startY: _yStart,
-      endX: xEnd + yAxisTickLineWidth,
-      endY: _yStart,
-    };
+    // 计算 xAxisTickPoint
+    if (xAxisShow && xAxisTickShow) {
+      let _yStart = yStartInit;
+      if (yIsSamePart) {
+        if (yAxisShow && yAxisLabelShow) {
+          _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
+        }
+      } else {
+        _yStart = yZero + xAxisLineWidth / 2 + yAxisTickLength;
+      }
+
+      chartData.axisData.xAxisTickPoint = chartData.axisData.xAxisLabelPoint.reduce((xAxisTickPoint, item, index) => {
+        xAxisTickPoint.push({
+          startX: item.x, // 起点x坐标
+          startY: _yStart, // 起点y坐标
+          endX: item.x, // 终点x坐标
+          endY: _yStart - xAxisTickLength, // 终点y坐标
+        });
+        return xAxisTickPoint
+      }, []);
+    }
+
+    // 计算 xAxisLinePoint
+    if (xAxisShow && xAxisLineShow) {
+      let _yStart = yStartInit;
+      if (yIsSamePart) {
+        if (xAxisShow && xAxisLabelShow) {
+          _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
+        }
+        if (xAxisShow && xAxisTickShow) {
+          _yStart -= xAxisTickLength; // 更新_yStart数据
+        }
+        _yStart -= xAxisLineWidth / 2;
+      } else {
+        _yStart = yZero;
+      }
+
+      chartData.axisData.xAxisLinePoint = {
+        startX: xStart, // 起点x坐标
+        startY: _yStart, // 起点y坐标
+        endX: xEnd + xAxisTickLineWidth / 2, // 终点x坐标
+        endY: _yStart, // 终点y坐标
+      };
+    }
+
+    // 计算 xAxisNamePoint
+    if (xAxisShow && xAxisNameShow) {
+      let _yStart = yStartInit;
+      if (xIsSamePart) {
+        if (xAxisShow && xAxisLabelShow) {
+          _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
+        }
+        if (xAxisShow && xAxisTickShow) {
+          _yStart -= xAxisTickLength; // 更新_yStart数据
+        }
+        if (xAxisShow && xAxisLineShow) {
+          _yStart -= xAxisLineWidth / 2; // 更新_yStart数据
+        }
+      } else {
+        _yStart = yZero;
+      }
+
+      chartData.axisData.xAxisNamePoint = {
+        text: xAxisNameText,
+        x: xEnd + xAxisNameGap,
+        y: _yStart,
+      };
+    }
   }
 
-  // 计算 xAxisNamePoint
-  if (xAxisShow && xAxisNameShow) {
-    let _yStart = yStartInit;
-    if (isSamePart) {
+  // 计算 yAxis 各项数据
+  if (yAxisType == 'category') {
+    // 计算 yAxisLabelPoint
+    chartData.axisData.yAxisLabelPoint = yAxisLabelTextArr.reduce((yAxisLabelPoint, item, index) => {
+      let _xStart = xStartInit;
+      if (yAxisShow && yAxisLabelShow) {
+        _xStart += yAxisLabelMaxWidth; // 更新_xStart数据
+      }
+
+      if (yAxisBoundaryGap) {
+        yAxisLabelPoint.push({
+          show: true,
+          text: item,
+          x: _xStart,
+          y: yStart - yEachSpacing * (index + 1) + yEachSpacing / 2,
+        });
+      } else {
+        yAxisLabelPoint.push({
+          show: true,
+          text: item,
+          x: _xStart,
+          y: yStart - yEachSpacing * index,
+        });
+      }
+
+      return yAxisLabelPoint
+    }, []);
+
+    if (yAxisLabelShowIndex && yAxisLabelShowIndex.length) {
+      chartData.axisData.yAxisLabelPoint = chartData.axisData.yAxisLabelPoint.map((item, index) => {
+        let isShow = yAxisLabelShowIndex.some(showIndex => {
+          return showIndex === index
+        });
+
+        if (isShow) {
+          item.show = true;
+        } else {
+          item.show = false;
+        }
+
+        return item
+      });
+    }
+
+    // 计算 yAxisSplitLinePoint
+    if (yAxisShow && yAxisSplitLineShow) {
+      let _xStart = xStartInit;
+      if (yAxisShow && yAxisLabelShow) {
+        _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+      }
+      if (yAxisShow && yAxisTickShow) {
+        if (xIsSamePart) {
+          _xStart += yAxisTickLength; // 更新_xStart数据
+        }
+      }
+
+      // yAxisSplitLineAlign为true时，刻度线与标签对齐
+      let yAxisSplitLineNumber = 0;
+      if (yAxisBoundaryGap) {
+        yAxisSplitLineNumber = yAxisSplitLineAlign ? yAxisLabelDataArr.length : yAxisLabelDataArr.length + 1;
+      } else {
+        yAxisSplitLineNumber = yAxisLabelDataArr.length;
+      }
+
+      for (let index = 0; index < yAxisSplitLineNumber; index++) {
+        if (yAxisBoundaryGap && yAxisSplitLineAlign) {
+          chartData.axisData.yAxisSplitLinePoint.push({
+            show: true,
+            startX: _xStart,
+            startY: yStart - yEachSpacing * index - yEachSpacing / 2,
+            endX: xEnd,
+            endY: yStart - yEachSpacing * index - yEachSpacing / 2,
+          });
+        } else {
+          chartData.axisData.yAxisSplitLinePoint.push({
+            show: true,
+            startX: _xStart,
+            startY: yStart - yEachSpacing * index,
+            endX: xEnd,
+            endY: yStart - yEachSpacing * index,
+          });
+        }
+      }
+    }
+
+    if (yAxisSplitLineShowIndex && yAxisSplitLineShowIndex.length) {
+      chartData.axisData.yAxisSplitLinePoint = chartData.axisData.yAxisSplitLinePoint.map((item, index) => {
+        let isShow = yAxisSplitLineShowIndex.some(showIndex => {
+          return showIndex === index
+        });
+
+        if (isShow) {
+          item.show = true;
+        } else {
+          item.show = false;
+        }
+
+        return item
+      });
+    }
+
+    // 计算 yAxisTickPoint
+    if (yAxisShow && yAxisTickShow) {
+      let _xStart = xStartInit;
+
+      if (xIsSamePart) {
+        if (yAxisShow && yAxisLabelShow) {
+          _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+        }
+      } else {
+        _xStart = xZero - yAxisLineWidth / 2 - yAxisTickLength;
+      }
+
+      // yAxisTickAlign为true时，刻度线与标签对齐
+      let yAxisTickNumber = 0;
+      if (yAxisBoundaryGap) {
+        yAxisTickNumber = yAxisTickAlign ? yAxisLabelDataArr.length : yAxisLabelDataArr.length + 1;
+      } else {
+        yAxisTickNumber = yAxisLabelDataArr.length;
+      }
+
+      for (let index = 0; index < yAxisTickNumber; index++) {
+        if (yAxisBoundaryGap && yAxisTickAlign) {
+          chartData.axisData.yAxisTickPoint.push({
+            show: true,
+            startX: _xStart,
+            startY: yStart - yEachSpacing * index - yEachSpacing / 2,
+            endX: _xStart + yAxisTickLength,
+            endY: yStart - yEachSpacing * index - yEachSpacing / 2,
+          });
+        } else {
+          chartData.axisData.yAxisTickPoint.push({
+            show: true,
+            startX: _xStart,
+            startY: yStart - yEachSpacing * index,
+            endX: _xStart + yAxisTickLength,
+            endY: yStart - yEachSpacing * index,
+          });
+        }
+      }
+    }
+
+    if (yAxisTickShowIndex && yAxisTickShowIndex.length) {
+      chartData.axisData.yAxisTickPoint = chartData.axisData.yAxisTickPoint.map((item, index) => {
+        let isShow = yAxisTickShowIndex.some(showIndex => {
+          return showIndex === index
+        });
+
+        if (isShow) {
+          item.show = true;
+        } else {
+          item.show = false;
+        }
+
+        return item
+      });
+    }
+
+    // 计算 yAxisLinePoint
+    if (yAxisShow && yAxisLineShow) {
+      let _xStart = xStartInit;
+      if (xIsSamePart) {
+        if (yAxisShow && yAxisLabelShow) {
+          _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+        }
+        if (yAxisShow && yAxisTickShow) {
+          _xStart += yAxisTickLength; // 更新_xStart数据
+        }
+        _xStart += yAxisLineWidth / 2;
+      } else {
+        _xStart = xZero;
+      }
+
+      chartData.axisData.yAxisLinePoint = {
+        startX: _xStart,
+        startY: yStart,
+        endX: _xStart,
+        endY: yEnd - yAxisTickLineWidth / 2,
+      };
+    }
+
+    // 计算 yAxisNamePoint
+    if (yAxisShow && yAxisNameShow) {
+      let _xStart = xStartInit;
+      if (xIsSamePart) {
+        if (yAxisShow && yAxisLabelShow) {
+          _xStart += yAxisLabelMaxWidth + yAxisLabelGap; // 更新_xStart数据
+        }
+        if (yAxisShow && yAxisTickShow) {
+          _xStart += yAxisTickLength; // 更新_xStart数据
+        }
+        if (yAxisShow && yAxisLineShow) {
+          _xStart += yAxisLineWidth / 2; // 更新_xStart数据
+        }
+      } else {
+        _xStart = xZero;
+      }
+
+      chartData.axisData.yAxisNamePoint = {
+        text: yAxisNameText,
+        x: _xStart,
+        y: yEnd - yAxisNameGap,
+      };
+    }
+  }
+
+  // 计算 xAxis 各项数据
+  if (xAxisType == 'category') {
+    // 计算 xAxisLabelPoint
+    chartData.axisData.xAxisLabelPoint = xAxisLabelTextArr.reduce((xAxisLabelPoint, item, index) => {
+      let _yStart = yStartInit;
       if (xAxisShow && xAxisLabelShow) {
-        _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新yStart数据
+        _yStart -= xAxisLabelMaxHeight; // 更新_yStart数据
+      }
+
+      if (xAxisBoundaryGap) {
+        xAxisLabelPoint.push({
+          show: true,
+          text: item,
+          x: xStart + xEachSpacing * (index + 1) - xEachSpacing / 2,
+          y: _yStart,
+        });
+      } else {
+        xAxisLabelPoint.push({
+          show: true,
+          text: item,
+          x: xStart + xEachSpacing * index,
+          y: _yStart,
+        });
+      }
+      return xAxisLabelPoint
+    }, []);
+
+    if (xAxisLabelShowIndex && xAxisLabelShowIndex.length) {
+      chartData.axisData.xAxisLabelPoint = chartData.axisData.xAxisLabelPoint.map((item, index) => {
+        let isShow = xAxisLabelShowIndex.some(showIndex => {
+          return showIndex === index
+        });
+
+        if (isShow) {
+          item.show = true;
+        } else {
+          item.show = false;
+        }
+
+        return item
+      });
+    }
+
+    // 计算 xAxisSplitLinePoint
+    if (xAxisShow && xAxisSplitLineShow) {
+      let _yStart = yStartInit;
+      if (xAxisShow && xAxisLabelShow) {
+        _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
       }
       if (xAxisShow && xAxisTickShow) {
-        _yStart -= xAxisTickLength; // 更新yStart数据
+        if (yIsSamePart) {
+          _yStart -= xAxisTickLength; // 更新_yStart数据
+        }
       }
-      if (xAxisShow && xAxisLineShow) {
-        _yStart -= xAxisLineWidth / 2; // 更新yStart数据
+
+      // xAxisSplitLineAlign为true时，网格线与标签对齐
+      let xAxisSplitLineNumber = 0;
+      if (xAxisBoundaryGap) {
+        xAxisSplitLineNumber = xAxisSplitLineAlign ? xAxisLabelDataArr.length : xAxisLabelDataArr.length + 1;
+      } else {
+        xAxisSplitLineNumber = xAxisLabelDataArr.length;
       }
-    } else {
-      _yStart = yZero - xAxisLineWidth / 2;
+
+      for (let index = 0; index < xAxisSplitLineNumber; index++) {
+        if (xAxisBoundaryGap && xAxisSplitLineAlign) {
+          chartData.axisData.xAxisSplitLinePoint.push({
+            show: true,
+            startX: xStart + xEachSpacing * index + xEachSpacing / 2,
+            startY: _yStart,
+            endX: xStart + xEachSpacing * index + xEachSpacing / 2,
+            endY: yEnd,
+          });
+        } else {
+          chartData.axisData.xAxisSplitLinePoint.push({
+            show: true,
+            startX: xStart + xEachSpacing * index,
+            startY: _yStart,
+            endX: xStart + xEachSpacing * index,
+            endY: yEnd,
+          });
+        }
+      }
     }
 
-    chartData.xAxis.xAxisNamePoint = {
-      text: xAxisNameText,
-      x: xEnd + xAxisNameGap,
-      y: _yStart,
-    };
+    if (xAxisSplitLineShowIndex && xAxisSplitLineShowIndex.length) {
+      chartData.axisData.xAxisSplitLinePoint = chartData.axisData.xAxisSplitLinePoint.map((item, index) => {
+        let isShow = xAxisSplitLineShowIndex.some(showIndex => {
+          return showIndex === index
+        });
+
+        if (isShow) {
+          item.show = true;
+        } else {
+          item.show = false;
+        }
+
+        return item
+      });
+    }
+
+    // 计算 xAxisTickPoint
+    if (xAxisShow && xAxisTickShow) {
+      let _yStart = yStartInit;
+
+      if (yIsSamePart) {
+        if (xAxisShow && xAxisLabelShow) {
+          _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
+        }
+        if (xAxisShow && xAxisTickShow) {
+          _yStart -= xAxisTickLength; // 更新_yStart数据
+        }
+      } else {
+        _yStart = yZero - xAxisLineWidth / 2;
+      }
+
+      // xAxisTickAlign为true时，刻度线与标签对齐
+      let xAxisTickNumber = 0;
+      if (xAxisBoundaryGap) {
+        xAxisTickNumber = xAxisTickAlign ? xAxisLabelDataArr.length : xAxisLabelDataArr.length + 1;
+      } else {
+        xAxisTickNumber = xAxisLabelDataArr.length;
+      }
+
+      for (let index = 0; index < xAxisTickNumber; index++) {
+        if (xAxisBoundaryGap && xAxisTickAlign) {
+          chartData.axisData.xAxisTickPoint.push({
+            show: true,
+            startX: xStart + xEachSpacing * index + xEachSpacing / 2,
+            startY: _yStart,
+            endX: xStart + xEachSpacing * index + xEachSpacing / 2,
+            endY: _yStart + xAxisTickLength,
+          });
+        } else {
+          chartData.axisData.xAxisTickPoint.push({
+            show: true,
+            startX: xStart + xEachSpacing * index,
+            startY: _yStart,
+            endX: xStart + xEachSpacing * index,
+            endY: _yStart + xAxisTickLength,
+          });
+        }
+      }
+    }
+
+    if (xAxisTickShowIndex && xAxisTickShowIndex.length) {
+      chartData.axisData.xAxisTickPoint = chartData.axisData.xAxisTickPoint.map((item, index) => {
+        let isShow = xAxisTickShowIndex.some(showIndex => {
+          return showIndex === index
+        });
+
+        if (isShow) {
+          item.show = true;
+        } else {
+          item.show = false;
+        }
+
+        return item
+      });
+    }
+
+    // 计算 xAxisLinePoint
+    if (xAxisShow && xAxisLineShow) {
+      let _yStart = yStartInit;
+      if (yIsSamePart) {
+        if (xAxisShow && xAxisLabelShow) {
+          _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
+        }
+        if (xAxisShow && xAxisTickShow) {
+          _yStart -= xAxisTickLength; // 更新_yStart数据
+        }
+        _yStart -= xAxisLineWidth / 2;
+      } else {
+        _yStart = yZero;
+      }
+
+      chartData.axisData.xAxisLinePoint = {
+        startX: xStart,
+        startY: _yStart,
+        endX: xEnd + xAxisTickLineWidth / 2,
+        endY: _yStart,
+      };
+    }
+
+    // 计算 xAxisNamePoint
+    if (xAxisShow && xAxisNameShow) {
+      let _yStart = yStartInit;
+      if (yIsSamePart) {
+        if (xAxisShow && xAxisLabelShow) {
+          _yStart -= xAxisLabelMaxHeight + xAxisLabelGap; // 更新_yStart数据
+        }
+        if (xAxisShow && xAxisTickShow) {
+          _yStart -= xAxisTickLength; // 更新_yStart数据
+        }
+        if (xAxisShow && xAxisLineShow) {
+          _yStart -= xAxisLineWidth / 2; // 更新_yStart数据
+        }
+      } else {
+        _yStart = yZero;
+      }
+
+      chartData.axisData.xAxisNamePoint = {
+        text: xAxisNameText,
+        x: xEnd + xAxisNameGap,
+        y: _yStart,
+      };
+    }
   }
 
-  chartData.xAxis.xAxisLabelMaxHeight = xAxisLabelMaxHeight;
-  chartData.xAxis.xStart = xStart;
-  chartData.xAxis.xEnd = xEnd;
-  chartData.xAxis.xSpacing = xSpacing;
-  chartData.xAxis.xEachSpacing = xEachSpacing;
+  chartData.axisData.xStart = xStart;
+  chartData.axisData.xEnd = xEnd;
+  chartData.axisData.yStart = yStart;
+  chartData.axisData.yEnd = yEnd;
 
-  chartData.yAxis.yAxisLabelMaxWidth = yAxisLabelMaxWidth;
-  chartData.yAxis.isSamePart = isSamePart;
-  chartData.yAxis.yZero = yZero;
-  chartData.yAxis.plusSpacing = plusSpacing;
-  chartData.yAxis.minusSpacing = minusSpacing;
-  chartData.yAxis.yStart = yStart;
-  chartData.yAxis.yEnd = yEnd;
-  chartData.yAxis.ySpacing = ySpacing;
-  chartData.yAxis.yEachSpacing = yEachSpacing;
-  chartData.yAxis.maxData = maxData;
-  chartData.yAxis.minData = minData;
-  chartData.yAxis.dataRange = dataRange;
-  chartData.yAxis.dataEachRange = dataEachRange;
+  chartData.axisData.yIsSamePart = yIsSamePart;
+  chartData.axisData.xIsSamePart = xIsSamePart;
 
-  console.log('complete calAxisData', this.chartData);
+  chartData.axisData.yZero = yZero;
+  chartData.axisData.yPlusSpacing = yPlusSpacing;
+  chartData.axisData.yMinusSpacing = yMinusSpacing;
+  chartData.axisData.ySpacing = ySpacing;
+  chartData.axisData.yEachSpacing = yEachSpacing;
+  chartData.axisData.xZero = xZero;
+  chartData.axisData.xPlusSpacing = xPlusSpacing;
+  chartData.axisData.xMinusSpacing = xMinusSpacing;
+  chartData.axisData.xSpacing = xSpacing;
+  chartData.axisData.xEachSpacing = xEachSpacing;
+
+  chartData.axisData.yMaxData = yMaxData;
+  chartData.axisData.yMinData = yMinData;
+  chartData.axisData.yDataRange = yDataRange;
+  chartData.axisData.xMaxData = xMaxData;
+  chartData.axisData.xMinData = xMinData;
+  chartData.axisData.xDataRange = xDataRange;
+
+  console.log('complete calAxisData', this.chartData.axisData);
 }
 
 function calAxisRadarData() {
@@ -1227,20 +2068,50 @@ function calAxisRadarData() {
     }, []);
   }
 
-  console.log('complete calAxisRadarData');
+  console.log('complete calAxisRadarData', this.chartData.radarAxis);
 }
 
 function calChartBarData() {
   let { opts, chartData } = this;
   let { series, xAxis } = opts;
-  let { lineWidth: xAxisLineWidth } = xAxis.axisLine.lineStyle;
-  let { lineWidth: xAxisTickLineWidth } = xAxis.axisTick.lineStyle;
-  let { xEachSpacing, xAxisLabelPoint } = chartData.xAxis;
-  let { yZero, plusSpacing, minusSpacing, yStart, yEnd, ySpacing, maxData, minData, dataRange } = chartData.yAxis;
+
+  let {
+    xStart,
+    xEnd,
+    yStart,
+    yEnd,
+    yZero,
+    yPlusSpacing,
+    yMinusSpacing,
+    ySpacing,
+    yEachSpacing,
+    xZero,
+    xPlusSpacing,
+    xMinusSpacing,
+    xSpacing,
+    xEachSpacing,
+    yMaxData,
+    yMinData,
+    yDataRange,
+    xMaxData,
+    xMinData,
+    xDataRange,
+    xAxisLabelPoint,
+    yAxisLabelPoint,
+  } = chartData.axisData;
 
   let autoWidth = 0;
   let autoWidthNumber = 0;
   let sumWidth = 0;
+
+  let maxData = xAxis.type == 'value' ? xMaxData : yMaxData;
+  let minData = xAxis.type == 'value' ? xMinData : yMinData;
+  let dataRange = xAxis.type == 'value' ? xDataRange : yDataRange;
+  let valueAxisPlusSpacing = xAxis.type == 'value' ? xPlusSpacing : yPlusSpacing;
+  let valueAxisMinusSpacing = xAxis.type == 'value' ? xMinusSpacing : yMinusSpacing;
+  let valueAxisSpacing = xAxis.type == 'value' ? xSpacing : ySpacing;
+  let categoryAxisMinusSpacing = xAxis.type == 'category' ? xEachSpacing : yEachSpacing;
+
   // 修正barWidth和计算autoWidthNumber和部分sumWidth
   series.forEach((seriesItem, seriesIndex) => {
     let { barMaxWidth, barMinWidth, barWidth, barGap } = seriesItem;
@@ -1266,8 +2137,8 @@ function calChartBarData() {
   });
 
   // 计算autoWidth
-  if (sumWidth + autoWidthNumber < xEachSpacing) {
-    autoWidth = (xEachSpacing - sumWidth) / autoWidthNumber;
+  if (sumWidth + autoWidthNumber < categoryAxisMinusSpacing) {
+    autoWidth = (categoryAxisMinusSpacing - sumWidth) / autoWidthNumber;
   } else {
     autoWidth = 1;
   }
@@ -1284,10 +2155,20 @@ function calChartBarData() {
 
   // 生成数据结构
   chartData.chartBar = JSON.parse(JSON.stringify(series)).reduce((chartBarArr, seriesItem, seriesIndex) => {
+    let isShow = true;
+
     seriesItem.data.forEach((dataItem, dataIndex) => {
+      if (seriesItem.showIndex && seriesItem.showIndex.length) {
+        isShow = seriesItem.showIndex.some(showIndex => {
+          return showIndex == dataIndex
+        });
+      }
+      seriesItem.show = isShow;
+
       if (!chartBarArr[dataIndex]) {
         chartBarArr[dataIndex] = [];
       }
+
       if (!chartBarArr[dataIndex][seriesIndex]) {
         chartBarArr[dataIndex][seriesIndex] = JSON.parse(JSON.stringify(seriesItem));
       }
@@ -1295,93 +2176,216 @@ function calChartBarData() {
     return chartBarArr
   }, []);
 
-  chartData.chartBar.forEach((barItemArr, dataIndex) => {
-    let x = xAxisLabelPoint[dataIndex].x - sumWidth / 2;
+  if (xAxis.type == 'category') {
+    chartData.chartBar.forEach((barItemArr, dataIndex) => {
+      let x = xAxisLabelPoint[dataIndex].x - sumWidth / 2;
+      barItemArr.forEach(barItem => {
+        // 记录柱体数值
+        let data = barItem.data[dataIndex];
 
-    barItemArr.forEach(barItem => {
-      // 记录柱体数值
-      barItem.data = barItem.data[dataIndex];
-
-      // 记录柱体宽度
-      if (barItem.barWidth == 'auto') {
-        barItem.barWidth = autoWidth;
-      }
-
-      // 记录柱体高度和y坐标点
-      let barHeight = 0;
-      let y = 0;
-      if (maxData >= 0 && minData >= 0) {
-        barHeight = (ySpacing * (barItem.data - minData)) / dataRange;
-        barHeight -= xAxisLineWidth;
-        y = yStart - xAxisLineWidth;
-      } else if (maxData <= 0 && minData <= 0) {
-        barHeight = (ySpacing * (Math.abs(barItem.data) - Math.abs(maxData))) / dataRange;
-        barHeight -= xAxisTickLineWidth;
-        y = yEnd + xAxisTickLineWidth;
-      } else {
-        if (barItem.data > 0) {
-          barHeight = (plusSpacing * barItem.data) / maxData;
-          barHeight -= xAxisLineWidth;
-          y = yZero - xAxisLineWidth;
+        if (data > maxData) {
+          barItem.data = maxData;
+        } else if (data < minData) {
+          barItem.data = minData;
         } else {
-          barHeight = (minusSpacing * Math.abs(barItem.data)) / Math.abs(minData);
-          barHeight -= xAxisLineWidth;
-          y = yZero + xAxisLineWidth;
+          barItem.data = data;
         }
-      }
-      barItem.barHeight = barHeight;
-      barItem.y = y;
 
-      // 记录柱体x坐标点
-      barItem.x = x + barItem.barGap + barItem.barWidth / 2;
+        // 记录柱体宽度
+        if (barItem.barWidth == 'auto') {
+          barItem.barWidth = autoWidth;
+        }
 
-      x += barItem.barGap + barItem.barWidth;
+        // 记录柱体高度和y坐标点
+        let barHeight = 0;
+        let y = 0;
+        if (maxData >= 0 && minData >= 0) {
+          barHeight = (valueAxisSpacing * (barItem.data - minData)) / dataRange;
+          y = yStart;
+        } else if (maxData <= 0 && minData <= 0) {
+          barHeight = (valueAxisSpacing * (Math.abs(barItem.data) - Math.abs(maxData))) / dataRange;
+          y = yEnd;
+        } else {
+          if (barItem.data > 0) {
+            barHeight = (valueAxisPlusSpacing * barItem.data) / maxData;
+            y = yZero;
+          } else {
+            barHeight = (valueAxisMinusSpacing * Math.abs(barItem.data)) / Math.abs(minData);
+            y = yZero;
+          }
+        }
+        barItem.barHeight = barHeight;
+        barItem.y = y;
+
+        // 记录x坐标点
+        barItem.x = x + barItem.barGap + barItem.barWidth / 2;
+
+        x += barItem.barGap + barItem.barWidth;
+      });
     });
-  });
+  } else {
+    chartData.chartBar.forEach((barItemArr, dataIndex) => {
+      let y = yAxisLabelPoint[dataIndex].y + sumWidth / 2;
 
-  console.log('complete calChartBarData', chartData.chartBar);
+      barItemArr.forEach(barItem => {
+        // 记录柱体数值
+        let data = barItem.data[dataIndex];
+
+        if (data > maxData) {
+          barItem.data = maxData;
+        } else if (data < minData) {
+          barItem.data = minData;
+        } else {
+          barItem.data = data;
+        }
+
+        // 记录柱体宽度
+        if (barItem.barWidth == 'auto') {
+          barItem.barWidth = autoWidth;
+        }
+
+        // 记录柱体高度和x坐标点
+        let barHeight = 0;
+        let x = 0;
+        if (maxData >= 0 && minData >= 0) {
+          barHeight = (valueAxisSpacing * (barItem.data - minData)) / dataRange;
+          x = xStart;
+        } else if (maxData <= 0 && minData <= 0) {
+          barHeight = (valueAxisSpacing * (Math.abs(barItem.data) - Math.abs(maxData))) / dataRange;
+          x = xEnd;
+        } else {
+          if (barItem.data > 0) {
+            barHeight = (valueAxisPlusSpacing * barItem.data) / maxData;
+            x = xZero;
+          } else {
+            barHeight = (valueAxisMinusSpacing * Math.abs(barItem.data)) / Math.abs(minData);
+            x = xZero;
+          }
+        }
+        barItem.barHeight = barHeight;
+        barItem.x = x;
+
+        // 记录柱体y坐标点
+        barItem.y = y - barItem.barGap - barItem.barWidth / 2;
+
+        y -= barItem.barGap + barItem.barWidth;
+      });
+    });
+  }
+
+  console.log('complete calChartBarData', this.chartData.chartBar);
 }
 
 function calChartLineData() {
   let { opts, chartData } = this;
   let { series, xAxis } = opts;
-  let { lineWidth: xAxisLineWidth } = xAxis.axisLine.lineStyle;
-  let { xAxisLabelPoint } = chartData.xAxis;
-  let { yZero, plusSpacing, minusSpacing, yStart, yEnd, ySpacing, maxData, minData, dataRange } = chartData.yAxis;
 
-  chartData.chartLine = JSON.parse(JSON.stringify(series)).reduce((chartLineArr, seriesItem) => {
-    seriesItem.data = seriesItem.data.reduce((dataArr, dataItem, dataIndex) => {
-      let itemHeight = 0;
-      let y = 0;
-      if (maxData >= 0 && minData >= 0) {
-        itemHeight = (ySpacing * (dataItem - minData)) / dataRange;
-        y = yStart - (xAxisLineWidth * 3) / 2 - itemHeight;
-      } else if (maxData <= 0 && minData <= 0) {
-        itemHeight = (ySpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
-        y = yEnd - (xAxisLineWidth * 3) / 2 + itemHeight;
-      } else {
-        if (dataItem > 0) {
-          itemHeight = (plusSpacing * dataItem) / maxData;
-          y = yZero - xAxisLineWidth - itemHeight;
+  let {
+    xStart,
+    xEnd,
+    yStart,
+    yEnd,
+    yZero,
+    yPlusSpacing,
+    yMinusSpacing,
+    ySpacing,
+    xZero,
+    xPlusSpacing,
+    xMinusSpacing,
+    xSpacing,
+    yMaxData,
+    yMinData,
+    yDataRange,
+    xMaxData,
+    xMinData,
+    xDataRange,
+    xAxisLabelPoint,
+    yAxisLabelPoint,
+  } = chartData.axisData;
+
+  let maxData = xAxis.type == 'value' ? xMaxData : yMaxData;
+  let minData = xAxis.type == 'value' ? xMinData : yMinData;
+  let dataRange = xAxis.type == 'value' ? xDataRange : yDataRange;
+  let valueAxisPlusSpacing = xAxis.type == 'value' ? xPlusSpacing : yPlusSpacing;
+  let valueAxisMinusSpacing = xAxis.type == 'value' ? xMinusSpacing : yMinusSpacing;
+  let valueAxisSpacing = xAxis.type == 'value' ? xSpacing : ySpacing;
+
+  if (xAxis.type == 'category') {
+    chartData.chartLine = JSON.parse(JSON.stringify(series)).reduce((chartLineArr, seriesItem) => {
+      seriesItem.data = seriesItem.data.reduce((dataArr, dataItem, dataIndex) => {
+        let itemHeight = 0;
+        let y = 0;
+
+        dataItem = dataItem > maxData ? maxData : dataItem;
+        dataItem = dataItem < minData ? minData : dataItem;
+
+        if (maxData >= 0 && minData >= 0) {
+          itemHeight = (valueAxisSpacing * (dataItem - minData)) / dataRange;
+          y = yStart - itemHeight;
+        } else if (maxData <= 0 && minData <= 0) {
+          itemHeight = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
+          y = yEnd + itemHeight;
         } else {
-          itemHeight = (minusSpacing * Math.abs(dataItem)) / Math.abs(minData);
-          y = yZero + xAxisLineWidth + itemHeight;
+          if (dataItem > 0) {
+            itemHeight = (valueAxisPlusSpacing * dataItem) / maxData;
+            y = yZero - itemHeight;
+          } else {
+            itemHeight = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
+            y = yZero + itemHeight;
+          }
         }
-      }
+        dataArr.push({
+          x: xAxisLabelPoint[dataIndex].x,
+          y,
+          data: dataItem,
+          height: itemHeight,
+        });
+        return dataArr
+      }, []);
 
-      dataArr.push({
-        x: xAxisLabelPoint[dataIndex].x,
-        y,
-        value: dataItem,
-        height: itemHeight,
-      });
-      return dataArr
+      chartLineArr.push(seriesItem);
+
+      return chartLineArr
     }, []);
+  } else {
+    chartData.chartLine = JSON.parse(JSON.stringify(series)).reduce((chartLineArr, seriesItem) => {
+      seriesItem.data = seriesItem.data.reduce((dataArr, dataItem, dataIndex) => {
+        let itemHeight = 0;
+        let x = 0;
 
-    chartLineArr.push(JSON.parse(JSON.stringify(seriesItem)));
+        dataItem = dataItem > maxData ? maxData : dataItem;
+        dataItem = dataItem < minData ? minData : dataItem;
 
-    return chartLineArr
-  }, []);
+        if (maxData >= 0 && minData >= 0) {
+          itemHeight = (valueAxisSpacing * (dataItem - minData)) / dataRange;
+          x = xStart + itemHeight;
+        } else if (maxData <= 0 && minData <= 0) {
+          itemHeight = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
+          x = xEnd - itemHeight;
+        } else {
+          if (dataItem > 0) {
+            itemHeight = (valueAxisPlusSpacing * dataItem) / maxData;
+            x = xZero + itemHeight;
+          } else {
+            itemHeight = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
+            x = xZero - itemHeight;
+          }
+        }
+
+        dataArr.push({
+          x,
+          y: yAxisLabelPoint[dataIndex].y,
+          data: dataItem,
+          height: itemHeight,
+        });
+        return dataArr
+      }, []);
+
+      chartLineArr.push(seriesItem);
+
+      return chartLineArr
+    }, []);
+  }
 
   console.log('complete calChartLineData', this.chartData.chartLine);
 }
@@ -1419,14 +2423,14 @@ function calChartPieData() {
   chartData.chartPie.center = [centerX, centerY];
   chartData.chartPie.radius = [radius1, radius2];
 
-  console.log('complete calChartPieData');
+  console.log('complete calChartPieData', this.chartData.chartPie);
 }
 
 function calChartRadarData() {
   let { opts, chartData } = this;
   let { radarAxis, categories, series } = opts;
   let { max } = radarAxis;
-  let { center, radius } = chartData.radarAxis;
+  let { radius } = chartData.radarAxis;
 
   let maxData = 0;
   series.forEach(seriesItem => {
@@ -1455,7 +2459,77 @@ function calChartRadarData() {
     return radarItem
   });
 
-  console.log('complete calChartRadarData');
+  console.log('complete calChartRadarData', this.chartData.chartRadar);
+}
+
+function calChartScatterData() {
+  let { opts, chartData } = this;
+  let { series } = opts;
+  let {
+    xStart,
+    xEnd,
+    yStart,
+    yEnd,
+    yZero,
+    yPlusSpacing,
+    yMinusSpacing,
+    ySpacing,
+    xZero,
+    xPlusSpacing,
+    xMinusSpacing,
+    xSpacing,
+    yMaxData,
+    yMinData,
+    yDataRange,
+    xMaxData,
+    xMinData,
+    xDataRange,
+  } = chartData.axisData;
+
+  chartData.chartScatter = JSON.parse(JSON.stringify(series)).reduce((chartScatterArr, seriesItem) => {
+    seriesItem.data = seriesItem.data.reduce((dataArr, dataItem) => {
+      let { x, y } = dataItem;
+      let positionX, positionY;
+
+      if (yMaxData >= 0 && yMaxData >= 0) {
+        positionY = yStart - (ySpacing * (y - yMinData)) / yDataRange;
+      } else if (yMinData <= 0 && yMinData <= 0) {
+        positionY = yEnd + (ySpacing * (Math.abs(y) - Math.abs(yMaxData))) / yDataRange;
+      } else {
+        if (y > 0) {
+          positionY = yZero - (yPlusSpacing * y) / yMaxData;
+        } else {
+          positionY = yZero + (yMinusSpacing * Math.abs(y)) / Math.abs(yMinData);
+        }
+      }
+
+      if (xMaxData >= 0 && xMaxData >= 0) {
+        positionX = xStart + (xSpacing * (x - xMinData)) / xDataRange;
+      } else if (xMinData <= 0 && xMinData <= 0) {
+        positionX = xEnd - (xSpacing * (Math.abs(x) - Math.abs(xMaxData))) / xDataRange;
+      } else {
+        if (x > 0) {
+          positionX = xZero + (xPlusSpacing * x) / xMaxData;
+        } else {
+          positionX = xZero - (xMinusSpacing * Math.abs(x)) / Math.abs(xMinData);
+        }
+      }
+
+      dataArr.push({
+        x,
+        y,
+        positionX,
+        positionY,
+      });
+      return dataArr
+    }, []);
+
+    chartScatterArr.push(JSON.parse(JSON.stringify(seriesItem)));
+
+    return chartScatterArr
+  }, []);
+
+  console.log('complete calChartScatterData', this.chartData.chartScatter);
 }
 
 /**
@@ -1495,6 +2569,9 @@ function drawLegend() {
         break
       case 'radar':
         legendType = 'rect';
+        break
+      case 'scatter':
+        legendType = 'circle';
         break
     }
   }
@@ -1579,14 +2656,30 @@ function drawAxisY() {
   let { context, opts, chartData } = this;
   let { xAxis, yAxis } = opts;
 
-  let { show: xAxisShow, axisName: xAxisName, axisLabel: xAxisLabel, axisTick: xAxisTick, axisLine: xAxisLine, axisSplitLine: xAxisSplitLine } = xAxis;
-  let { show: yAxisShow, axisName: yAxisName, axisLabel: yAxisLabel, axisTick: yAxisTick, axisLine: yAxisLine, axisSplitLine: yAxisSplitLine } = yAxis;
+  let {
+    show: xAxisShow,
+    type: xAxisType,
+    axisName: xAxisName,
+    axisLabel: xAxisLabel,
+    axisTick: xAxisTick,
+    axisLine: xAxisLine,
+    axisSplitLine: xAxisSplitLine,
+  } = xAxis;
+  let {
+    show: yAxisShow,
+    type: yAxisType,
+    axisName: yAxisName,
+    axisLabel: yAxisLabel,
+    axisTick: yAxisTick,
+    axisLine: yAxisLine,
+    axisSplitLine: yAxisSplitLine,
+  } = yAxis;
 
   let { show: xAxisNameShow, textStyle: xAxisNameTextStyle } = xAxisName;
-  let { show: xAxisLabelShow, showIndex: xAxisLabelShowIndex, textStyle: xAxisLabelTextStyle, rotate: xAxisLabelRotate } = xAxisLabel;
-  let { show: xAxisTickShow, showIndex: xAxisTickShowIndex, lineStyle: xAxisTickStyle } = xAxisTick;
+  let { show: xAxisLabelShow, textStyle: xAxisLabelTextStyle, rotate: xAxisLabelRotate } = xAxisLabel;
+  let { show: xAxisTickShow, lineStyle: xAxisTickStyle } = xAxisTick;
   let { show: xAxisLineShow, lineStyle: xAxisLineStyle } = xAxisLine;
-  let { show: xAxisSplitLineShow, showIndex: xAxisSplitShowIndex, lineStyle: xAxisSplitLineStyle } = xAxisSplitLine;
+  let { show: xAxisSplitLineShow, lineStyle: xAxisSplitLineStyle } = xAxisSplitLine;
 
   let { show: yAxisNameShow, textStyle: yAxisNameTextStyle } = yAxisName;
   let { show: yAxisLabelShow, textStyle: yAxisLabelTextStyle } = yAxisLabel;
@@ -1606,8 +2699,18 @@ function drawAxisY() {
   let { color: yAxisLineColor, lineWidth: yAxisLineWidth } = yAxisLineStyle;
   let { color: yAxisSplitLineColor, lineWidth: yAxisSplitLineWidth } = yAxisSplitLineStyle;
 
-  let { xAxisLabelPoint, xAxisTickPoint, xAxisLinePoint, xAxisSplitLinePoint, xAxisNamePoint } = chartData.xAxis;
-  let { yAxisLabelPoint, yAxisTickPoint, yAxisLinePoint, yAxisSplitLinePoint, yAxisNamePoint } = chartData.yAxis;
+  let {
+    xAxisLabelPoint,
+    xAxisTickPoint,
+    xAxisLinePoint,
+    xAxisSplitLinePoint,
+    xAxisNamePoint,
+    yAxisLabelPoint,
+    yAxisTickPoint,
+    yAxisLinePoint,
+    yAxisSplitLinePoint,
+    yAxisNamePoint,
+  } = chartData.axisData;
 
   if (yAxisShow) {
     if (yAxisLabelShow) {
@@ -1617,23 +2720,11 @@ function drawAxisY() {
       context.textAlign = 'right';
       context.textBaseline = 'middle';
       yAxisLabelPoint.forEach(item => {
-        context.fillText(item.text, item.x, item.y);
+        if (yAxisType == 'value' || item.show) {
+          context.fillText(item.text, item.x, item.y);
+        }
       });
       context.restore();
-    }
-
-    if (yAxisTickShow) {
-      context.lineWidth = yAxisTickLineWidth;
-      context.strokeStyle = yAxisTickLineColor;
-
-      yAxisTickPoint.forEach(item => {
-        context.beginPath();
-        context.moveTo(item.startX, item.startY);
-        context.lineTo(item.endX, item.endY);
-        context.closePath();
-
-        context.stroke();
-      });
     }
 
     if (yAxisSplitLineShow) {
@@ -1641,24 +2732,14 @@ function drawAxisY() {
       context.strokeStyle = yAxisSplitLineColor;
 
       yAxisSplitLinePoint.forEach((item, index) => {
-        context.beginPath();
-        context.moveTo(item.startX, item.startY);
-        context.lineTo(item.endX, item.endY);
-        context.closePath();
-
-        context.stroke();
+        if (yAxisType == 'value' || item.show) {
+          context.beginPath();
+          context.moveTo(item.startX, item.startY);
+          context.lineTo(item.endX, item.endY);
+          context.closePath();
+          context.stroke();
+        }
       });
-    }
-
-    if (yAxisLineShow) {
-      context.beginPath();
-      context.moveTo(yAxisLinePoint.startX, yAxisLinePoint.startY);
-      context.lineTo(yAxisLinePoint.endX, yAxisLinePoint.endY);
-      context.closePath();
-
-      context.lineWidth = yAxisLineWidth;
-      context.strokeStyle = yAxisLineColor;
-      context.stroke();
     }
 
     if (yAxisNameShow) {
@@ -1687,11 +2768,8 @@ function drawAxisY() {
         context.textAlign = 'left';
       }
 
-      if (xAxisLabelShowIndex && xAxisLabelShowIndex.length) {
-        // 存在控制显示的下标数组
-        xAxisLabelShowIndex.forEach(showIndex => {
-          let item = xAxisLabelPoint[showIndex];
-
+      xAxisLabelPoint.forEach(item => {
+        if (xAxisType == 'value' || item.show) {
           if (xAxisLabelRotate == 0) {
             context.fillText(item.text, item.x, item.y);
           } else {
@@ -1701,20 +2779,8 @@ function drawAxisY() {
             context.fillText(item.text, 0, 0);
             context.restore();
           }
-        });
-      } else {
-        xAxisLabelPoint.forEach(item => {
-          if (xAxisLabelRotate == 0) {
-            context.fillText(item.text, item.x, item.y);
-          } else {
-            context.save();
-            context.translate(item.x, item.y);
-            context.rotate((-xAxisLabelRotate * Math.PI) / 180);
-            context.fillText(item.text, 0, 0);
-            context.restore();
-          }
-        });
-      }
+        }
+      });
 
       context.restore();
     }
@@ -1723,61 +2789,71 @@ function drawAxisY() {
       context.lineWidth = xAxisSplitLineWidth;
       context.strokeStyle = xAxisSplitLineColor;
 
-      if (xAxisSplitShowIndex && xAxisSplitShowIndex.length) {
-        // 存在控制显示的下标数组
-        xAxisSplitShowIndex.forEach(showIndex => {
-          let item = xAxisSplitLinePoint[showIndex];
-
-          if (showIndex == 0 && yAxisShow && yAxisLineShow) return
-
+      xAxisSplitLinePoint.forEach((item, index) => {
+        if (xAxisType == 'value' || item.show) {
           context.beginPath();
           context.moveTo(item.startX, item.startY);
           context.lineTo(item.endX, item.endY);
           context.closePath();
-
           context.stroke();
-        });
-      } else {
-        xAxisSplitLinePoint.forEach((item, index) => {
-          // 由于先绘制y轴后绘制x轴, 在y轴轴线显示的情况下，为避免覆盖，不绘制x轴网格线的第一条
-          if (index == 0 && yAxisShow && yAxisLineShow) return
-
-          context.beginPath();
-          context.moveTo(item.startX, item.startY);
-          context.lineTo(item.endX, item.endY);
-          context.closePath();
-
-          context.stroke();
-        });
-      }
+        }
+      });
     }
 
+    if (xAxisNameShow) {
+      context.save();
+      context.font = `${xAxisNameFontSize}px`;
+      context.fillStyle = xAxisNameColor;
+      context.textAlign = 'left';
+      context.textBaseline = 'middle';
+      context.fillText(xAxisNamePoint.text, xAxisNamePoint.x, xAxisNamePoint.y);
+      context.restore();
+    }
+  }
+
+  // 防止轴线被网格线覆盖, 最后绘制
+  if (yAxisShow) {
+    if (yAxisTickShow) {
+      context.lineWidth = yAxisTickLineWidth;
+      context.strokeStyle = yAxisTickLineColor;
+
+      yAxisTickPoint.forEach(item => {
+        if (yAxisType == 'value' || item.show) {
+          context.beginPath();
+          context.moveTo(item.startX, item.startY);
+          context.lineTo(item.endX, item.endY);
+          context.closePath();
+          context.stroke();
+        }
+      });
+    }
+
+    if (yAxisLineShow) {
+      context.beginPath();
+      context.moveTo(yAxisLinePoint.startX, yAxisLinePoint.startY);
+      context.lineTo(yAxisLinePoint.endX, yAxisLinePoint.endY);
+      context.closePath();
+
+      context.lineWidth = yAxisLineWidth;
+      context.strokeStyle = yAxisLineColor;
+      context.stroke();
+    }
+  }
+
+  if (xAxisShow) {
     if (xAxisTickShow) {
       context.lineWidth = xAxisTickLineWidth;
       context.strokeStyle = xAxisTickLineColor;
 
-      if (xAxisTickShowIndex && xAxisTickShowIndex.length) {
-        // 存在控制显示的下标数组
-        xAxisTickShowIndex.forEach(showIndex => {
-          let item = xAxisTickPoint[showIndex];
-
+      xAxisTickPoint.forEach(item => {
+        if (xAxisType == 'value' || item.show) {
           context.beginPath();
           context.moveTo(item.startX, item.startY);
           context.lineTo(item.endX, item.endY);
           context.closePath();
-
           context.stroke();
-        });
-      } else {
-        xAxisTickPoint.forEach(item => {
-          context.beginPath();
-          context.moveTo(item.startX, item.startY);
-          context.lineTo(item.endX, item.endY);
-          context.closePath();
-
-          context.stroke();
-        });
-      }
+        }
+      });
     }
 
     if (xAxisLineShow) {
@@ -1789,16 +2865,6 @@ function drawAxisY() {
       context.lineWidth = xAxisLineWidth;
       context.strokeStyle = xAxisLineColor;
       context.stroke();
-    }
-
-    if (xAxisNameShow) {
-      context.save();
-      context.font = `${xAxisNameFontSize}px`;
-      context.fillStyle = xAxisNameColor;
-      context.textAlign = 'left';
-      context.textBaseline = 'middle';
-      context.fillText(xAxisNamePoint.text, xAxisNamePoint.x, xAxisNamePoint.y);
-      context.restore();
     }
   }
 
@@ -1955,71 +3021,141 @@ function drawAxisRadar() {
 
 function drawChartPie(process) {
   let { context, opts, chartData } = this;
-  let { label: globalLabel } = opts;
-  let { maxData, minData } = chartData.yAxis;
+  let { label: globalLabel, xAxis } = opts;
 
-  chartData.chartBar.forEach(barItemArr => {
-    barItemArr.forEach(barItem => {
-      let { x, y, data, barWidth, barHeight, itemStyle } = barItem;
-      let { color: barItemColor } = itemStyle;
+  let { yMaxData, yMinData, xMaxData, xMinData } = chartData.axisData;
 
-      context.beginPath();
-      context.save();
-      context.fillStyle = barItemColor;
-      if (maxData >= 0 && minData >= 0) {
-        context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
-      } else if (maxData <= 0 && minData <= 0) {
-        context.fillRect(x - barWidth / 2, y, barWidth, barHeight * process);
-      } else {
-        if (data > 0) {
-          context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
-        } else {
-          context.fillRect(x - barWidth / 2, y, barWidth, barHeight * process);
-        }
-      }
+  let maxData = xAxis.type == 'value' ? xMaxData : yMaxData;
+  let minData = xAxis.type == 'value' ? xMinData : yMinData;
 
-      context.restore();
-      context.closePath();
-    });
-  });
-
-  if (process == 1) {
+  if (xAxis.type == 'category') {
     chartData.chartBar.forEach(barItemArr => {
       barItemArr.forEach(barItem => {
-        let { x, y, barHeight, data, label, itemStyle } = barItem;
-        let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+        let { x, y, data, barWidth, barHeight, itemStyle } = barItem;
         let { color: barItemColor } = itemStyle;
 
-        // globalLabel 权重大于 seriesLabel
-        labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
-        labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
-        labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
-        labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
-
-        if (!labelShow) return
-
+        context.beginPath();
         context.save();
-        context.font = `${labelFontSize}px`;
-        context.fillStyle = labelColor == 'auto' ? barItemColor : labelColor;
-        context.textAlign = 'center';
+        context.fillStyle = barItemColor;
         if (maxData >= 0 && minData >= 0) {
-          context.textBaseline = 'bottom';
-          context.fillText(data, x, y - barHeight - labelMargin);
+          context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
         } else if (maxData <= 0 && minData <= 0) {
-          context.textBaseline = 'top';
-          context.fillText(data, x, y + barHeight + labelMargin);
+          context.fillRect(x - barWidth / 2, y, barWidth, barHeight * process);
         } else {
           if (data > 0) {
-            context.textBaseline = 'bottom';
-            context.fillText(data, x, y - barHeight - labelMargin);
+            context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
           } else {
-            context.textBaseline = 'top';
-            context.fillText(data, x, y + barHeight + labelMargin);
+            context.fillRect(x - barWidth / 2, y, barWidth, barHeight * process);
           }
         }
+
         context.restore();
+        context.closePath();
       });
     });
+
+    if (process == 1) {
+      chartData.chartBar.forEach(barItemArr => {
+        barItemArr.forEach(barItem => {
+          let { show: barItemShow, x, y, barHeight, data, label, itemStyle } = barItem;
+          let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+          let { color: barItemColor } = itemStyle;
+
+          // globalLabel 权重大于 seriesLabel
+          labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+          labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+          labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+          labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+
+          if (labelShow && barItemShow) {
+            context.save();
+            context.font = `${labelFontSize}px`;
+            context.fillStyle = labelColor == 'auto' ? barItemColor : labelColor;
+            context.textAlign = 'center';
+            if (maxData >= 0 && minData >= 0) {
+              context.textBaseline = 'bottom';
+              context.fillText(data, x, y - barHeight - labelMargin);
+            } else if (maxData <= 0 && minData <= 0) {
+              context.textBaseline = 'top';
+              context.fillText(data, x, y + barHeight + labelMargin);
+            } else {
+              if (data > 0) {
+                context.textBaseline = 'bottom';
+                context.fillText(data, x, y - barHeight - labelMargin);
+              } else {
+                context.textBaseline = 'top';
+                context.fillText(data, x, y + barHeight + labelMargin);
+              }
+            }
+            context.restore();
+          }
+        });
+      });
+    }
+  } else {
+    chartData.chartBar.forEach(barItemArr => {
+      barItemArr.forEach(barItem => {
+        let { x, y, data, barWidth, barHeight, itemStyle } = barItem;
+        let { color: barItemColor } = itemStyle;
+
+        context.beginPath();
+        context.save();
+        context.fillStyle = barItemColor;
+        if (maxData >= 0 && minData >= 0) {
+          context.fillRect(x, y - (barWidth * process) / 2, barHeight, barWidth * process);
+        } else if (maxData <= 0 && minData <= 0) {
+          context.fillRect(x, y - (barWidth * process) / 2, -barHeight, barWidth * process);
+        } else {
+          if (data > 0) {
+            context.fillRect(x, y - (barWidth * process) / 2, barHeight, barWidth * process);
+          } else {
+            context.fillRect(x, y - (barWidth * process) / 2, -barHeight, barWidth * process);
+          }
+        }
+
+        context.restore();
+        context.closePath();
+      });
+    });
+
+    if (process == 1) {
+      chartData.chartBar.forEach(barItemArr => {
+        barItemArr.forEach(barItem => {
+          let { show: barItemShow, x, y, barHeight, data, label, itemStyle } = barItem;
+          let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+          let { color: barItemColor } = itemStyle;
+
+          // globalLabel 权重大于 seriesLabel
+          labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+          labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+          labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+          labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+
+          if (labelShow && barItemShow) {
+            context.save();
+            context.font = `${labelFontSize}px`;
+            context.fillStyle = labelColor == 'auto' ? barItemColor : labelColor;
+            context.textBaseline = 'middle';
+            if (maxData >= 0 && minData >= 0) {
+              context.textAlign = 'left';
+              context.fillText(data, x + barHeight + labelMargin, y);
+            } else if (maxData <= 0 && minData <= 0) {
+              context.textAlign = 'right';
+              context.fillText(data, x - barHeight - labelMargin, y);
+            } else {
+              if (data > 0) {
+                context.textAlign = 'left';
+                context.fillText(data, x + barHeight + labelMargin, y);
+              } else {
+                context.textAlign = 'right';
+                context.fillText(data, x - barHeight - labelMargin, y);
+              }
+            }
+            context.restore();
+          }
+        });
+      });
+    }
   }
 
   console.log('complete drawChartBar', process);
@@ -2027,45 +3163,56 @@ function drawChartPie(process) {
 
 function drawChartLine(process) {
   let { context, opts, chartData } = this;
-  let { label: globalLabel } = opts;
-  let { lineWidth: xAxisLineWidth } = opts.xAxis.axisLine.lineStyle;
-  let { yZero, yStart, yEnd, maxData, minData } = chartData.yAxis;
+  let { label: globalLabel, xAxis } = opts;
 
-  chartData.chartLine.forEach(lineItem => {
-    let { data, showIndex: dataShowIndex, itemStyle, line, symbol, area, label, smooth } = lineItem;
+  let { xStart, xEnd, yStart, yEnd, yZero, xZero, yMaxData, yMinData, xMaxData, xMinData } = chartData.axisData;
+
+  let maxData = xAxis.type == 'value' ? xMaxData : yMaxData;
+  let minData = xAxis.type == 'value' ? xMinData : yMinData;
+
+  JSON.parse(JSON.stringify(chartData.chartLine)).forEach(lineItem => {
+    let { itemStyle, line, symbol, area, label, smooth } = lineItem;
     let { color: lineItemColor } = itemStyle;
     let { show: lineShow, lineWidth, color: lineColor, opacity: lineOpacity } = line;
     let { show: symbolShow, type: symbolType, size: symbolSize, color: symbolColor } = symbol;
     let { show: areaShow, color: areaColor, opacity: areaOpacity } = area;
     let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
 
-    // globalLabel 权重大于 seriesLabel
-    labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
-    labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
-    labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
-    labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
-
     if (smooth) {
       // process更新y坐标数据
-      data = JSON.parse(JSON.stringify(data)).map(dataItem => {
-        let { y, height, value } = dataItem;
-        if (maxData >= 0 && minData >= 0) {
-          dataItem.y = y + height - height * process;
-        } else if (maxData <= 0 && minData <= 0) {
-          dataItem.y = y - height + height * process;
-        } else {
-          if (value > 0) {
+      lineItem.data = lineItem.data.map(dataItem => {
+        let { x, y, height, data } = dataItem;
+
+        if (xAxis.type == 'category') {
+          if (maxData >= 0 && minData >= 0) {
             dataItem.y = y + height - height * process;
-          } else {
+          } else if (maxData <= 0 && minData <= 0) {
             dataItem.y = y - height + height * process;
+          } else {
+            if (data > 0) {
+              dataItem.y = y + height - height * process;
+            } else {
+              dataItem.y = y - height + height * process;
+            }
+          }
+        } else {
+          if (maxData >= 0 && minData >= 0) {
+            dataItem.x = x - height + height * process;
+          } else if (maxData <= 0 && minData <= 0) {
+            dataItem.x = x + height - height * process;
+          } else {
+            if (data > 0) {
+              dataItem.x = x - height + height * process;
+            } else {
+              dataItem.x = x + height - height * process;
+            }
           }
         }
         return dataItem
       });
-
       // 计算贝塞尔曲线控制点并绘制路径
       context.beginPath();
-      data.forEach((dataItem, dataIndex, points) => {
+      lineItem.data.forEach((dataItem, dataIndex, points) => {
         function isNotMiddlePoint(points, i) {
           if (points[i - 1] && points[i + 1]) {
             return points[i].y >= Math.max(points[i - 1].y, points[i + 1].y) || points[i].y <= Math.min(points[i - 1].y, points[i + 1].y)
@@ -2115,17 +3262,32 @@ function drawChartLine(process) {
       });
     } else {
       context.beginPath();
-      data.forEach((dataItem, dataIndex) => {
-        let { x, y, height, value } = dataItem;
-        if (maxData >= 0 && minData >= 0) {
-          y = y + height - height * process;
-        } else if (maxData <= 0 && minData <= 0) {
-          y = y - height + height * process;
-        } else {
-          if (value > 0) {
+      lineItem.data.forEach((dataItem, dataIndex) => {
+        let { x, y, height, data } = dataItem;
+
+        if (xAxis.type == 'category') {
+          if (maxData >= 0 && minData >= 0) {
             y = y + height - height * process;
-          } else {
+          } else if (maxData <= 0 && minData <= 0) {
             y = y - height + height * process;
+          } else {
+            if (data > 0) {
+              y = y + height - height * process;
+            } else {
+              y = y - height + height * process;
+            }
+          }
+        } else {
+          if (maxData >= 0 && minData >= 0) {
+            x = x - height + height * process;
+          } else if (maxData <= 0 && minData <= 0) {
+            x = x + height - height * process;
+          } else {
+            if (data > 0) {
+              x = x - height + height * process;
+            } else {
+              x = x + height - height * process;
+            }
           }
         }
 
@@ -2148,15 +3310,28 @@ function drawChartLine(process) {
     }
 
     if (areaShow) {
-      if (maxData >= 0 && minData >= 0) {
-        context.lineTo(data[data.length - 1].x, yStart - xAxisLineWidth);
-        context.lineTo(data[0].x, yStart - xAxisLineWidth);
-      } else if (maxData <= 0 && minData <= 0) {
-        context.lineTo(data[data.length - 1].x, yEnd);
-        context.lineTo(data[0].x, yEnd);
+      if (xAxis.type == 'category') {
+        if (maxData >= 0 && minData >= 0) {
+          context.lineTo(lineItem.data[lineItem.data.length - 1].x, yStart);
+          context.lineTo(lineItem.data[0].x, yStart);
+        } else if (maxData <= 0 && minData <= 0) {
+          context.lineTo(lineItem.data[lineItem.data.length - 1].x, yEnd);
+          context.lineTo(lineItem.data[0].x, yEnd);
+        } else {
+          context.lineTo(lineItem.data[lineItem.data.length - 1].x, yZero);
+          context.lineTo(lineItem.data[0].x, yZero);
+        }
       } else {
-        context.lineTo(data[data.length - 1].x, yZero);
-        context.lineTo(data[0].x, yZero);
+        if (maxData >= 0 && minData >= 0) {
+          context.lineTo(xStart, lineItem.data[lineItem.data.length - 1].y);
+          context.lineTo(xStart, lineItem.data[0].y);
+        } else if (maxData <= 0 && minData <= 0) {
+          context.lineTo(xEnd, lineItem.data[lineItem.data.length - 1].y);
+          context.lineTo(xEnd, lineItem.data[0].y);
+        } else {
+          context.lineTo(xZero, lineItem.data[lineItem.data.length - 1].y);
+          context.lineTo(xZero, lineItem.data[0].y);
+        }
       }
       context.closePath();
       context.save();
@@ -2168,49 +3343,31 @@ function drawChartLine(process) {
 
     if (process == 1) {
       if (symbolShow) {
-        if (dataShowIndex && dataShowIndex.length) {
-          // 存在控制显示的下标数组
-          dataShowIndex.forEach(showIndex => {
-            let dataItem = data[showIndex];
-            let { x, y } = dataItem;
+        switch (symbolType) {
+          case 'circle':
+            context.save();
+            lineItem.data.forEach(dataItem => {
+              let { x, y } = dataItem;
+              context.beginPath();
+              context.arc(x, y, symbolSize / 2, 0, 2 * Math.PI);
+              context.fillStyle = symbolColor == 'auto' ? lineItemColor : symbolColor;
+              context.fill();
 
-            switch (symbolType) {
-              case 'circle':
-                context.save();
-                context.beginPath();
-                context.arc(x, y, symbolSize / 2, 0, 2 * Math.PI);
-                context.fillStyle = symbolColor == 'auto' ? lineItemColor : symbolColor;
-                context.fill();
-
-                context.beginPath();
-                context.arc(x, y, symbolSize / 4, 0, 2 * Math.PI);
-                context.fillStyle = '#fff';
-                context.fill();
-                context.restore();
-                break
-            }
-          });
-        } else {
-          switch (symbolType) {
-            case 'circle':
-              context.save();
-              data.forEach(dataItem => {
-                let { x, y } = dataItem;
-                context.beginPath();
-                context.arc(x, y, symbolSize / 2, 0, 2 * Math.PI);
-                context.fillStyle = symbolColor == 'auto' ? lineItemColor : symbolColor;
-                context.fill();
-
-                context.beginPath();
-                context.arc(x, y, symbolSize / 4, 0, 2 * Math.PI);
-                context.fillStyle = '#fff';
-                context.fill();
-              });
-              context.restore();
-              break
-          }
+              context.beginPath();
+              context.arc(x, y, symbolSize / 4, 0, 2 * Math.PI);
+              context.fillStyle = '#fff';
+              context.fill();
+            });
+            context.restore();
+            break
         }
       }
+
+      // globalLabel 权重大于 seriesLabel
+      labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+      labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+      labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+      labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
 
       if (labelShow) {
         context.save();
@@ -2218,49 +3375,30 @@ function drawChartLine(process) {
         context.fillStyle = labelColor == 'auto' ? lineItemColor : labelColor;
         context.textAlign = 'center';
 
-        if (dataShowIndex && dataShowIndex.length) {
-          // 存在控制显示的下标数组
-          dataShowIndex.forEach(showIndex => {
-            let dataItem = data[showIndex];
-            let { x, y, value } = dataItem;
+        lineItem.data.forEach(dataItem => {
+          let { x, y, data } = dataItem;
 
+          if (xAxis.type == 'category') {
             if (maxData >= 0 && minData >= 0) {
               context.textBaseline = 'bottom';
-              context.fillText(value, x, y - labelMargin);
+              context.fillText(data, x, y - labelMargin);
             } else if (maxData <= 0 && minData <= 0) {
               context.textBaseline = 'top';
-              context.fillText(value, x, y + labelMargin);
+              context.fillText(data, x, y + labelMargin);
             } else {
-              if (value) {
+              if (data) {
                 context.textBaseline = 'bottom';
-                context.fillText(value, x, y - labelMargin);
+                context.fillText(data, x, y - labelMargin);
               } else {
                 context.textBaseline = 'top';
-                context.fillText(value, x, y + labelMargin);
+                context.fillText(data, x, y + labelMargin);
               }
             }
-          });
-        } else {
-          data.forEach(dataItem => {
-            let { x, y, value } = dataItem;
-
-            if (maxData >= 0 && minData >= 0) {
-              context.textBaseline = 'bottom';
-              context.fillText(value, x, y - labelMargin);
-            } else if (maxData <= 0 && minData <= 0) {
-              context.textBaseline = 'top';
-              context.fillText(value, x, y + labelMargin);
-            } else {
-              if (value) {
-                context.textBaseline = 'bottom';
-                context.fillText(value, x, y - labelMargin);
-              } else {
-                context.textBaseline = 'top';
-                context.fillText(value, x, y + labelMargin);
-              }
-            }
-          });
-        }
+          } else {
+            context.textBaseline = 'bottom';
+            context.fillText(data, x, y - labelMargin);
+          }
+        });
 
         context.restore();
       }
@@ -2302,6 +3440,8 @@ function drawChartPie$1(process) {
       context.moveTo(centerX, centerY);
       context.arc(centerX, centerY, radiusMin, dataItem._start_, dataItem._start_ + 2 * dataItem._proportion_ * Math.PI);
       context.fillStyle = backgroundColor;
+      context.strokeStyle = backgroundColor;
+      context.stroke();
       context.fill();
     }
 
@@ -2322,80 +3462,81 @@ function drawChartPie$1(process) {
     labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
     labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
 
-    if (!labelShow) return
+    if (labelShow) {
+      data.forEach((dataItem, dataIndex) => {
+        let arc = 2 * Math.PI - (dataItem._start_ + (2 * Math.PI * dataItem._proportion_) / 2);
+        let text = format ? format(dataItem.value, name) : `${(+dataItem._proportion_ * 100).toFixed(2)}%`;
 
-    data.forEach((dataItem, dataIndex) => {
-      let arc = 2 * Math.PI - (dataItem._start_ + (2 * Math.PI * dataItem._proportion_) / 2);
-      let text = format ? format(dataItem.value, name) : `${(+dataItem._proportion_ * 100).toFixed(2)}%`;
+        // length1 start
+        let length1StartOrigin = {
+          x: Math.cos(arc) * radiusMax,
+          y: Math.sin(arc) * radiusMax,
+        };
+        // length2 start
+        let length2StartOrigin = {
+          x: Math.cos(arc) * lineRadius,
+          y: Math.sin(arc) * lineRadius,
+        };
+        // length2 end
+        let length2EndOrigin = {
+          x: length2StartOrigin.x >= 0 ? length2StartOrigin.x + length2 : length2StartOrigin.x - length2,
+          y: length2StartOrigin.y,
+        };
 
-      // length1 start
-      let length1StartOrigin = {
-        x: Math.cos(arc) * radiusMax,
-        y: Math.sin(arc) * radiusMax,
-      };
-      // length2 start
-      let length2StartOrigin = {
-        x: Math.cos(arc) * lineRadius,
-        y: Math.sin(arc) * lineRadius,
-      };
-      // length2 end
-      let length2EndOrigin = {
-        x: length2StartOrigin.x >= 0 ? length2StartOrigin.x + length2 : length2StartOrigin.x - length2,
-        y: length2StartOrigin.y,
-      };
+        length2EndOrigin = avoidCollision(length2EndOrigin, lastOrigin, Math.max(lineDotRadius, labelFontSize / 2) * 2);
+        lastOrigin = length2EndOrigin;
 
-      length2EndOrigin = avoidCollision(length2EndOrigin, lastOrigin, Math.max(lineDotRadius, labelFontSize / 2) * 2);
-      lastOrigin = length2EndOrigin;
+        let length1StartPosition = convertCoordinateOrigin(length1StartOrigin, center);
+        let length2StartPosition = convertCoordinateOrigin(length2StartOrigin, center);
+        let length2EndPosition = convertCoordinateOrigin(length2EndOrigin, center);
 
-      let length1StartPosition = convertCoordinateOrigin(length1StartOrigin, center);
-      let length2StartPosition = convertCoordinateOrigin(length2StartOrigin, center);
-      let length2EndPosition = convertCoordinateOrigin(length2EndOrigin, center);
+        // text start
+        context.font = `${labelFontSize}px`;
+        let textWidth = context.measureText(text).width;
+        let textStartPosition = Object.assign({}, length2EndPosition);
+        if (length2EndOrigin.x > 0) {
+          textStartPosition.x += lineDotRadius + labelMargin;
+        } else {
+          textStartPosition.x -= textWidth + lineDotRadius + labelMargin;
+        }
 
-      // text start
-      context.font = `${labelFontSize}px`;
-      let textWidth = context.measureText(text).width;
-      let textStartPosition = Object.assign({}, length2EndPosition);
-      if (length2EndOrigin.x > 0) {
-        textStartPosition.x += lineDotRadius + labelMargin;
-      } else {
-        textStartPosition.x -= textWidth + lineDotRadius + labelMargin;
-      }
+        context.beginPath();
+        context.moveTo(length1StartPosition.x, length1StartPosition.y);
+        context.quadraticCurveTo(length2StartPosition.x, length2StartPosition.y, length2EndPosition.x, length2EndPosition.y);
+        context.lineWidth = lineWidth;
+        context.strokeStyle = dataItem.itemStyle.color;
+        context.stroke();
+        context.closePath();
 
-      context.beginPath();
-      context.moveTo(length1StartPosition.x, length1StartPosition.y);
-      context.quadraticCurveTo(length2StartPosition.x, length2StartPosition.y, length2EndPosition.x, length2EndPosition.y);
-      context.lineWidth = lineWidth;
-      context.strokeStyle = dataItem.itemStyle.color;
-      context.stroke();
-      context.closePath();
+        context.beginPath();
+        context.moveTo(length2EndPosition.x, length2EndPosition.y);
+        context.arc(length2EndPosition.x, length2EndPosition.y, lineDotRadius, 0, 2 * Math.PI);
+        context.closePath();
+        context.fillStyle = dataItem.itemStyle.color;
+        context.fill();
 
-      context.beginPath();
-      context.moveTo(length2EndPosition.x, length2EndPosition.y);
-      context.arc(length2EndPosition.x, length2EndPosition.y, lineDotRadius, 0, 2 * Math.PI);
-      context.closePath();
-      context.fillStyle = dataItem.itemStyle.color;
-      context.fill();
-
-      context.font = `${labelFontSize}px`;
-      context.textBaseline = 'middle';
-      context.fillStyle = labelColor == 'auto' ? dataItem.itemStyle.color : labelColor;
-      context.fillText(text, textStartPosition.x, textStartPosition.y);
-    });
+        context.font = `${labelFontSize}px`;
+        context.textBaseline = 'middle';
+        context.fillStyle = labelColor == 'auto' ? dataItem.itemStyle.color : labelColor;
+        context.fillText(text, textStartPosition.x, textStartPosition.y);
+      });
+    }
   }
 
   console.log('complete drawChartPie', process);
 }
 
 function drawChartRadar(process) {
-  let { context, chartData } = this;
+  let { context, opts, chartData } = this;
+  let { label: globalLabel } = opts;
   let { center } = chartData.radarAxis;
 
   chartData.chartRadar.forEach(radarItem => {
-    console.log(1111, radarItem);
-    let { dataPosition, itemStyle, area, line, symbol } = radarItem;
+    let { dataPosition, itemStyle, area, line, symbol, label } = radarItem;
     let { show: areaShow, color: areaColor, opacity: areaOpactiy } = area;
     let { show: lineShow, lineWidht, color: lineColor, opacity: lineOpacity } = line;
     let { show: symbolShow, type: symbolType, size: symbolSize, color: symbolColor } = symbol;
+    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
 
     context.beginPath();
     dataPosition.forEach((dataItem, dataIndex) => {
@@ -2454,10 +3595,81 @@ function drawChartRadar(process) {
             break
         }
       }
+
+      // globalLabel 权重大于 seriesLabel
+      labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+      labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+      labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+      labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+
+      if (labelShow) {
+        context.save();
+        context.font = `${labelFontSize}px`;
+        context.fillStyle = labelColor == 'auto' ? itemStyle.color : labelColor;
+        context.textAlign = 'center';
+        context.textBaseline = 'bottom';
+
+        dataPosition.forEach(dataItem => {
+          let { x, y } = dataItem.position;
+          context.fillText(dataItem.data, x, y - labelMargin);
+        });
+      }
     }
   });
 
   console.log('complete drawChartRadar', process);
+}
+
+function drawChartScatter(process) {
+  let { context, opts, chartData } = this;
+  let { label: globalLabel } = opts;
+
+  chartData.chartScatter.forEach(ScatterItem => {
+    let { data, label, itemStyle, opacity, radius } = ScatterItem;
+    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+    let { color: ScatterItemColor } = itemStyle;
+    radius = radius * process;
+
+    context.save();
+    context.beginPath();
+    data.forEach(dataItem => {
+      let { positionX, positionY } = dataItem;
+
+      context.moveTo(positionX, positionY);
+      context.arc(positionX, positionY, radius, 0, Math.PI * 2);
+    });
+    context.fillStyle = ScatterItemColor;
+    context.globalAlpha = opacity;
+    context.fill();
+    context.restore();
+
+    if (process == 1) {
+      // globalLabel 权重大于 seriesLabel
+      labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+      labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+      labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+      labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+
+      if (labelShow) {
+        context.save();
+        context.font = `${labelFontSize}px`;
+        context.strokeStyle = labelColor == 'auto' ? ScatterItemColor : labelColor;
+        context.fillStyle = '#ffffff';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+
+        data.forEach(dataItem => {
+          let { y, positionX, positionY } = dataItem;
+
+          context.strokeText(y, positionX, positionY);
+          context.fillText(y, positionX, positionY);
+        });
+        context.restore();
+      }
+    }
+  });
+
+  console.log('complete drawChartScatter', process);
 }
 
 function drawCharts() {
@@ -2524,6 +3736,20 @@ function drawCharts() {
         }
       };
       break
+    case 'scatter':
+      calAxisYData.call(this);
+      calChartScatterData.call(this);
+
+      onProcessFn = process => {
+        drawBackground.call(this);
+        drawAxisY.call(this);
+        drawChartScatter.call(this, process);
+
+        if (process == 1) {
+          drawLegend.call(this);
+        }
+      };
+      break
   }
 
   this.animationInstance = new Animation({
@@ -2567,6 +3793,8 @@ class Charts {
         replenishData(dataKey, data, opts, true);
       }
     });
+
+    console.log('complete updateData', this);
 
     drawCharts.call(this);
   }
