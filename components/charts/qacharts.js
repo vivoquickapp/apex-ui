@@ -1,5 +1,13 @@
 /*
- * banner
+ * qacharts v1.0
+ *
+ * Charts for Quick App. 
+ * 
+ * A component of Apex-UI.
+ *
+ * Apex-UI 组件库：https://github.com/vivoquickapp/apex-ui
+ * 
+ * Apex-UI 组件库官方文档：https://vivoquickapp.github.io/apex-ui-docs/
  */
 
 class Event {
@@ -43,7 +51,7 @@ var Config = {
   colors: ['#7cb5ec', '#f7a35c', '#434348', '#90ed7d', '#f15c80', '#8085e9'], // wxcharts调色盘
   label: {
     show: true,
-    fontSize: 15,
+    fontSize: 10,
     color: 'auto',
     margin: 5,
   },
@@ -80,9 +88,31 @@ var Config = {
     },
   },
   scatter: {
-    color: 'auto',
     radius: 10,
     opacity: 1,
+    lineWidth: 0,
+    strokeColor: 'auto',
+  },
+  funnel: {
+    width: 'auto',
+    height: 'auto',
+    top: '0%',
+    left: '0%',
+    right: '0%',
+    bottom: '0%',
+    max: 100,
+    min: 0,
+    gap: 5,
+    shape: 'funnel', // funnel, pyramid
+    sort: 'descending', // descending, ascending
+    funnelAlign: 'center', // left, center, right
+    label: {
+      position: 'inside', // inside, outside
+    },
+    itemStyle: {
+      borderColor: '#ffffff',
+      borderWidth: 1,
+    },
   },
   line: {
     smooth: false,
@@ -125,7 +155,7 @@ var Config = {
     },
   },
   radarAxis: {
-    shape: 'polygon', // polygon. circle
+    shape: 'polygon', // polygon, circle
     center: ['50%', '50%'],
     radius: '80%',
     max: 'auto',
@@ -263,6 +293,91 @@ var Config = {
     },
   },
 };
+
+/**
+ * HEX to HSL
+ * @param {String} HEX
+ * @return {Array} HSL
+ */
+function HEX2HSL(hex) {
+  let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+  let r = parseInt(result[1], 16);
+  let g = parseInt(result[2], 16);
+  let b = parseInt(result[3], 16)
+
+  ;(r /= 255), (g /= 255), (b /= 255);
+  let max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  let h,
+    s,
+    l = (max + min) / 2;
+
+  if (max == min) {
+    h = s = 0; // achromatic
+  } else {
+    let d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break
+      case g:
+        h = (b - r) / d + 2;
+        break
+      case b:
+        h = (r - g) / d + 4;
+        break
+    }
+    h /= 6;
+  }
+
+  s = s * 100;
+  s = Math.round(s);
+  l = l * 100;
+  l = Math.round(l);
+  h = Math.round(360 * h);
+
+  return [h, s, l]
+}
+
+/**
+ * HSL to HEX
+ * @param {Array} HSL
+ * @return {String} HEX
+ */
+function HSL2HEX(hsl) {
+  let [h, s, l] = hsl;
+  let r, g, b;
+
+  h /= 360;
+  s /= 100;
+  l /= 100;
+
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t
+      if (t < 1 / 2) return q
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6
+      return p
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+  const toHex = x => {
+    const hex = Math.round(x * 255).toString(16);
+    return hex.length === 1 ? '0' + hex : hex
+  };
+
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
 
 /**
  * 转化坐标
@@ -473,14 +588,6 @@ function calSeries() {
         replenishData('area', config.line, seriesItem);
       });
       break
-    case 'scatter':
-      opts.series.forEach(seriesItem => {
-        replenishData('label', config, seriesItem);
-        replenishData('color', config.scatter, seriesItem);
-        replenishData('radius', config.scatter, seriesItem);
-        replenishData('opacity', config.scatter, seriesItem);
-      });
-      break
     case 'pie':
       opts.series.forEach(seriesItem => {
         replenishData('label', config, seriesItem);
@@ -497,6 +604,35 @@ function calSeries() {
         replenishData('line', config.radar, seriesItem);
         replenishData('symbol', config.radar, seriesItem);
         replenishData('area', config.radar, seriesItem);
+      });
+      break
+    case 'scatter':
+      opts.series.forEach(seriesItem => {
+        replenishData('label', config, seriesItem);
+        replenishData('color', config.scatter, seriesItem);
+        replenishData('radius', config.scatter, seriesItem);
+        replenishData('opacity', config.scatter, seriesItem);
+        replenishData('lineWidth', config.scatter, seriesItem);
+        replenishData('strokeColor', config.scatter, seriesItem);
+      });
+      break
+    case 'funnel':
+      opts.series.forEach(seriesItem => {
+        replenishData('label', config, seriesItem);
+        replenishData('position', config.funnel.label, seriesItem.label);
+        replenishData('width', config.funnel, seriesItem);
+        replenishData('height', config.funnel, seriesItem);
+        replenishData('top', config.funnel, seriesItem);
+        replenishData('left', config.funnel, seriesItem);
+        replenishData('right', config.funnel, seriesItem);
+        replenishData('bottom', config.funnel, seriesItem);
+        replenishData('max', config.funnel, seriesItem);
+        replenishData('min', config.funnel, seriesItem);
+        replenishData('gap', config.funnel, seriesItem);
+        replenishData('sort', config.funnel, seriesItem);
+        replenishData('shape', config.funnel, seriesItem);
+        replenishData('funnelAlign', config.funnel, seriesItem);
+        replenishData('itemStyle', config.funnel, seriesItem);
       });
       break
   }
@@ -551,6 +687,7 @@ class Animation {
             break
           case 'pie':
           case 'radar':
+          case 'funnel':
             animationTiming = 'easeInOut';
             break
         }
@@ -596,11 +733,21 @@ class Animation {
 }
 
 function calSeriesColor() {
-  const colors = this.opts.colors;
+  let { type, colors, series } = this.opts;
   const colorsLength = colors.length;
 
-  if (this.opts.type == 'pie') {
-    this.opts.series.forEach(seriesItem => {
+  if (type == 'funnel') {
+    series[0].data.sort((a, b) => {
+      if (series[0].sort == 'descending') {
+        return b.value - a.value
+      } else {
+        return a.value - b.value
+      }
+    });
+  }
+
+  if (type == 'pie' || type == 'funnel') {
+    series.forEach(seriesItem => {
       seriesItem.data.forEach((dataItem, dataIndex) => {
         dataItem.itemStyle = dataItem.itemStyle || {};
         if (!dataItem.itemStyle.color) {
@@ -609,21 +756,13 @@ function calSeriesColor() {
       });
     });
   }
-  if (this.opts.type == 'scatter') {
-    this.opts.series.forEach((seriesItem, seriesIndex) => {
-      seriesItem.itemStyle = seriesItem.itemStyle || {};
-      if (!seriesItem.itemStyle.color) {
-        seriesItem.itemStyle.color = seriesItem.color !== 'auto' ? seriesItem.color : colors[seriesIndex % colorsLength];
-      }
-    });
-  } else {
-    this.opts.series.forEach((seriesItem, seriesIndex) => {
-      seriesItem.itemStyle = seriesItem.itemStyle || {};
-      if (!seriesItem.itemStyle.color) {
-        seriesItem.itemStyle.color = colors[seriesIndex % colorsLength];
-      }
-    });
-  }
+
+  series.forEach((seriesItem, seriesIndex) => {
+    seriesItem.itemStyle = seriesItem.itemStyle || {};
+    if (!seriesItem.itemStyle.color) {
+      seriesItem.itemStyle.color = colors[seriesIndex % colorsLength];
+    }
+  });
 
   console.log('complete calSeriesColor');
 }
@@ -642,7 +781,7 @@ function calLegendData() {
 
     context.font = `${fontSize}px`;
 
-    if (type == 'pie') {
+    if (type == 'pie' || type == 'funnel') {
       seriesDataList = series[0].data;
     } else {
       seriesDataList = series;
@@ -656,7 +795,7 @@ function calLegendData() {
       let obj = {
         name,
         measureText,
-        itemStyle,
+        color: typeof itemStyle.color == 'string' ? itemStyle.color : '#000000',
       };
 
       if (legendWidthNum + itemWidth > width) {
@@ -686,7 +825,7 @@ function calLegendData() {
     };
   }
 
-  console.log('complete calLegendData');
+  console.log('complete calLegendData', this.legendData);
 }
 
 function calAxisYData() {
@@ -818,6 +957,7 @@ function calAxisYData() {
 
   function calAxisValue(axis = 'x') {
     let allDataArr = [];
+
     if (xAxisType == 'value' && yAxisType == 'value') {
       allDataArr = series.reduce((allDataArr, seriesItem) => {
         let dataArr = seriesItem.data.reduce((dataArr, dataItem) => {
@@ -827,9 +967,42 @@ function calAxisYData() {
         return allDataArr.concat(dataArr)
       }, []);
     } else {
-      allDataArr = series.reduce((allDataArr, seriesItem) => {
-        return allDataArr.concat(seriesItem.data)
-      }, []);
+      let allDataObject = {};
+
+      JSON.parse(JSON.stringify(series)).forEach(seriesItem => {
+        if (seriesItem.stack) {
+          if (!allDataObject[seriesItem.stack]) {
+            allDataObject[seriesItem.stack] = [];
+          }
+
+          allDataObject[seriesItem.stack].push(seriesItem.data);
+        } else {
+          if (!allDataObject[seriesItem.name]) {
+            allDataObject[seriesItem.name] = [];
+          }
+
+          allDataObject[seriesItem.name].push(seriesItem.data);
+        }
+      });
+
+      Object.keys(allDataObject).forEach(key => {
+        if (allDataObject[key].length > 1) {
+          let stackDataArr = allDataObject[key].reduce((stackDataArr, dataArr) => {
+            if (stackDataArr.length == 0) {
+              stackDataArr = dataArr;
+            } else {
+              dataArr.forEach((dataItem, dataIndex) => {
+                stackDataArr[dataIndex] += dataItem;
+              });
+            }
+            return stackDataArr
+          }, []);
+          allDataArr = allDataArr.concat(stackDataArr);
+        } else {
+          let dataArr = allDataObject[key][0];
+          allDataArr = allDataArr.concat(dataArr);
+        }
+      });
     }
 
     let axisLabelDataArr = [];
@@ -1162,7 +1335,6 @@ function calAxisYData() {
   if (xAxisLabelRotate == 0) {
     xAxisLabelMaxHeight = xAxisLabelFontSize;
   } else {
-    console.log(123, xAxisLabelRotate, Math.sin((xAxisLabelRotate * Math.PI) / 180));
     xAxisLabelMaxHeight =
       Math.abs(xAxisLabelMaxWidth * Math.sin((xAxisLabelRotate * Math.PI) / 180)) + Math.abs(xAxisLabelFontSize * Math.cos((xAxisLabelRotate * Math.PI) / 180));
   }
@@ -2073,7 +2245,7 @@ function calAxisRadarData() {
 
 function calChartBarData() {
   let { opts, chartData } = this;
-  let { series, xAxis } = opts;
+  let { series, xAxis, yAxis } = opts;
 
   let {
     xStart,
@@ -2110,165 +2282,222 @@ function calChartBarData() {
   let valueAxisPlusSpacing = xAxis.type == 'value' ? xPlusSpacing : yPlusSpacing;
   let valueAxisMinusSpacing = xAxis.type == 'value' ? xMinusSpacing : yMinusSpacing;
   let valueAxisSpacing = xAxis.type == 'value' ? xSpacing : ySpacing;
-  let categoryAxisMinusSpacing = xAxis.type == 'category' ? xEachSpacing : yEachSpacing;
+  let categoryAxisEachSpacing = xAxis.type == 'category' ? xEachSpacing : yEachSpacing;
+  let categoryAxisData = xAxis.type == 'category' ? xAxis.data : yAxis.data;
 
-  // 修正barWidth和计算autoWidthNumber和部分sumWidth
-  series.forEach((seriesItem, seriesIndex) => {
-    let { barMaxWidth, barMinWidth, barWidth, barGap } = seriesItem;
+  let allDataObject = {};
+  series.forEach(seriesItem => {
+    if (seriesItem.stack) {
+      if (!allDataObject[seriesItem.stack]) {
+        allDataObject[seriesItem.stack] = [];
+      }
 
-    if (typeof seriesItem.barWidth == 'number') {
-      if (barWidth > barMaxWidth) {
-        seriesItem.barWidth = barMaxWidth;
-      }
-      if (barWidth < barMinWidth) {
-        seriesItem.barWidth = barMinWidth;
-      }
-      sumWidth += seriesItem.barWidth;
+      allDataObject[seriesItem.stack].push(seriesItem);
     } else {
-      autoWidthNumber++;
+      if (!allDataObject[seriesItem.name]) {
+        allDataObject[seriesItem.name] = [];
+      }
+
+      allDataObject[seriesItem.name].push(seriesItem);
     }
-    if (seriesIndex == 0) {
-      // 第一个seriesItem的barGap为两边的padding，其他的为与上一个的间隙
-      sumWidth += 2 * barGap;
-    } else {
-      sumWidth += barGap;
-    }
-    return seriesItem
+  });
+
+  let chartBar = [];
+  for (let i = 0, len = categoryAxisData.length; i < len; i++) {
+    let chartBarArrItem = [];
+
+    Object.keys(allDataObject).forEach(key => {
+      chartBarArrItem.push(allDataObject[key]);
+    });
+    chartBar.push(chartBarArrItem);
+  }
+
+  chartData.chartBar = JSON.parse(JSON.stringify(chartBar)).map((barItemArr, barItemArrIndex) => {
+    barItemArr.forEach((barItem, barIndex) => {
+      barItem.forEach((seriesItem, seriesIndex) => {
+        let isShow = true;
+        if (seriesItem.showIndex && seriesItem.showIndex.length) {
+          isShow = seriesItem.showIndex.some(showIndex => {
+            return showIndex == chartBarArrIndex
+          });
+        }
+        seriesItem.show = isShow;
+        seriesItem.data = seriesItem.data[barItemArrIndex];
+
+        if (seriesIndex == 0) {
+          let { barMaxWidth, barMinWidth, barWidth, barGap } = seriesItem;
+          if (typeof barWidth == 'number') {
+            if (barWidth > barMaxWidth) {
+              seriesItem.barWidth = barMaxWidth;
+            }
+            if (barWidth < barMinWidth) {
+              seriesItem.barWidth = barMinWidth;
+            }
+
+            if (barItemArrIndex == 0) {
+              sumWidth += seriesItem.barWidth;
+            }
+          } else {
+            if (barItemArrIndex == 0) {
+              autoWidthNumber++;
+            }
+          }
+        } else {
+          seriesItem.barWidth = barItem[0].barWidth;
+        }
+      });
+
+      if (barItemArrIndex == 0) {
+        if (barIndex == 0) {
+          sumWidth += 2 * barItem[0].barGap;
+        } else {
+          sumWidth += barItem[0].barGap;
+        }
+      }
+    });
+
+    return barItemArr
   });
 
   // 计算autoWidth
-  if (sumWidth + autoWidthNumber < categoryAxisMinusSpacing) {
-    autoWidth = (categoryAxisMinusSpacing - sumWidth) / autoWidthNumber;
+  if (sumWidth + autoWidthNumber < categoryAxisEachSpacing) {
+    autoWidth = (categoryAxisEachSpacing - sumWidth) / autoWidthNumber;
   } else {
     autoWidth = 1;
   }
 
-  // 修正barWidth，和计算完成sumWidth
-  series.forEach(seriesItem => {
-    let { barMaxWidth, barWidth } = seriesItem;
+  // 修正barWidth, 计算sumWidth
+  chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+    barItemArr.forEach((barItem, barIndex) => {
+      barItem.forEach((seriesItem, seriesIndex) => {
+        let { barMaxWidth, barWidth } = seriesItem;
+        if (seriesIndex == 0 && barWidth == 'auto') {
+          seriesItem.barWidth = autoWidth > barMaxWidth ? barMaxWidth : autoWidth;
+        } else {
+          seriesItem.barWidth = barItem[0].barWidth;
+          seriesItem.barGap = barItem[0].barGap;
+        }
 
-    if (barWidth == 'auto') {
-      seriesItem.barWidth = autoWidth > barMaxWidth ? barMaxWidth : autoWidth;
-      sumWidth += seriesItem.barWidth;
-    }
+        if (barItemArrIndex == 0 && seriesIndex == 0 && barWidth == 'auto') {
+          sumWidth += seriesItem.barWidth;
+        }
+      });
+    });
   });
 
-  // 生成数据结构
-  chartData.chartBar = JSON.parse(JSON.stringify(series)).reduce((chartBarArr, seriesItem, seriesIndex) => {
-    let isShow = true;
-
-    seriesItem.data.forEach((dataItem, dataIndex) => {
-      if (seriesItem.showIndex && seriesItem.showIndex.length) {
-        isShow = seriesItem.showIndex.some(showIndex => {
-          return showIndex == dataIndex
-        });
-      }
-      seriesItem.show = isShow;
-
-      if (!chartBarArr[dataIndex]) {
-        chartBarArr[dataIndex] = [];
-      }
-
-      if (!chartBarArr[dataIndex][seriesIndex]) {
-        chartBarArr[dataIndex][seriesIndex] = JSON.parse(JSON.stringify(seriesItem));
-      }
-    });
-    return chartBarArr
-  }, []);
-
   if (xAxis.type == 'category') {
-    chartData.chartBar.forEach((barItemArr, dataIndex) => {
-      let x = xAxisLabelPoint[dataIndex].x - sumWidth / 2;
-      barItemArr.forEach(barItem => {
-        // 记录柱体数值
-        let data = barItem.data[dataIndex];
+    chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+      let x = xAxisLabelPoint[barItemArrIndex].x - sumWidth / 2;
 
-        if (data > maxData) {
-          barItem.data = maxData;
-        } else if (data < minData) {
-          barItem.data = minData;
-        } else {
-          barItem.data = data;
-        }
+      barItemArr.forEach((barItem, barIndex) => {
+        x += barItem[0].barGap + barItem[0].barWidth / 2;
 
-        // 记录柱体宽度
-        if (barItem.barWidth == 'auto') {
-          barItem.barWidth = autoWidth;
-        }
+        let yPositive = 0;
+        let yNagative = 0;
 
-        // 记录柱体高度和y坐标点
-        let barHeight = 0;
-        let y = 0;
         if (maxData >= 0 && minData >= 0) {
-          barHeight = (valueAxisSpacing * (barItem.data - minData)) / dataRange;
-          y = yStart;
+          yPositive = yStart;
         } else if (maxData <= 0 && minData <= 0) {
-          barHeight = (valueAxisSpacing * (Math.abs(barItem.data) - Math.abs(maxData))) / dataRange;
-          y = yEnd;
+          yNagative = yEnd;
         } else {
-          if (barItem.data > 0) {
-            barHeight = (valueAxisPlusSpacing * barItem.data) / maxData;
-            y = yZero;
-          } else {
-            barHeight = (valueAxisMinusSpacing * Math.abs(barItem.data)) / Math.abs(minData);
-            y = yZero;
-          }
+          yPositive = yZero;
+          yNagative = yZero;
         }
-        barItem.barHeight = barHeight;
-        barItem.y = y;
 
-        // 记录x坐标点
-        barItem.x = x + barItem.barGap + barItem.barWidth / 2;
+        barItem.forEach((seriesItem, seriesIndex) => {
+          seriesItem.x = x;
 
-        x += barItem.barGap + barItem.barWidth;
+          // 记录y坐标点和柱体高度
+          let barHeight = 0;
+
+          if (maxData >= 0 && minData >= 0) {
+            if (seriesItem.data == 0) {
+              seriesItem.y = yStart;
+              barHeight = 0;
+            } else {
+              seriesItem.y = yPositive;
+              barHeight = (valueAxisSpacing * (seriesItem.data - minData)) / dataRange;
+              yPositive -= barHeight;
+            }
+          } else if (maxData <= 0 && minData <= 0) {
+            if (seriesItem.data == 0) {
+              seriesItem.y = yEnd;
+              barHeight = 0;
+            } else {
+              seriesItem.y = yNagative;
+              barHeight = (valueAxisSpacing * (Math.abs(seriesItem.data) - Math.abs(maxData))) / dataRange;
+              yNagative += barHeight;
+            }
+          } else {
+            if (seriesItem.data > 0) {
+              seriesItem.y = yPositive;
+              barHeight = (valueAxisPlusSpacing * seriesItem.data) / maxData;
+              yPositive -= barHeight;
+            } else if (seriesItem.data < 0) {
+              seriesItem.y = yNagative;
+              barHeight = (valueAxisMinusSpacing * Math.abs(seriesItem.data)) / Math.abs(minData);
+              yNagative += barHeight;
+            } else {
+              seriesItem.y = yZero;
+              barHeight = 0;
+            }
+          }
+
+          seriesItem.barHeight = barHeight;
+        });
+
+        x += barItem[0].barWidth / 2;
       });
     });
   } else {
-    chartData.chartBar.forEach((barItemArr, dataIndex) => {
-      let y = yAxisLabelPoint[dataIndex].y + sumWidth / 2;
+    chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+      let y = yAxisLabelPoint[barItemArrIndex].y + sumWidth / 2;
 
-      barItemArr.forEach(barItem => {
-        // 记录柱体数值
-        let data = barItem.data[dataIndex];
+      barItemArr.forEach((barItem, barIndex) => {
+        y -= barItem[0].barGap + barItem[0].barWidth / 2;
 
-        if (data > maxData) {
-          barItem.data = maxData;
-        } else if (data < minData) {
-          barItem.data = minData;
-        } else {
-          barItem.data = data;
-        }
+        let xPositive = 0;
+        let xNagative = 0;
 
-        // 记录柱体宽度
-        if (barItem.barWidth == 'auto') {
-          barItem.barWidth = autoWidth;
-        }
-
-        // 记录柱体高度和x坐标点
-        let barHeight = 0;
-        let x = 0;
         if (maxData >= 0 && minData >= 0) {
-          barHeight = (valueAxisSpacing * (barItem.data - minData)) / dataRange;
-          x = xStart;
+          xPositive = xStart;
         } else if (maxData <= 0 && minData <= 0) {
-          barHeight = (valueAxisSpacing * (Math.abs(barItem.data) - Math.abs(maxData))) / dataRange;
-          x = xEnd;
+          xNagative = xEnd;
         } else {
-          if (barItem.data > 0) {
-            barHeight = (valueAxisPlusSpacing * barItem.data) / maxData;
-            x = xZero;
-          } else {
-            barHeight = (valueAxisMinusSpacing * Math.abs(barItem.data)) / Math.abs(minData);
-            x = xZero;
-          }
+          xPositive = xZero;
+          xNagative = xZero;
         }
-        barItem.barHeight = barHeight;
-        barItem.x = x;
 
-        // 记录柱体y坐标点
-        barItem.y = y - barItem.barGap - barItem.barWidth / 2;
+        barItem.forEach((seriesItem, seriesIndex) => {
+          seriesItem.y = y;
 
-        y -= barItem.barGap + barItem.barWidth;
+          // 记录y坐标点和柱体高度
+          let barHeight = 0;
+
+          if (maxData >= 0 && minData >= 0) {
+            seriesItem.x = xPositive;
+            barHeight = (valueAxisSpacing * (seriesItem.data - minData)) / dataRange;
+            xPositive += barHeight;
+          } else if (maxData <= 0 && minData <= 0) {
+            seriesItem.x = xNagative;
+            barHeight = (valueAxisSpacing * (Math.abs(seriesItem.data) - Math.abs(maxData))) / dataRange;
+            xNagative -= barHeight;
+          } else {
+            if (seriesItem.data > 0) {
+              seriesItem.x = xPositive;
+              barHeight = (valueAxisPlusSpacing * seriesItem.data) / maxData;
+              xPositive += barHeight;
+            } else {
+              seriesItem.x = xNagative;
+              barHeight = (valueAxisMinusSpacing * Math.abs(seriesItem.data)) / Math.abs(minData);
+              xNagative -= barHeight;
+            }
+          }
+
+          seriesItem.barHeight = barHeight;
+        });
+
+        y -= barItem[0].barWidth / 2;
       });
     });
   }
@@ -2486,9 +2715,37 @@ function calChartScatterData() {
     xDataRange,
   } = chartData.axisData;
 
-  chartData.chartScatter = JSON.parse(JSON.stringify(series)).reduce((chartScatterArr, seriesItem) => {
-    seriesItem.data = seriesItem.data.reduce((dataArr, dataItem) => {
-      let { x, y } = dataItem;
+  chartData.chartScatter = JSON.parse(JSON.stringify(series)).map(seriesItem => {
+    let { data, radius, itemStyle } = seriesItem;
+    let { color: scatterItemColor } = itemStyle;
+    let radiusMax, radiusMin, radiusRange;
+    let zMax, zMin, zRange;
+    let HSLColorMax, HSLColorMin, HSLColorRange;
+
+    if (typeof radius !== 'number') {
+      radiusMax = radius[1];
+      radiusMin = radius[0];
+      radiusRange = radiusMax - radiusMin;
+
+      let sortData = data.concat([]).sort((a, b) => {
+        return a.z - b.z
+      });
+      zMax = sortData[sortData.length - 1].z;
+      zMin = sortData[0].z ? sortData[0].z : 0;
+      zRange = zMax - zMin;
+    }
+
+    if (typeof scatterItemColor !== 'string') {
+      let [HEXColorMin, HEXColorMax] = scatterItemColor;
+      HSLColorMax = HEX2HSL(HEXColorMax);
+      HSLColorMin = HEX2HSL(HEXColorMin);
+      HSLColorRange = [HSLColorMax[0] - HSLColorMin[0], HSLColorMax[1] - HSLColorMin[1], HSLColorMax[2] - HSLColorMin[2]];
+
+      seriesItem.label.color = '#000000';
+    }
+
+    seriesItem.data = data.concat([]).map(dataItem => {
+      let { x, y, z } = dataItem;
       let positionX, positionY;
 
       if (yMaxData >= 0 && yMaxData >= 0) {
@@ -2514,22 +2771,252 @@ function calChartScatterData() {
           positionX = xZero - (xMinusSpacing * Math.abs(x)) / Math.abs(xMinData);
         }
       }
+      dataItem.positionX = positionX;
+      dataItem.positionY = positionY;
 
-      dataArr.push({
-        x,
-        y,
-        positionX,
-        positionY,
-      });
-      return dataArr
-    }, []);
+      if (typeof radius !== 'number') {
+        dataItem.z = z ? z : 0;
+        let scale = (z - zMin) / zRange;
+        dataItem.radius = radiusMin + radiusRange * scale;
+      } else {
+        dataItem.radius = radius;
+      }
 
-    chartScatterArr.push(JSON.parse(JSON.stringify(seriesItem)));
+      if (typeof scatterItemColor !== 'string') {
+        dataItem.z = z ? z : 0;
+        let scale = (z - zMin) / zRange;
+        let HSLColor = [HSLColorMin[0] + HSLColorRange[0] * scale, HSLColorMin[1] + HSLColorRange[1] * scale, HSLColorMin[2] + HSLColorRange[2] * scale];
 
-    return chartScatterArr
-  }, []);
+        dataItem.color = HSL2HEX(HSLColor);
+      } else {
+        dataItem.color = scatterItemColor;
+      }
+
+      return dataItem
+    });
+
+    return seriesItem
+  });
 
   console.log('complete calChartScatterData', this.chartData.chartScatter);
+}
+
+function calChartPieData$1() {
+  let { opts, legendData, chartData } = this;
+  let { width, height, series, padding } = opts;
+
+  let chartFunnel = JSON.parse(JSON.stringify(series[0]));
+  let { data, width: funnelWidth, height: funnelHeight, top, left, right, bottom, max, min, gap, sort, shape, funnelAlign, label, itemStyle } = chartFunnel;
+  let xStart = padding[3];
+  let xEnd = width - padding[1];
+  let yStart = padding[0];
+  let yEnd = height - padding[2] - legendData.legendHeight;
+  let containerWidth = xEnd - xStart;
+  let containerHeight = yEnd - yStart;
+
+  max = max > 100 ? 100 : max;
+  min = min < 0 ? 0 : min;
+
+  xStart = left == 'auto' ? xStart : xStart + containerWidth * percentToNum(left);
+  xEnd = right == 'auto' ? xEnd : xEnd - containerWidth * percentToNum(right);
+  yStart = top == 'auto' ? yStart : yStart + containerHeight * percentToNum(top);
+  yEnd = bottom == 'auto' ? yEnd : yEnd - containerHeight * percentToNum(bottom);
+  containerWidth = funnelWidth == 'auto' ? xEnd - xStart : containerWidth * percentToNum(funnelWidth);
+  containerHeight = funnelHeight == 'auto' ? yEnd - yStart : containerHeight * percentToNum(funnelHeight);
+
+  let funnelItemHeight = (containerHeight - (data.length - 1) * gap) / data.length;
+
+  data.forEach(dataItem => {
+    dataItem.value = dataItem.value > max ? max : dataItem.value;
+    dataItem.value = dataItem.value < min ? min : dataItem.value;
+
+    dataItem.width = containerWidth * (dataItem.value / max);
+    dataItem.height = funnelItemHeight;
+  });
+
+  let pointX, pointY;
+  if (funnelAlign == 'left') {
+    pointX = xStart;
+    pointY = yStart;
+  } else if (funnelAlign == 'right') {
+    pointX = xEnd;
+    pointY = yStart;
+  } else {
+    if (sort == 'ascending') {
+      pointX = xStart + data[data.length - 1].width / 2 - data[0].width / 2;
+    } else {
+      pointX = xStart;
+    }
+    pointY = yStart;
+  }
+
+  data.forEach((dataItem, dataIndex) => {
+    let point = [];
+
+    if (funnelAlign == 'left') {
+      if (sort == 'descending') {
+        if (dataIndex + 1 == data.length) {
+          if (shape == 'funnel') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          } else if (shape == 'pyramid') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          }
+        } else {
+          point.push({ x: pointX, y: pointY });
+          point.push({ x: pointX + dataItem.width, y: pointY });
+          point.push({ x: pointX + data[dataIndex + 1].width, y: pointY + dataItem.height });
+          point.push({ x: pointX, y: pointY + dataItem.height });
+        }
+      } else if (sort == 'ascending') {
+        if (dataIndex == 0) {
+          if (shape == 'funnel') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          } else if (shape == 'pyramid') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          }
+        } else {
+          point.push({ x: pointX, y: pointY });
+          point.push({ x: pointX + data[dataIndex - 1].width, y: pointY });
+          point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+          point.push({ x: pointX, y: pointY + dataItem.height });
+        }
+      }
+    } else if (funnelAlign == 'right') {
+      if (sort == 'descending') {
+        if (dataIndex + 1 == data.length) {
+          if (shape == 'funnel') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX - dataItem.width, y: pointY });
+            point.push({ x: pointX - dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          } else if (shape == 'pyramid') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX - dataItem.width, y: pointY });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          }
+        } else {
+          point.push({ x: pointX, y: pointY });
+          point.push({ x: pointX - dataItem.width, y: pointY });
+          point.push({ x: pointX - data[dataIndex + 1].width, y: pointY + dataItem.height });
+          point.push({ x: pointX, y: pointY + dataItem.height });
+        }
+      } else if (sort == 'ascending') {
+        if (dataIndex == 0) {
+          if (shape == 'funnel') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX - dataItem.width, y: pointY });
+            point.push({ x: pointX - dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          } else if (shape == 'pyramid') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX - dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          }
+        } else {
+          point.push({ x: pointX, y: pointY });
+          point.push({ x: pointX - data[dataIndex - 1].width, y: pointY });
+          point.push({ x: pointX - dataItem.width, y: pointY + dataItem.height });
+          point.push({ x: pointX, y: pointY + dataItem.height });
+        }
+      }
+    } else {
+      if (sort == 'descending') {
+        if (dataIndex + 1 == data.length) {
+          if (shape == 'funnel') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          } else if (shape == 'pyramid') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY });
+            point.push({ x: pointX + dataItem.width / 2, y: pointY + dataItem.height });
+          }
+        } else {
+          point.push({ x: pointX, y: pointY });
+          point.push({ x: pointX + dataItem.width, y: pointY });
+          point.push({ x: pointX + dataItem.width / 2 + data[dataIndex + 1].width / 2, y: pointY + dataItem.height });
+          point.push({ x: pointX + dataItem.width / 2 - data[dataIndex + 1].width / 2, y: pointY + dataItem.height });
+        }
+      } else if (sort == 'ascending') {
+        if (dataIndex == 0) {
+          if (shape == 'funnel') {
+            point.push({ x: pointX, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          } else if (shape == 'pyramid') {
+            point.push({ x: pointX + dataItem.width / 2, y: pointY });
+            point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+            point.push({ x: pointX, y: pointY + dataItem.height });
+          }
+        } else {
+          point.push({ x: pointX + dataItem.width / 2 - data[dataIndex - 1].width / 2, y: pointY });
+          point.push({ x: pointX + dataItem.width / 2 + data[dataIndex - 1].width / 2, y: pointY });
+          point.push({ x: pointX + dataItem.width, y: pointY + dataItem.height });
+          point.push({ x: pointX, y: pointY + dataItem.height });
+        }
+      }
+    }
+
+    dataItem.point = point;
+
+    let medianWidth;
+    if (sort == 'descending') {
+      if (dataIndex + 1 == data.length) {
+        medianWidth = shape == 'funnel' ? dataItem.width : dataItem.width / 2;
+      } else {
+        medianWidth = (dataItem.width + data[dataIndex + 1].width) / 2;
+      }
+    } else {
+      if (dataIndex == 0) {
+        medianWidth = shape == 'funnel' ? dataItem.width : dataItem.width / 2;
+      } else {
+        medianWidth = (dataItem.width + data[dataIndex - 1].width) / 2;
+      }
+    }
+
+    if (label.position == 'inside') {
+      if (funnelAlign == 'left') {
+        dataItem.textPoint = { x: pointX + medianWidth / 2, y: pointY + dataItem.height / 2 };
+      } else if (funnelAlign == 'right') {
+        dataItem.textPoint = { x: pointX - medianWidth / 2, y: pointY + dataItem.height / 2 };
+      } else {
+        dataItem.textPoint = { x: pointX + dataItem.width / 2, y: pointY + dataItem.height / 2 };
+      }
+    } else {
+      if (funnelAlign == 'left') {
+        dataItem.textPoint = { x: pointX + medianWidth + label.margin, y: pointY + dataItem.height / 2 };
+      } else if (funnelAlign == 'right') {
+        dataItem.textPoint = { x: pointX - medianWidth - label.margin, y: pointY + dataItem.height / 2 };
+      } else {
+        dataItem.textPoint = { x: pointX + dataItem.width / 2 + medianWidth / 2 + label.margin, y: pointY + dataItem.height / 2 };
+      }
+    }
+
+    if (dataIndex + 1 !== data.length) {
+      if (funnelAlign == 'center') {
+        pointX = pointX + dataItem.width / 2 - data[dataIndex + 1].width / 2;
+        pointY = pointY + dataItem.height + gap;
+      } else {
+        pointY = pointY + dataItem.height + gap;
+      }
+    }
+  });
+
+  chartData.chartFunnel = chartFunnel;
+
+  console.log('complete calChartFunnelData', this.chartData.chartFunnel);
 }
 
 /**
@@ -2573,6 +3060,9 @@ function drawLegend() {
       case 'scatter':
         legendType = 'circle';
         break
+      case 'funnel':
+        legendType = 'rect';
+        break
     }
   }
 
@@ -2590,7 +3080,7 @@ function drawLegend() {
           context.arc(startX + shapeWidth / 2, startY + legendHeightMax / 2, shapeWidth / 2, 0, 2 * Math.PI);
           context.closePath();
 
-          context.fillStyle = legendItem.itemStyle.color;
+          context.fillStyle = legendItem.color;
           context.fill();
           break
         case 'line':
@@ -2601,14 +3091,14 @@ function drawLegend() {
           context.lineTo(startX + lineLength - 2, startY + legendHeightMax / 2);
           context.closePath();
           context.lineWidth = 2;
-          context.strokeStyle = legendItem.itemStyle.color;
+          context.strokeStyle = legendItem.color;
           context.stroke();
 
           context.beginPath();
           context.moveTo(startX + shapeWidth / 2, startY + legendHeightMax / 2);
           context.arc(startX + shapeWidth / 2, startY + legendHeightMax / 2, shapeHeight / 2, 0, 2 * Math.PI);
           context.closePath();
-          context.fillStyle = legendItem.itemStyle.color;
+          context.fillStyle = legendItem.color;
           context.fill();
 
           context.beginPath();
@@ -2616,12 +3106,12 @@ function drawLegend() {
           context.lineTo(startX + shapeWidth, startY + legendHeightMax / 2);
           context.closePath();
           context.lineWidth = 2;
-          context.strokeStyle = legendItem.itemStyle.color;
+          context.strokeStyle = legendItem.color;
           context.stroke();
 
           break
         case 'rect':
-          context.fillStyle = legendItem.itemStyle.color;
+          context.fillStyle = legendItem.color;
           if (shapeHeight >= fontSize) {
             context.fillRect(startX, startY, shapeWidth, shapeHeight);
           } else {
@@ -2745,6 +3235,7 @@ function drawAxisY() {
     if (yAxisNameShow) {
       context.save();
       context.font = `${yAxisNameFontSize}px`;
+      console.log(123, this.opts.yAxis,yAxisName,yAxisNameFontSize);
       context.fillStyle = yAxisNameColor;
       context.textAlign = 'center';
       context.textBaseline = 'bottom';
@@ -3029,130 +3520,112 @@ function drawChartPie(process) {
   let minData = xAxis.type == 'value' ? xMinData : yMinData;
 
   if (xAxis.type == 'category') {
-    chartData.chartBar.forEach(barItemArr => {
-      barItemArr.forEach(barItem => {
-        let { x, y, data, barWidth, barHeight, itemStyle } = barItem;
-        let { color: barItemColor } = itemStyle;
+    chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+      barItemArr.forEach((barItem, barIndex) => {
+        barItem.forEach((seriesItem, seriesIndex) => {
+          let { x, y, data, barWidth, barHeight, itemStyle } = seriesItem;
+          let { color: barItemColor } = itemStyle;
 
-        context.beginPath();
-        context.save();
-        context.fillStyle = barItemColor;
-        if (maxData >= 0 && minData >= 0) {
-          context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
-        } else if (maxData <= 0 && minData <= 0) {
-          context.fillRect(x - barWidth / 2, y, barWidth, barHeight * process);
-        } else {
-          if (data > 0) {
+          context.save();
+          context.fillStyle = barItemColor;
+          if (data >= 0) {
             context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
           } else {
             context.fillRect(x - barWidth / 2, y, barWidth, barHeight * process);
           }
-        }
 
-        context.restore();
-        context.closePath();
+          context.restore();
+        });
       });
     });
 
     if (process == 1) {
-      chartData.chartBar.forEach(barItemArr => {
-        barItemArr.forEach(barItem => {
-          let { show: barItemShow, x, y, barHeight, data, label, itemStyle } = barItem;
-          let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
-          let { color: barItemColor } = itemStyle;
+      chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+        barItemArr.forEach((barItem, barIndex) => {
+          barItem.forEach((seriesItem, seriesIndex) => {
+            let { show: barItemShow, x, y, barWidth, barHeight, data, label, itemStyle } = seriesItem;
+            let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+            let { color: barItemColor } = itemStyle;
 
-          // globalLabel 权重大于 seriesLabel
-          labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
-          labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
-          labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
-          labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+            // globalLabel 权重大于 seriesLabel
+            labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+            labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+            labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+            labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
 
-          if (labelShow && barItemShow) {
-            context.save();
-            context.font = `${labelFontSize}px`;
-            context.fillStyle = labelColor == 'auto' ? barItemColor : labelColor;
-            context.textAlign = 'center';
-            if (maxData >= 0 && minData >= 0) {
-              context.textBaseline = 'bottom';
-              context.fillText(data, x, y - barHeight - labelMargin);
-            } else if (maxData <= 0 && minData <= 0) {
-              context.textBaseline = 'top';
-              context.fillText(data, x, y + barHeight + labelMargin);
-            } else {
-              if (data > 0) {
-                context.textBaseline = 'bottom';
-                context.fillText(data, x, y - barHeight - labelMargin);
+            if (labelShow && barItemShow) {
+              context.save();
+              context.font = `${labelFontSize}px`;
+              context.strokeStyle = labelColor == 'auto' ? barItemColor : labelColor;
+              context.fillStyle = '#ffffff';
+              context.textBaseline = 'middle';
+              context.textAlign = 'center';
+
+              if (data >= 0) {
+                context.strokeText(data, x, y - barHeight / 2);
+                context.fillText(data, x, y - barHeight / 2);
               } else {
-                context.textBaseline = 'top';
-                context.fillText(data, x, y + barHeight + labelMargin);
+                context.strokeText(data, x, y + barHeight / 2);
+                context.fillText(data, x, y + barHeight / 2);
               }
+              context.restore();
             }
-            context.restore();
-          }
+          });
         });
       });
     }
   } else {
-    chartData.chartBar.forEach(barItemArr => {
-      barItemArr.forEach(barItem => {
-        let { x, y, data, barWidth, barHeight, itemStyle } = barItem;
-        let { color: barItemColor } = itemStyle;
+    chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+      barItemArr.forEach((barItem, barIndex) => {
+        barItem.forEach((seriesItem, seriesIndex) => {
+          let { x, y, data, barWidth, barHeight, itemStyle } = seriesItem;
+          let { color: barItemColor } = itemStyle;
 
-        context.beginPath();
-        context.save();
-        context.fillStyle = barItemColor;
-        if (maxData >= 0 && minData >= 0) {
-          context.fillRect(x, y - (barWidth * process) / 2, barHeight, barWidth * process);
-        } else if (maxData <= 0 && minData <= 0) {
-          context.fillRect(x, y - (barWidth * process) / 2, -barHeight, barWidth * process);
-        } else {
+          context.save();
+          context.fillStyle = barItemColor;
+
           if (data > 0) {
             context.fillRect(x, y - (barWidth * process) / 2, barHeight, barWidth * process);
           } else {
             context.fillRect(x, y - (barWidth * process) / 2, -barHeight, barWidth * process);
           }
-        }
-
-        context.restore();
-        context.closePath();
+          context.restore();
+        });
       });
     });
 
     if (process == 1) {
-      chartData.chartBar.forEach(barItemArr => {
-        barItemArr.forEach(barItem => {
-          let { show: barItemShow, x, y, barHeight, data, label, itemStyle } = barItem;
-          let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
-          let { color: barItemColor } = itemStyle;
+      chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+        barItemArr.forEach((barItem, barIndex) => {
+          barItem.forEach((seriesItem, seriesIndex) => {
+            let { show: barItemShow, x, y, barWidth, barHeight, data, label, itemStyle } = seriesItem;
+            let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+            let { color: barItemColor } = itemStyle;
 
-          // globalLabel 权重大于 seriesLabel
-          labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
-          labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
-          labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
-          labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+            // globalLabel 权重大于 seriesLabel
+            labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+            labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+            labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+            labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
 
-          if (labelShow && barItemShow) {
-            context.save();
-            context.font = `${labelFontSize}px`;
-            context.fillStyle = labelColor == 'auto' ? barItemColor : labelColor;
-            context.textBaseline = 'middle';
-            if (maxData >= 0 && minData >= 0) {
-              context.textAlign = 'left';
-              context.fillText(data, x + barHeight + labelMargin, y);
-            } else if (maxData <= 0 && minData <= 0) {
-              context.textAlign = 'right';
-              context.fillText(data, x - barHeight - labelMargin, y);
-            } else {
-              if (data > 0) {
-                context.textAlign = 'left';
-                context.fillText(data, x + barHeight + labelMargin, y);
+            if (labelShow && barItemShow) {
+              context.save();
+              context.font = `${labelFontSize}px`;
+              context.strokeStyle = labelColor == 'auto' ? barItemColor : labelColor;
+              context.fillStyle = '#ffffff';
+              context.textBaseline = 'middle';
+              context.textAlign = 'center';
+
+              if (data >= 0) {
+                context.strokeText(data, x + barHeight / 2, y);
+                context.fillText(data, x + barHeight / 2, y);
               } else {
-                context.textAlign = 'right';
-                context.fillText(data, x - barHeight - labelMargin, y);
+                context.strokeText(data, x - barHeight / 2, y);
+                context.fillText(data, x - barHeight / 2, y);
               }
+              context.restore();
             }
-            context.restore();
-          }
+          });
         });
       });
     }
@@ -3170,13 +3643,73 @@ function drawChartLine(process) {
   let maxData = xAxis.type == 'value' ? xMaxData : yMaxData;
   let minData = xAxis.type == 'value' ? xMinData : yMinData;
 
-  JSON.parse(JSON.stringify(chartData.chartLine)).forEach(lineItem => {
-    let { itemStyle, line, symbol, area, label, smooth } = lineItem;
-    let { color: lineItemColor } = itemStyle;
+  function isNotMiddlePoint(dataArr, i) {
+    if (dataArr[i - 1] && dataArr[i + 1]) {
+      return dataArr[i].y >= Math.max(dataArr[i - 1].y, dataArr[i + 1].y) || dataArr[i].y <= Math.min(dataArr[i - 1].y, dataArr[i + 1].y)
+    } else {
+      return false
+    }
+  }
+
+  function drawLine(line, itemStyle) {
     let { show: lineShow, lineWidth, color: lineColor, opacity: lineOpacity } = line;
-    let { show: symbolShow, type: symbolType, size: symbolSize, color: symbolColor } = symbol;
+    let { color: lineItemColor } = itemStyle;
+
+    if (lineShow) {
+      context.save();
+      context.lineJoin = 'round';
+      context.globalAlpha = lineOpacity;
+      context.lineWidth = lineWidth;
+      context.strokeStyle = lineColor == 'auto' ? lineItemColor : lineColor;
+      context.stroke();
+      context.restore();
+    }
+  }
+
+  function drawArea(area, itemStyle, lineStartX, lineStartY, lineEndX, lineEndY) {
     let { show: areaShow, color: areaColor, opacity: areaOpacity } = area;
+    let { color: lineItemColor } = itemStyle;
+
+    if (areaShow) {
+      if (xAxis.type == 'category') {
+        if (maxData >= 0 && minData >= 0) {
+          context.lineTo(lineEndX, yStart);
+          context.lineTo(lineStartX, yStart);
+        } else if (maxData <= 0 && minData <= 0) {
+          context.lineTo(lineEndX, yEnd);
+          context.lineTo(lineStartX, yEnd);
+        } else {
+          context.lineTo(lineEndX, yZero);
+          context.lineTo(lineStartX, yZero);
+        }
+      } else {
+        if (maxData >= 0 && minData >= 0) {
+          context.lineTo(xStart, lineEndY);
+          context.lineTo(xStart, lineStartY);
+        } else if (maxData <= 0 && minData <= 0) {
+          context.lineTo(xEnd, lineEndY);
+          context.lineTo(xEnd, lineStartY);
+        } else {
+          context.lineTo(xZero, lineEndY);
+          context.lineTo(xZero, lineStartY);
+        }
+      }
+      context.closePath();
+      context.save();
+      context.globalAlpha = areaOpacity;
+      context.fillStyle = areaColor == 'auto' ? lineItemColor : areaColor;
+      context.fill();
+      context.restore();
+    }
+  }
+
+  JSON.parse(JSON.stringify(chartData.chartLine)).forEach(lineItem => {
+    let { itemStyle, line, symbol, area, label, smooth, connectNulls } = lineItem;
+    let { color: lineItemColor } = itemStyle;
+    let { show: symbolShow, type: symbolType, size: symbolSize, color: symbolColor } = symbol;
     let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+
+    let lineStartX, lineStartY, lineEndX, lineEndY;
 
     if (smooth) {
       // process更新y坐标数据
@@ -3210,59 +3743,75 @@ function drawChartLine(process) {
         }
         return dataItem
       });
-      // 计算贝塞尔曲线控制点并绘制路径
-      context.beginPath();
-      lineItem.data.forEach((dataItem, dataIndex, points) => {
-        function isNotMiddlePoint(points, i) {
-          if (points[i - 1] && points[i + 1]) {
-            return points[i].y >= Math.max(points[i - 1].y, points[i + 1].y) || points[i].y <= Math.min(points[i - 1].y, points[i + 1].y)
-          } else {
-            return false
-          }
-        }
+      // 获取有效data
+      lineItem.validData = lineItem.data.filter(dataItem => {
+        return typeof dataItem.data == 'number'
+      });
 
+      // 计算贝塞尔曲线控制点并绘制路径
+      let bezierCurveData = connectNulls ? lineItem.validData : lineItem.data;
+
+      bezierCurveData.forEach((dataItem, dataIndex, dataArr) => {
         const a = 0.2;
         const b = 0.2;
         let pAx = null;
         let pAy = null;
         let pBx = null;
         let pBy = null;
-        let { x, y } = dataItem;
+        let { x, y, data } = dataItem;
 
-        if (dataIndex == 0) {
-          context.moveTo(x, y);
-        } else {
-          let i = dataIndex - 1;
-          if (i < 1) {
-            pAx = points[0].x + (points[1].x - points[0].x) * a;
-            pAy = points[0].y + (points[1].y - points[0].y) * a;
+        if (typeof data == 'number') {
+          if (lineStartX && lineStartY) {
+            let i = dataIndex - 1;
+            if (i < 1) {
+              pAx = dataArr[0].x + (dataArr[1].x - dataArr[0].x) * a;
+              pAy = dataArr[0].y + (dataArr[1].y - dataArr[0].y) * a;
+            } else {
+              pAx = dataArr[i].x + (dataArr[i + 1].x - dataArr[i - 1].x) * a;
+              pAy = dataArr[i].y + (dataArr[i + 1].y - dataArr[i - 1].y) * a;
+            }
+
+            if (i > dataArr.length - 3) {
+              let last = dataArr.length - 1;
+              pBx = dataArr[last].x - (dataArr[last].x - dataArr[last - 1].x) * b;
+              pBy = dataArr[last].y - (dataArr[last].y - dataArr[last - 1].y) * b;
+            } else {
+              pBx = dataArr[i + 1].x - (dataArr[i + 2].x - dataArr[i].x) * b;
+              pBy = dataArr[i + 1].y - (dataArr[i + 2].y - dataArr[i].y) * b;
+            }
+
+            if (isNotMiddlePoint(dataArr, i + 1)) {
+              pBy = dataArr[i + 1].y;
+            }
+            if (isNotMiddlePoint(dataArr, i)) {
+              pAy = dataArr[i].y;
+            }
+
+            context.bezierCurveTo(pAx, pAy, pBx, pBy, x, y);
+
+            lineEndX = x;
+            lineEndY = y;
           } else {
-            pAx = points[i].x + (points[i + 1].x - points[i - 1].x) * a;
-            pAy = points[i].y + (points[i + 1].y - points[i - 1].y) * a;
+            context.beginPath();
+            context.moveTo(x, y);
+            lineStartX = x;
+            lineStartY = y;
           }
+        }
 
-          if (i > points.length - 3) {
-            let last = points.length - 1;
-            pBx = points[last].x - (points[last].x - points[last - 1].x) * b;
-            pBy = points[last].y - (points[last].y - points[last - 1].y) * b;
-          } else {
-            pBx = points[i + 1].x - (points[i + 2].x - points[i].x) * b;
-            pBy = points[i + 1].y - (points[i + 2].y - points[i].y) * b;
+        if ((!connectNulls && typeof data !== 'number') || dataIndex + 1 == dataArr.length) {
+          if (lineEndX && lineEndY) {
+            drawLine(line, itemStyle);
+            drawArea(area, itemStyle, lineStartX, lineStartY, lineEndX, lineEndY);
+            lineEndX = null;
+            lineEndY = null;
           }
-
-          if (isNotMiddlePoint(points, i + 1)) {
-            pBy = points[i + 1].y;
-          }
-          if (isNotMiddlePoint(points, i)) {
-            pAy = points[i].y;
-          }
-
-          context.bezierCurveTo(pAx, pAy, pBx, pBy, x, y);
+          lineStartX = null;
+          lineStartY = null;
         }
       });
     } else {
-      context.beginPath();
-      lineItem.data.forEach((dataItem, dataIndex) => {
+      lineItem.data.forEach((dataItem, dataIndex, dataArr) => {
         let { x, y, height, data } = dataItem;
 
         if (xAxis.type == 'category') {
@@ -3291,63 +3840,42 @@ function drawChartLine(process) {
           }
         }
 
-        if (dataIndex == 0) {
-          context.moveTo(x, y);
-        } else {
-          context.lineTo(x, y);
+        if (typeof data == 'number') {
+          if (lineStartX && lineStartY) {
+            context.lineTo(x, y);
+            lineEndX = x;
+            lineEndY = y;
+          } else {
+            context.beginPath();
+            context.moveTo(x, y);
+            lineStartX = x;
+            lineStartY = y;
+          }
+        }
+
+        if ((!connectNulls && typeof data !== 'number') || dataIndex + 1 == dataArr.length) {
+          if (lineEndX && lineEndY) {
+            drawLine(line, itemStyle);
+            drawArea(area, itemStyle, lineStartX, lineStartY, lineEndX, lineEndY);
+            lineStartX = null;
+            lineStartY = null;
+            lineEndX = null;
+            lineEndY = null;
+          }
         }
       });
     }
 
-    if (lineShow) {
-      context.save();
-      context.lineJoin = 'round';
-      context.globalAlpha = lineOpacity;
-      context.lineWidth = lineWidth;
-      context.strokeStyle = lineColor == 'auto' ? lineItemColor : lineColor;
-      context.stroke();
-      context.restore();
-    }
-
-    if (areaShow) {
-      if (xAxis.type == 'category') {
-        if (maxData >= 0 && minData >= 0) {
-          context.lineTo(lineItem.data[lineItem.data.length - 1].x, yStart);
-          context.lineTo(lineItem.data[0].x, yStart);
-        } else if (maxData <= 0 && minData <= 0) {
-          context.lineTo(lineItem.data[lineItem.data.length - 1].x, yEnd);
-          context.lineTo(lineItem.data[0].x, yEnd);
-        } else {
-          context.lineTo(lineItem.data[lineItem.data.length - 1].x, yZero);
-          context.lineTo(lineItem.data[0].x, yZero);
-        }
-      } else {
-        if (maxData >= 0 && minData >= 0) {
-          context.lineTo(xStart, lineItem.data[lineItem.data.length - 1].y);
-          context.lineTo(xStart, lineItem.data[0].y);
-        } else if (maxData <= 0 && minData <= 0) {
-          context.lineTo(xEnd, lineItem.data[lineItem.data.length - 1].y);
-          context.lineTo(xEnd, lineItem.data[0].y);
-        } else {
-          context.lineTo(xZero, lineItem.data[lineItem.data.length - 1].y);
-          context.lineTo(xZero, lineItem.data[0].y);
-        }
-      }
-      context.closePath();
-      context.save();
-      context.globalAlpha = areaOpacity;
-      context.fillStyle = areaColor == 'auto' ? lineItemColor : areaColor;
-      context.fill();
-      context.restore();
-    }
-
     if (process == 1) {
       if (symbolShow) {
-        switch (symbolType) {
-          case 'circle':
-            context.save();
-            lineItem.data.forEach(dataItem => {
-              let { x, y } = dataItem;
+        context.save();
+        lineItem.data.forEach(dataItem => {
+          let { x, y, data } = dataItem;
+
+          if (typeof data !== 'number') return
+
+          switch (symbolType) {
+            case 'circle':
               context.beginPath();
               context.arc(x, y, symbolSize / 2, 0, 2 * Math.PI);
               context.fillStyle = symbolColor == 'auto' ? lineItemColor : symbolColor;
@@ -3357,10 +3885,10 @@ function drawChartLine(process) {
               context.arc(x, y, symbolSize / 4, 0, 2 * Math.PI);
               context.fillStyle = '#fff';
               context.fill();
-            });
-            context.restore();
-            break
-        }
+              break
+          }
+        });
+        context.restore();
       }
 
       // globalLabel 权重大于 seriesLabel
@@ -3377,6 +3905,8 @@ function drawChartLine(process) {
 
         lineItem.data.forEach(dataItem => {
           let { x, y, data } = dataItem;
+
+          if (typeof data !== 'number') return
 
           if (xAxis.type == 'category') {
             if (maxData >= 0 && minData >= 0) {
@@ -3624,24 +4154,26 @@ function drawChartScatter(process) {
   let { context, opts, chartData } = this;
   let { label: globalLabel } = opts;
 
-  chartData.chartScatter.forEach(ScatterItem => {
-    let { data, label, itemStyle, opacity, radius } = ScatterItem;
+  chartData.chartScatter.forEach(scatterItem => {
+    let { name: scatterItemName, data, label, itemStyle, opacity, lineWidth, strokeColor } = scatterItem;
     let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
-    let { color: ScatterItemColor } = itemStyle;
-    radius = radius * process;
+    let { color: scatterItemColor } = itemStyle;
 
-    context.save();
-    context.beginPath();
     data.forEach(dataItem => {
-      let { positionX, positionY } = dataItem;
-
-      context.moveTo(positionX, positionY);
-      context.arc(positionX, positionY, radius, 0, Math.PI * 2);
+      let { positionX, positionY, radius, color: dataItemColor } = dataItem;
+      context.save();
+      context.beginPath();
+      context.arc(positionX, positionY, radius * process, 0, Math.PI * 2);
+      if (lineWidth > 0) {
+        context.strokeStyle = strokeColor == 'auto' ? dataItemColor : strokeColor;
+        context.lineWidth = 0;
+        context.stroke();
+      }
+      context.fillStyle = dataItemColor;
+      context.globalAlpha = opacity;
+      context.fill();
+      context.restore();
     });
-    context.fillStyle = ScatterItemColor;
-    context.globalAlpha = opacity;
-    context.fill();
-    context.restore();
 
     if (process == 1) {
       // globalLabel 权重大于 seriesLabel
@@ -3653,16 +4185,21 @@ function drawChartScatter(process) {
       if (labelShow) {
         context.save();
         context.font = `${labelFontSize}px`;
-        context.strokeStyle = labelColor == 'auto' ? ScatterItemColor : labelColor;
-        context.fillStyle = '#ffffff';
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
+        context.fillStyle = labelColor == 'auto' ? scatterItemColor : labelColor;
 
         data.forEach(dataItem => {
-          let { y, positionX, positionY } = dataItem;
+          let { y, z, radius, name, positionX, positionY } = dataItem;
+          let text = name ? name : z ? z : scatterItemName;
 
-          context.strokeText(y, positionX, positionY);
-          context.fillText(y, positionX, positionY);
+          if (typeof scatterItemColor !== 'string') {
+            context.textAlign = 'center';
+            context.textBaseline = 'bottom';
+            context.fillText(text, positionX, positionY - radius - labelMargin);
+          } else {
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(text, positionX, positionY);
+          }
         });
         context.restore();
       }
@@ -3670,6 +4207,80 @@ function drawChartScatter(process) {
   });
 
   console.log('complete drawChartScatter', process);
+}
+
+function drawChartPie$2(process) {
+  let { context, opts, chartData } = this;
+  let { data, funnelAlign, itemStyle, label: seriesLabel } = chartData.chartFunnel;
+  let { borderColor, borderWidth } = itemStyle;
+
+  data.forEach(dataItem => {
+    let { point, itemStyle: dataItemStyle } = dataItem;
+    let { color: dataItemColor } = dataItemStyle;
+
+    context.beginPath();
+    point.forEach((pointItem, pointIndex) => {
+      let { x, y } = pointItem;
+      if (pointIndex == 0) {
+        context.moveTo(x, y * process);
+      } else {
+        context.lineTo(x, y * process);
+      }
+    });
+    context.closePath();
+
+    if (borderWidth > 0) {
+      context.strokeStyle = borderColor;
+      context.lineWidth = borderWidth;
+      context.stroke();
+    }
+    context.fillStyle = dataItemColor;
+    context.fill();
+  });
+
+  // 绘制文本标签
+  if (process == 1) {
+    let { label: globalLabel } = opts;
+    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin, position: labelPosition } = seriesLabel;
+    // globalLabel 权重大于 seriesLabel
+    labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+    labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+    labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+    labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+
+    if (labelShow) {
+      context.save();
+      data.forEach(dataItem => {
+        let { name, itemStyle: dataItemStyle, textPoint } = dataItem;
+        let { x, y } = textPoint;
+
+        if (labelPosition == 'inside') {
+          context.textAlign = 'center';
+          context.textBaseline = 'middle';
+          context.font = `${labelFontSize}px`;
+          context.strokeStyle = dataItemStyle.color;
+          context.fillStyle = '#ffffff';
+          context.strokeText(name, x, y);
+          context.fillText(name, x, y);
+        } else {
+          if (funnelAlign == 'right') {
+            // 右对齐
+            context.textAlign = 'right';
+          } else {
+            // 左对齐 左右对称
+            context.textAlign = 'left';
+          }
+          context.textBaseline = 'middle';
+          context.font = `${labelFontSize}px`;
+          context.fillStyle = labelColor == 'auto' ? dataItemStyle.color : labelColor;
+          context.fillText(name, x, y);
+        }
+      });
+      context.restore();
+    }
+  }
+
+  console.log('complete drawChartFunnel', process);
 }
 
 function drawCharts() {
@@ -3750,6 +4361,18 @@ function drawCharts() {
         }
       };
       break
+    case 'funnel':
+      calChartPieData$1.call(this);
+
+      onProcessFn = process => {
+        drawBackground.call(this);
+        drawChartPie$2.call(this, process);
+
+        if (process == 1) {
+          drawLegend.call(this);
+        }
+      };
+      break
   }
 
   this.animationInstance = new Animation({
@@ -3783,16 +4406,20 @@ class Charts {
   }
 
   updateData(data = {}) {
-    let { opts, config } = this;
-
-    Object.keys(data).forEach(dataKey => {
-      if (dataKey == 'series') {
-        opts.series = JSON.parse(JSON.stringify(data.series));
-        calSeries.call(this);
-      } else {
-        replenishData(dataKey, data, opts, true);
-      }
-    });
+    if (this.opts.type == 'pie' || this.opts.type == 'funnel') {
+      Object.keys(data).forEach(dataKey => {
+        replenishData(dataKey, data, this.opts, true);
+      });
+    } else {
+      Object.keys(data).forEach(dataKey => {
+        if (dataKey == 'series') {
+          this.opts.series = JSON.parse(JSON.stringify(data.series));
+          calSeries.call(this);
+        } else {
+          replenishData(dataKey, data, this.opts, true);
+        }
+      });
+    }
 
     console.log('complete updateData', this);
 
