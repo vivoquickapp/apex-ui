@@ -1,7 +1,7 @@
 <import name="my-icon" src="../icon/index"></import>
 <template>
-  <div class="apex-dialog" if="{{visible}}">
-    <div class="mask {{showModal?'mask-exist':'mask-none'}}">
+  <div class="apex-dialog">
+    <div class="mask {{showModal?'mask-exist':'mask-none'}}" if="{{visible}}">
       <div class="dialog" style="{{setDialog}}">
         <div class="box">
           <div class="top">
