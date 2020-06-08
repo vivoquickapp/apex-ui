@@ -9,10 +9,10 @@
     ></div>
     <block for="{{(index, button) in buttons }}">
       <div
-        class="fab-button-button-wrap fab-button-button-{{position}} {{buttonStyle[index]}}"
+        class="fab-button-button-wrap fab-button-{{position}} {{buttonStyle[index]}}"
       >
         <my-button
-          class="fab-button-button {{ button.disabled ? 'fab-button-button-disabled': ''}}"
+          class="fab-button-button fab-button-{{theme}} {{ button.disabled ? 'fab-button-button-disabled': ''}}"
           onclick="handleButtonClick(button)"
           icon="{{button.icon}}"
           disabled="{{button.disabled}}"
@@ -207,6 +207,7 @@ export default {
 @dark: #444;
 
 .fab-button(@theme, @color) {
+  &-@{theme},
   &-@{theme} &-action,
   &-@{theme} &-button {
     background-color: @color;
@@ -267,6 +268,7 @@ export default {
   &-button {
     width: 80px * @ratio;
     height: 80px * @ratio;
+    margin: 10px;
     background-color: @balanced;
     border-radius: 120px * @ratio;
     align-items: center;
@@ -285,31 +287,6 @@ export default {
     &-wrap {
       position: fixed;
       align-items: center;
-    }
-
-    &-center {
-      left: 330px * @ratio;
-      top: 610px * @ratio;
-    }
-
-    &-topLeft {
-      left: 25px * @ratio;
-      top: 25px * @ratio;
-    }
-
-    &-topRight {
-      right: 25px * @ratio;
-      top: 25px * @ratio;
-    }
-
-    &-bottomLeft {
-      left: 25px * @ratio;
-      bottom: 25px * @ratio;
-    }
-
-    &-bottomRight {
-      right: 25px * @ratio;
-      bottom: 25px * @ratio;
     }
   }
 

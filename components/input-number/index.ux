@@ -2,7 +2,6 @@
   <div class="apex-input-number">
     <text
       class="apex-input-number-minus {{ my_value <= my_min ? 'apex-input-number-disabled' : '' }}"
-      data-disabled="{{ my_value <= my_min }}"
       onclick="handleMinus"
       if="{{ !positive || my_value > 0 }}"
       >-
@@ -17,7 +16,6 @@
     />
     <text
       class="apex-input-number-plus {{ my_value >= my_max ? 'apex-input-number-disabled' : '' }}"
-      data-disabled="{{ my_value >= my_max }}"
       onclick="handlePlus"
       >+
     </text>
@@ -97,44 +95,38 @@ export default {
     };
   },
 
-  handleChangeStep(e, type) {
-    const { dataset = {} } = e.target;
-    const { disabled } = dataset;
-    const { my_step } = this._data;
-    let { my_value } = this._data;
-    const { my_min, my_max } = this._data;
-
-    if (disabled) return null;
-
+  handleChangeStep(type) {
+    let disabled = false;
+    if (this.my_value <= this.my_min && type === "minus") {
+      disabled = true;
+    } else if (this.my_value >= this.my_max && type === "plus") {
+      disabled = true;
+    }
+    if (disabled) return;
     if (type === "minus") {
-      my_value = addNum(my_value, -my_step);
+      this.my_value = addNum(this.my_value, -this.my_step);
     } else if (type === "plus") {
-      my_value = addNum(my_value, my_step);
+      this.my_value = addNum(this.my_value, this.my_step);
     }
-
-    if (my_value > my_max) {
-      my_value = my_max;
-    } else if (my_value < my_min) {
-      my_value = my_min;
+    if (this.my_value > this.my_max) {
+      this.my_value = this.my_max;
+    } else if (this.my_value < this.my_min) {
+      this.my_value = this.my_min;
     }
-
-    this.my_value = my_value;
-
-    this.handleEmit(my_value, type);
+    this.handleEmit(this.my_value, type);
   },
 
   handleMinus(e) {
-    this.handleChangeStep(e, "minus");
+    this.handleChangeStep("minus");
   },
 
   handlePlus(e) {
-    this.handleChangeStep(e, "plus");
+    this.handleChangeStep("plus");
   },
 
   handleChange(e) {
-    let value = parseFloat(e.target.value);
-    const { my_min, my_max } = this._data;
-
+    let value = e.value;
+    const { my_min, my_max } = this;
     if (value > my_max) {
       value = my_max;
     } else if (value < my_min) {

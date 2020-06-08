@@ -1,0 +1,356 @@
+<import name="my-icon" src="../icon/index"></import>
+
+<template>
+  <stack>
+    <div show="{{isShow}}" class="mask" onclick="clickMask"></div>
+    <div show="{{isShow}}" class="cascader">
+      <text class="title">所在地区</text>
+      <div class="checked-wrap">
+        <block for="checked">
+          <text onclick="clickText($idx)">{{ $item }}</text>
+        </block>
+      </div>
+      <div>
+        <list id="province" class="province {{animotion1}}" style="{{style1}}">
+          <block for="province">
+            <list-item
+              class="item"
+              type="province"
+              onclick="chooseProvince($item)"
+            >
+              <text
+                class="content"
+                style="color: {{$item.value === currentProvince.value ? '#ff2828' : '666666'}};"
+                >{{ $item.label }}</text
+              >
+              <div show="{{$item.value === currentProvince.value}}">
+                <my-icon color="#ff2828" size="40" type="checkmark"></my-icon>
+              </div>
+            </list-item>
+          </block>
+        </list>
+        <list id="city" class="city" if="{{level > 1}}">
+          <block for="citys">
+            <list-item class="item" type="city" onclick="choseCity($item)">
+              <text
+                class="content"
+                style="color: {{$item.value === currentCity.value ? '#ff2828' : '666666'}};"
+                >{{ $item.label }}</text
+              >
+              <div show="{{$item.value === currentCity.value}}">
+                <my-icon color="#ff2828" size="40" type="checkmark"></my-icon>
+              </div>
+            </list-item>
+          </block>
+        </list>
+        <list
+          id="area"
+          class="area {{animotion2}}"
+          if="{{level > 2}}"
+          style="{{style2}}"
+        >
+          <block for="areas">
+            <list-item class="item" type="area" onclick="choseArea($item)">
+              <text
+                class="content"
+                style="color: {{$item.value === currentArea.value ? '#ff2828' : '666666'}};"
+                >{{ $item.label }}</text
+              >
+              <div show="{{$item.value === currentArea.value}}">
+                <my-icon color="#ff2828" size="40" type="checkmark"></my-icon>
+              </div>
+            </list-item>
+          </block>
+        </list>
+      </div>
+    </div>
+  </stack>
+</template>
+
+<script>
+import data from "./data.js";
+
+export default {
+  data: {
+    isShow: false,
+    checked: [],
+    currentProvince: {},
+    currentCity: {},
+    currentArea: {},
+    province: data,
+    citys: [],
+    areas: [],
+    animotion1: "",
+    animotion2: "",
+    style1: "",
+    style2: ""
+  },
+
+  props: {
+    level: {
+      type: Number,
+      default: 3 //1.province 2.city 3.area
+    },
+    default: {
+      type: Object,
+      default: {}
+    }
+  },
+
+  onInit() {
+    this.checked = [];
+    if (this.default.province) {
+      this.currentProvince = this.default.province;
+      this.checked.push(this.currentProvince.label);
+      if (this.level > 1) {
+        const index = this.province.findIndex(
+          item => item.value === this.currentProvince.value
+        );
+        this.citys = this.province[index].children;
+      }
+    }
+    if (this.default.city && this.level > 1) {
+      this.currentCity = this.default.city;
+      this.checked.push(this.currentCity.label);
+      if (this.level > 2) {
+        const index = this.citys.findIndex(
+          item => item.value === this.currentCity.value
+        );
+        this.areas = this.citys[index].children;
+      }
+    }
+    if (this.default.area && this.level > 2) {
+      this.currentArea = this.default.area;
+      this.checked.push(this.currentArea.label);
+    }
+    if (this.checked.length < this.level) {
+      this.checked.push("请选择");
+    }
+    if (this.level === 1) {
+      this.style1 = "width: 100%;";
+    }
+    if (!!this.currentCity.value && this.level === 3) {
+      this.style1 = "width: 0;";
+      this.style2 = "width: 50%;";
+    }
+  },
+
+  clickText(idx) {
+    if (this.level === 3) {
+      if ((idx === 0 || idx === 1) && this.animotion1 !== "to-widen") {
+        this.animotion1 = "to-widen";
+        this.animotion2 = "to-narrow";
+      } else if (idx === 2 && this.animotion2 !== "to-widen") {
+        this.animotion1 = "to-narrow";
+        this.animotion2 = "to-widen";
+      }
+    }
+  },
+
+  clickMask() {
+    this.isShow = false;
+  },
+
+  chooseProvince(item) {
+    if (!!item) {
+      this.currentProvince = {
+        label: item.label,
+        value: item.value
+      };
+      this.checked = [];
+      this.checked.push(this.currentProvince.label);
+      if (this.checked.length < this.level) {
+        this.checked.push("请选择");
+      }
+      if (this.level === 1) {
+        this.emitEvent();
+      } else if (this.level > 1) {
+        const index = this.province.findIndex(
+          item => item.value === this.currentProvince.value
+        );
+        this.citys = this.province[index].children;
+      }
+    }
+  },
+
+  choseCity(item) {
+    if (!!item) {
+      this.currentCity = {
+        label: item.label,
+        value: item.value
+      };
+      while (this.checked.length > 1) {
+        this.checked.pop();
+      }
+      this.checked.push(this.currentCity.label);
+      if (this.checked.length < this.level) {
+        this.checked.push("请选择");
+      }
+      if (this.level === 2) {
+        this.emitEvent();
+      } else if (this.level > 2) {
+        //这三个市没有区
+        if (
+          this.currentCity.label === "东莞市" ||
+          this.currentCity.label === "中山市" ||
+          this.currentCity.label === "儋州市"
+        ) {
+          this.currentArea = {};
+          this.emitEvent();
+        } else {
+          const index = this.citys.findIndex(
+            item => item.value === this.currentCity.value
+          );
+          const areas = this.citys[index].children;
+          //过滤市辖区
+          const filterIndex = areas.findIndex(item => item.label === "市辖区");
+          if (filterIndex !== -1) {
+            areas.splice(filterIndex, 1);
+          }
+          this.areas = areas;
+          this.animotion1 = "to-narrow";
+          this.animotion2 = "to-widen";
+        }
+      }
+    }
+  },
+
+  choseArea(item) {
+    if (!!item) {
+      this.currentArea = {
+        label: item.label,
+        value: item.value
+      };
+      this.checked.pop();
+      this.checked.push(this.currentArea.label);
+      this.emitEvent();
+    }
+  },
+
+  show() {
+    this.isShow = true;
+    if (!!this.currentProvince.value) {
+      const index = this.province.findIndex(
+        item => item.value === this.currentProvince.value
+      );
+      this.$element("province").scrollTo({ index });
+    }
+    if (!!this.currentCity.value) {
+      const index = this.citys.findIndex(
+        item => item.value === this.currentCity.value
+      );
+      this.$element("city").scrollTo({ index });
+    }
+    if (!!this.currentArea.value) {
+      const index = this.areas.findIndex(
+        item => item.value === this.currentArea.value
+      );
+      this.$element("area").scrollTo({ index });
+    }
+  },
+
+  emitEvent() {
+    this.$emit("cascader", {
+      province: this.currentProvince,
+      city: this.currentCity,
+      area: this.currentArea
+    });
+    this.isShow = false;
+  }
+};
+</script>
+
+<style lang="less">
+@import "../styles/base.less";
+
+.mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.item {
+  height: 80px;
+  margin: 0 40px;
+  border-bottom: 1px * @ratio solid #dddddd;
+  justify-content: space-between;
+  .content {
+    font-size: 25px * @ratio;
+  }
+}
+
+.cascader {
+  width: 100%;
+  height: 40%;
+  position: fixed;
+  bottom: 0;
+  background-color: #eeeeee;
+  flex-direction: column;
+  .title {
+    width: 100%;
+    height: 80px * @ratio;
+    text-align: center;
+    font-size: 35px * @ratio;
+    color: #666666;
+    border-bottom: 1px * @ratio solid #dddddd;
+  }
+  .checked-wrap {
+    width: 100%;
+    height: 80px * @ratio;
+    border-bottom: 1px * @ratio solid #dddddd;
+    text {
+      font-size: 25px * @ratio;
+      color: #ff2828;
+      padding-left: 40px * @ratio;
+    }
+  }
+  .province {
+    width: 50%;
+    height: 100%;
+  }
+  .city {
+    width: 50%;
+    height: 100%;
+    background-color: #dddddd;
+  }
+  .area {
+    width: 0;
+    height: 100%;
+  }
+}
+
+.to-narrow {
+  animation-name: narrow;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+.to-widen {
+  animation-name: widen;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes narrow {
+  from {
+    width: 375px * @ratio;
+  }
+  to {
+    width: 0;
+  }
+}
+
+@keyframes widen {
+  from {
+    width: 0;
+  }
+  to {
+    width: 375px * @ratio;
+  }
+}
+</style>

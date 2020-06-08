@@ -2,11 +2,12 @@
 <import name="my-icon" src="../icon/index"></import>
 
 <template>
-  <div class="wrap {{isVisible?'show':isAnimationEnd?'hide':''}}">
+  <div class="wrap {{isAnimationEnd?'hide':'show'}}" style="z-index: {{zIndex}}">
     <my-mask id="mask" z-index="{{zIndex}}" onclick="handleClickMask"></my-mask>
 
     <div
-      class="popup {{`popup-${position}`}} {{isAnimationEnd?'hide':animationClass()}}"
+      class="popup {{`popup-${position}`}} {{animationClass()}}"
+      style="background-color: {{background}}; z-index: {{zIndex}}"
     >
       <div class="popup-header" show="{{hasHeader}}">
         <text class="popup-header-text" if="{{title}}">{{ title }}</text>
@@ -41,15 +42,14 @@
   align-items: center;
   justify-content: center;
 
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   .popup {
     flex-direction: column;
-    background-color: #fff;
-
+    position: relative;
     animation-duration: 200ms;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
@@ -127,6 +127,9 @@
 <script>
 export default {
   props: {
+    background: {
+      default: "#ffffff"
+    },
     title: {
       default: ""
     },
