@@ -1,11 +1,19 @@
+<import name="my-icon" src="../icon/index.ux"></import>
 <template>
   <div class="apex-class">
     <div
       class=" apex-message  {{ visible ? 'apex-message-show' : 'apex-message-hide' }}"
       style="background-color:{{!!bgColor ? bgColor : typeColor[type]}}"
-      if="{{visible}}"
+      show="{{visible}}"
     >
-      <text>{{ content }}</text>
+      <div class="apex-message-content">
+        <marquee if="{{enableScroll && useMarquee}}" id="marquee" value="{{content}}" scrollamount=30>{{ content }}</marquee>
+        <text else class="{{ visible && enableScroll ? 'apex-message-scroll' : '' }}">{{ content }}</text>
+      </div>
+      <div if="{{showClose}}" class="apex-message-close" @click="handleClose">
+        <my-icon color="#ffffff" type="close" size="38"></my-icon>
+      </div>
+      
     </div>
   </div>
 </template>
@@ -23,17 +31,28 @@
 .apex-message {
   width: 100%;
   justify-content: center;
+  align-items: center;
   background-color: @primary-color;
   height: 60px * @ratio;
   opacity: 1;
 
-  text {
-    color: #fff;
-    text-align: center;
-    font-size: @size-font-small;
-    lines: 1;
-    padding: 0 20px * @ratio;
-    text-overflow: ellipsis;
+  &-content {
+    margin: 0 20px * @ratio;
+
+    text, marquee {
+      width: 100%;
+      color: #fff;
+      text-align: center;
+      font-size: @size-font-small;
+      lines: 1;
+      /* padding: 0 20px * @ratio; */
+      text-overflow: ellipsis;
+    }
+  }
+
+  &-close {
+    width: 36px;
+    margin-right: 20px;
   }
 
   &-show {
@@ -43,6 +62,12 @@
   &-hide {
     animation-name: hide;
     animation-duration: 500ms;
+  }
+  &-scroll {
+    animation-name: scroll;
+    animation-duration: 8000ms;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
   }
 }
 
@@ -67,17 +92,28 @@
     opacity: 0;
   }
 }
+
+@keyframes scroll {
+  from {
+    transform: translateX(750px * @ratio);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
 </style>
 <script>
+import device from '@system.device'
 const defaultData = {
   visible: false,
   content: "",
   duration: 2,
   type: "default", // default || success || warning || error
-  bgColor: ""
+  bgColor: "",
+  showClose: false,
+  enableScroll: true
 };
 let timmer = null;
-
 export default {
   data() {
     return {
@@ -91,17 +127,33 @@ export default {
         success: "#19be6b",
         warning: "#ff9900",
         error: "#ed3f14"
-      }
+      },
+      useMarquee: false,
+      showClose: false,
+      enableScroll: true
     };
   },
-
+  onInit() {
+    this.$watch('visible', 'visibleChange')
+  },
+  onReady() {
+    device.getInfo({
+      success: (ret) => {
+        // 当启动滚动且版本号大于1050时文字显示使用marquee组件，对文字长度不会有限制
+        if (ret.platformVersionCode > 1050) {
+          this.useMarquee = true
+        }
+      }
+    })
+  },
   showMessage(options) {
-    const { type = "default", duration = 2, bgColor = "" } = options;
+    const { type = "default", duration = 2, bgColor = "", enableScroll = false } = options;
     Object.assign(this._data, {
       ...options,
       type: type,
       duration: duration,
-      visible: true
+      visible: true,
+      enableScroll: enableScroll
     });
     console.log(this.bgColor);
     this.bgColor = bgColor;
@@ -120,6 +172,17 @@ export default {
     Object.assign(this._data, {
       ...defaultData
     });
+  },
+
+  handleClose() {
+    this.hideMessage();
+  },
+
+  visibleChange(newVal) {
+    if (this.useMarquee && this.enableScroll) {
+      newVal ? this.$element('marquee').start() : this.$element('marquee').stop();
+    }
+    
   }
 };
 </script>
