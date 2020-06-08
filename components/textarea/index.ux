@@ -21,7 +21,6 @@
           disabled="{{ disabled }}"
           maxlength="{{ maxlength }}"
           onchange="onChange"
-          onfocus="onFocus"
           >{{ inputValue }}</textarea
         >
       </div>
@@ -112,19 +111,10 @@ export default {
     }
   },
 
-  onInit() {
-    setTimeout(() => {
-      if (this.focus) {
-        const apexTextArea = this.$element("apex-textarea");
-        apexTextArea.focus();
-      }
-    }, 0);
-  },
-
-  onFocus() {
-    console.log("onfocus");
-    const apexTextArea = this.$element("apex-textarea");
-    apexTextArea.select();
+  onReady() {
+    const focus = this.focus.toString() === "true";
+    if (!focus) return;
+    this.$element("apex-textarea").focus({ focus: focus });
   },
 
   onClear() {

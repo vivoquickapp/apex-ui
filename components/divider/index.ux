@@ -3,12 +3,16 @@
     <div class="apex-divider-line" style="background-color:{{lineColor}}"></div>
     <text
       class="apex-divider-content"
-      style="color:{{color}};font-size:{{size}}px"
+      style="color:{{color}};font-size:{{size}}px;background-color:{{bgColor}};"
       if="{{content !== ''}}"
     >
       {{ content }}
     </text>
-    <div class="apex-divider-content" else>
+    <div
+      class="apex-divider-content"
+      style="background-color:{{bgColor}};"
+      else
+    >
       <slot></slot>
     </div>
   </stack>
@@ -31,7 +35,6 @@
     background-color: @background-color-base;
   }
   &-content {
-    background-color: #ffffff;
     padding: 0 10px * @ratio;
   }
 }
@@ -51,6 +54,10 @@ export default {
     color: {
       type: String,
       default: "#80848f"
+    },
+    bgColor: {
+      type: String,
+      default: "#ffffff"
     },
     lineColor: {
       type: String,

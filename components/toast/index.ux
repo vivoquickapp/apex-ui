@@ -1,62 +1,64 @@
 <import name="my-icon" src="../icon/index.ux"></import>
 <template>
-  <div class="{{visible ? 'wrap': ''}}">
-    <div
-      class="apex-toast-mask"
-      if="{{ visible && mask }}"
-      onclick="hideToast"
-    ></div>
-    <div class="apex-class apex-toast" if="{{ visible }}">
-      <block if="{{ type !== 'default' }}">
-        <div class="apex-toast-type">
-          <my-icon
-            color="#ffffff"
-            type="information-circle-outline"
-            if="{{ type === 'info' }}"
-            size="80"
-          ></my-icon>
-          <my-icon
-            color="#ffffff"
-            type="checkmark-circle-outline"
-            if="{{ type === 'success' }}"
-            size="80"
-          ></my-icon>
-          <my-icon
-            color="#ffffff"
-            type="warning"
-            if="{{ type === 'warning' }}"
-            size="80"
-          ></my-icon>
-          <my-icon
-            color="#ffffff"
-            type="close-circle-outline"
-            if="{{ type === 'error' }}"
-            size="80"
-          ></my-icon>
-          <progress
-            class="loading"
-            type="circular"
-            if="{{ type === 'loading' }}"
-          ></progress>
-        </div>
-      </block>
-      <block else>
-        <div class="custom-icon" if="{{ icon }}">
-          <my-icon
-            color="#ffffff"
-            apex-class="apex-toast-icon"
-            type="{{ icon }}"
-            if="{{ icon }}"
-            size="80"
-          ></my-icon>
-        </div>
-        <image
-          class="apex-toast-image"
-          src="{{ image }}"
-          if="{{ image }}"
-        ></image>
-      </block>
-      <text class="apex-toast-content" if="{{ content }}">{{ content }}</text>
+  <div>
+    <div class="wrap" if="{{visible}}">
+      <div
+        class="apex-toast-mask"
+        if="{{ visible && mask }}"
+        onclick="hideToast"
+      ></div>
+      <div class="apex-class apex-toast" if="{{ visible }}">
+        <block if="{{ type !== 'default' }}">
+          <div class="apex-toast-type">
+            <my-icon
+              color="#ffffff"
+              type="information-circle-outline"
+              if="{{ type === 'info' }}"
+              size="80"
+            ></my-icon>
+            <my-icon
+              color="#ffffff"
+              type="checkmark-circle-outline"
+              if="{{ type === 'success' }}"
+              size="80"
+            ></my-icon>
+            <my-icon
+              color="#ffffff"
+              type="warning"
+              if="{{ type === 'warning' }}"
+              size="80"
+            ></my-icon>
+            <my-icon
+              color="#ffffff"
+              type="close-circle-outline"
+              if="{{ type === 'error' }}"
+              size="80"
+            ></my-icon>
+            <progress
+              class="loading"
+              type="circular"
+              if="{{ type === 'loading' }}"
+            ></progress>
+          </div>
+        </block>
+        <block else>
+          <div class="custom-icon" if="{{ icon }}">
+            <my-icon
+              color="#ffffff"
+              apex-class="apex-toast-icon"
+              type="{{ icon }}"
+              if="{{ icon }}"
+              size="80"
+            ></my-icon>
+          </div>
+          <image
+            class="apex-toast-image"
+            src="{{ image }}"
+            if="{{ image }}"
+          ></image>
+        </block>
+        <text class="apex-toast-content" if="{{ content }}">{{ content }}</text>
+      </div>
     </div>
   </div>
 </template>
@@ -69,6 +71,7 @@
   width: 100%;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .apex-toast {
@@ -76,7 +79,6 @@
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.7);
-  margin: 0 auto;
   padding: 10px * @ratio 18px * @ratio;
   border-radius: 8px * @ratio;
 
