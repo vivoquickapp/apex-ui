@@ -20,7 +20,7 @@ class Event {
    * @param {String} type
    * @param {String} listener
    */
-  addEventListener(type, listener = function() {}) {
+  addEventListener(type, listener = function () {}) {
     this.events[type] = this.events[type] || [];
     this.events[type].push(listener);
   }
@@ -43,10 +43,14 @@ class Event {
   }
 }
 
+/**
+ * 默认参数配置
+ */
+
 var Config = {
   animation: true,
   animationDuration: 1000,
-  animationTiming: 'default', // default, easeIn, easeOut, easeInOut, linear
+  animationTiming: 'easeInOut', // easeIn, easeOut, easeInOut, linear
   backgroundColor: '#ffffff',
   colors: ['#7cb5ec', '#f7a35c', '#434348', '#90ed7d', '#f15c80', '#8085e9'], // wxcharts调色盘
   label: {
@@ -57,10 +61,11 @@ var Config = {
   },
   legend: {
     show: true,
-    type: 'default', // default, circle, line, rect
-    marginTop: 8,
+    type: 'default', // default, rect, circle, line
+    marginTop: 15,
     itemGap: 15,
-    shapeWidth: 15,
+    shapeRadius: 7.5,
+    shapeWidth: 30,
     shapeHeight: 15,
     textStyle: {
       fontSize: 15,
@@ -69,135 +74,148 @@ var Config = {
     },
   },
   padding: [20, 20, 20, 20],
-  bar: {
-    barMaxWidth: 20,
-    barMinWidth: 1,
-    barWidth: 'auto',
-    barGap: 5,
-  },
-  pie: {
-    center: ['50%', '50%'],
-    radius: [0, '80%'],
-    offsetAngle: 0,
-    disablePieStroke: true,
-    labelLine: {
-      lineDotRadius: 3,
-      lineWidth: 1,
-      length1: 25,
-      length2: 15,
-    },
-  },
-  scatter: {
-    radius: 10,
-    opacity: 1,
-    lineWidth: 0,
-    strokeColor: 'auto',
-  },
-  funnel: {
-    width: 'auto',
-    height: 'auto',
-    top: '0%',
-    left: '0%',
-    right: '0%',
-    bottom: '0%',
-    max: 100,
-    min: 0,
-    gap: 5,
-    shape: 'funnel', // funnel, pyramid
-    sort: 'descending', // descending, ascending
-    funnelAlign: 'center', // left, center, right
-    label: {
-      position: 'inside', // inside, outside
-    },
-    itemStyle: {
-      borderColor: '#ffffff',
-      borderWidth: 1,
-    },
-  },
-  line: {
-    smooth: false,
-    connectNulls: false,
-    line: {
-      show: true,
-      lineWidth: 2,
-      color: 'auto',
-      opacity: 1,
-    },
-    symbol: {
-      show: true,
-      type: 'circle', // circle
-      size: 7,
-      color: 'auto',
-    },
-    area: {
-      show: false,
-      color: 'auto',
-      opacity: 0.5,
-    },
-  },
-  radar: {
-    line: {
-      show: true,
-      lineWidth: 1,
-      color: 'auto',
-      opacity: 1,
-    },
-    area: {
-      show: false,
-      color: 'auto',
-      opacity: 0.5,
-    },
-    symbol: {
-      show: true,
-      type: 'circle', // circle
-      size: 7,
-      color: 'auto',
-    },
-  },
-  radarAxis: {
-    shape: 'polygon', // polygon, circle
-    center: ['50%', '50%'],
-    radius: '80%',
-    max: 'auto',
-    splitNumber: 4,
+  yAxisCategory: {
+    show: true,
+    type: 'category', // category, value
+    boundaryGap: true,
     axisName: {
       show: true,
+      text: '轴线名称',
+      gap: 10,
       textStyle: {
-        fontSize: 15,
         color: '#666666',
-        margin: 10,
+        fontSize: 15,
+        align: 'center',
+      },
+    },
+    axisLabel: {
+      show: true,
+      gap: 5,
+      textStyle: {
+        color: '#666666',
+        fontSize: 12,
+      },
+    },
+    axisTick: {
+      show: true,
+      alignWithLabel: false, // alignWithLabel为true时，刻度线与标签对齐
+      length: 5,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#666666',
       },
     },
     axisLine: {
       show: true,
       lineStyle: {
         lineWidth: 1,
-        color: '#cccccc',
-        opacity: 1,
+        color: '#666666',
       },
     },
-    splitLine: {
+    axisSplitLine: {
       show: true,
+      alignWithLabel: false, // alignWithLabel为true时，网格线与标签对齐
       lineStyle: {
         lineWidth: 1,
-        color: '#cccccc',
-        opacity: 1,
-      },
-    },
-    splitArea: {
-      odd: {
-        show: true,
-        color: '#f5f5f5',
-        opacity: 1,
-      },
-      even: {
-        show: true,
-        color: '#e6e6e6',
-        opacity: 1,
+        color: '#dddddd',
       },
     },
   },
-  yAxis: {
+  yAxisValue: {
+    show: true,
+    type: 'value', // category, value
+    max: 'auto',
+    min: 'auto',
+    splitNumber: 4,
+    axisName: {
+      show: true,
+      text: '轴线名称',
+      gap: 10,
+      textStyle: {
+        color: '#666666',
+        fontSize: 15,
+        align: 'center',
+      },
+    },
+    axisLabel: {
+      show: true,
+      gap: 5,
+      textStyle: {
+        color: '#666666',
+        fontSize: 12,
+      },
+    },
+    axisTick: {
+      show: true,
+      length: 5,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#666666',
+      },
+    },
+    axisLine: {
+      show: true,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#666666',
+      },
+    },
+    axisSplitLine: {
+      show: true,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#dddddd',
+      },
+    },
+  },
+  xAxisCategory: {
+    show: true,
+    type: 'category', // category, value
+    boundaryGap: true, // boundaryGap为true时, 这时候刻度只是作为分隔线，标签和数据点都会在两个刻度之间的带(band)中间
+    axisName: {
+      show: true,
+      text: '轴线名称',
+      gap: 10,
+      textStyle: {
+        color: '#666666',
+        fontSize: 15,
+      },
+    },
+    axisLabel: {
+      show: true,
+      rotate: 0,
+      gap: 5,
+      textStyle: {
+        color: '#666666',
+        fontSize: 12,
+      },
+    },
+    axisTick: {
+      show: true,
+      alignWithLabel: false, // alignWithLabel为true时，刻度线与标签对齐
+      length: 5,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#666666',
+      },
+    },
+    axisLine: {
+      show: true,
+      lineStyle: {
+        lineWidth: 1,
+        color: '#666666',
+      },
+    },
+    axisSplitLine: {
+      show: true,
+      alignWithLabel: false, // alignWithLabel为true时，网格线与标签对齐
+      lineStyle: {
+        lineWidth: 1,
+        color: '#dddddd',
+      },
+    },
+  },
+  xAxisValue: {
     show: true,
     type: 'value', // category, value
     max: 'auto',
@@ -245,52 +263,200 @@ var Config = {
       },
     },
   },
-  xAxis: {
-    show: true,
-    type: 'category', // category, value
-    boundaryGap: true, // boundaryGap为true时, 这时候刻度只是作为分隔线，标签和数据点都会在两个刻度之间的带(band)中间
+  radarAxis: {
+    shape: 'polygon', // polygon, circle
+    center: ['50%', '50%'],
+    radius: '80%',
+    max: 'auto',
+    splitNumber: 4,
     axisName: {
       show: true,
-      text: '轴线名称',
-      gap: 10,
       textStyle: {
-        color: '#666666',
         fontSize: 15,
-      },
-    },
-    axisLabel: {
-      show: true,
-      rotate: 0,
-      gap: 5,
-      textStyle: {
         color: '#666666',
-        fontSize: 12,
-      },
-    },
-    axisTick: {
-      show: true,
-      alignWithLabel: false, // alignWithLabel为true时，刻度线与标签对齐
-      length: 5,
-      lineStyle: {
-        lineWidth: 1,
-        color: '#666666',
+        margin: 10,
       },
     },
     axisLine: {
       show: true,
       lineStyle: {
         lineWidth: 1,
-        color: '#666666',
+        color: '#cccccc',
+        opacity: 1,
       },
     },
-    axisSplitLine: {
+    splitLine: {
       show: true,
-      alignWithLabel: false, // alignWithLabel为true时，网格线与标签对齐
       lineStyle: {
         lineWidth: 1,
-        color: '#dddddd',
+        color: '#cccccc',
+        opacity: 1,
       },
     },
+    splitArea: {
+      odd: {
+        show: true,
+        color: '#f5f5f5',
+        opacity: 1,
+      },
+      even: {
+        show: true,
+        color: '#e6e6e6',
+        opacity: 1,
+      },
+    },
+  },
+  bar: {
+    barMaxWidth: 20,
+    barMinWidth: 1,
+    barWidth: 'auto',
+    barGap: 5,
+  },
+  line: {
+    smooth: false,
+    connectNulls: false,
+    line: {
+      show: true,
+      lineWidth: 2,
+      color: 'auto',
+      opacity: 1,
+    },
+    symbol: {
+      show: true,
+      type: 'circle', // circle
+      size: 7,
+      color: 'auto',
+    },
+    area: {
+      show: false,
+      color: 'auto',
+      opacity: 0.5,
+    },
+  },
+  pie: {
+    center: ['50%', '50%'],
+    radius: [0, '80%'],
+    roseType: false, // false radius area
+    offsetAngle: 0,
+    disablePieStroke: true,
+    labelLine: {
+      lineDotRadius: 3,
+      lineWidth: 1,
+      length1: 25,
+      length2: 15,
+    },
+  },
+  radar: {
+    line: {
+      show: true,
+      lineWidth: 1,
+      color: 'auto',
+      opacity: 1,
+    },
+    area: {
+      show: false,
+      color: 'auto',
+      opacity: 0.5,
+    },
+    symbol: {
+      show: true,
+      type: 'circle', // circle
+      size: 7,
+      color: 'auto',
+    },
+  },
+  scatter: {
+    radius: 10,
+    opacity: 1,
+    lineWidth: 0,
+    strokeColor: 'auto',
+  },
+  funnel: {
+    width: 'auto',
+    height: 'auto',
+    top: '0%',
+    left: '0%',
+    right: '0%',
+    bottom: '0%',
+    max: 100,
+    min: 0,
+    gap: 5,
+    shape: 'funnel', // funnel, pyramid
+    sort: 'descending', // descending, ascending
+    funnelAlign: 'center', // left, center, right
+    label: {
+      position: 'inside', // inside, outside
+    },
+    itemStyle: {
+      borderColor: '#ffffff',
+      borderWidth: 1,
+    },
+  },
+  candlestick: {
+    barMaxWidth: 20,
+    barMinWidth: 1,
+    barWidth: 'auto',
+    itemStyle: {
+      color: '#ec0000',
+      bordercolor: '#ec0000',
+      opacity: 1,
+      color0: '#00da3c',
+      bordercolor0: '#00da3c',
+      opacity0: 1,
+      borderWidth: 1,
+    },
+    highLine: {
+      show: false,
+      lineStyle: {
+        color: '#ec0000',
+        lineWidth: 1,
+        lineDash: [10, 15],
+        opacity: 1,
+      },
+    },
+    lowLine: {
+      show: false,
+      lineStyle: {
+        color: '#ec0000',
+        lineWidth: 1,
+        lineDash: [10, 15],
+        opacity: 1,
+      },
+    },
+    bar: {
+      show: false,
+      height: 50,
+      margin: 15,
+      itemStyle: {
+        color: 'auto',
+        opacity: 1,
+      },
+      lineStyle: {
+        lineWidth: 1,
+        lineColor: '#666666',
+      },
+    },
+  },
+  heatmap: {
+    itemStyle: {
+      color: ['#BAE7FF', '#0050B3'],
+      useSplit: false,
+    },
+  },
+  treemap: {
+    splitLine: {
+      show: true,
+      lineWidth: 5,
+      color: '#ffffff',
+    },
+  },
+  tagCloud: {
+    padding: 1,
+    timeInterval: 500,
+    font: 'serif',
+    fontSize: 15,
+    rotate: 0,
+    spiral: 'archimedean', // archimedean rectangular {function}
   },
 };
 
@@ -459,49 +625,1799 @@ function isArray(data) {
   return Object.prototype.toString.call(data) === '[object Array]'
 }
 
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var lodash_clonedeep = createCommonjsModule(function (module, exports) {
 /**
- * 将来源对象数据补充到目标对象中
- * @param {String} key
- * @param {Object} sources // 来源对象
- * @param {Object} target  // 目标对象
- * @param {Boolean} isCover  // 是否强制来源对象数据覆盖目标对象数据
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
-function replenishData(key, sources, target, isCover = false) {
-  if (!target[key] && target[key] !== 0 && target[key] !== '' && typeof target[key] !== 'boolean') {
-    // console.log(`空值, ${key}, target[key]: ${target[key]}, sources[key]: ${sources[key]}, isCover: ${isCover}`)
-    // (opts参数为空时赋值)
-    if (isObject(sources[key])) {
-      target[key] = Object.assign({}, sources[key]);
-    } else if (isArray(sources[key])) {
-      target[key] = [].concat(sources[key]);
-    } else {
-      target[key] = sources[key];
+
+/** Used as the size to enable large array optimizations. */
+var LARGE_ARRAY_SIZE = 200;
+
+/** Used to stand-in for `undefined` hash values. */
+var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+/** Used as references for various `Number` constants. */
+var MAX_SAFE_INTEGER = 9007199254740991;
+
+/** `Object#toString` result references. */
+var argsTag = '[object Arguments]',
+    arrayTag = '[object Array]',
+    boolTag = '[object Boolean]',
+    dateTag = '[object Date]',
+    errorTag = '[object Error]',
+    funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    mapTag = '[object Map]',
+    numberTag = '[object Number]',
+    objectTag = '[object Object]',
+    promiseTag = '[object Promise]',
+    regexpTag = '[object RegExp]',
+    setTag = '[object Set]',
+    stringTag = '[object String]',
+    symbolTag = '[object Symbol]',
+    weakMapTag = '[object WeakMap]';
+
+var arrayBufferTag = '[object ArrayBuffer]',
+    dataViewTag = '[object DataView]',
+    float32Tag = '[object Float32Array]',
+    float64Tag = '[object Float64Array]',
+    int8Tag = '[object Int8Array]',
+    int16Tag = '[object Int16Array]',
+    int32Tag = '[object Int32Array]',
+    uint8Tag = '[object Uint8Array]',
+    uint8ClampedTag = '[object Uint8ClampedArray]',
+    uint16Tag = '[object Uint16Array]',
+    uint32Tag = '[object Uint32Array]';
+
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+
+/** Used to match `RegExp` flags from their coerced string values. */
+var reFlags = /\w*$/;
+
+/** Used to detect host constructors (Safari). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+/** Used to detect unsigned integer values. */
+var reIsUint = /^(?:0|[1-9]\d*)$/;
+
+/** Used to identify `toStringTag` values supported by `_.clone`. */
+var cloneableTags = {};
+cloneableTags[argsTag] = cloneableTags[arrayTag] =
+cloneableTags[arrayBufferTag] = cloneableTags[dataViewTag] =
+cloneableTags[boolTag] = cloneableTags[dateTag] =
+cloneableTags[float32Tag] = cloneableTags[float64Tag] =
+cloneableTags[int8Tag] = cloneableTags[int16Tag] =
+cloneableTags[int32Tag] = cloneableTags[mapTag] =
+cloneableTags[numberTag] = cloneableTags[objectTag] =
+cloneableTags[regexpTag] = cloneableTags[setTag] =
+cloneableTags[stringTag] = cloneableTags[symbolTag] =
+cloneableTags[uint8Tag] = cloneableTags[uint8ClampedTag] =
+cloneableTags[uint16Tag] = cloneableTags[uint32Tag] = true;
+cloneableTags[errorTag] = cloneableTags[funcTag] =
+cloneableTags[weakMapTag] = false;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+/** Detect free variable `exports`. */
+var freeExports =  exports && !exports.nodeType && exports;
+
+/** Detect free variable `module`. */
+var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
+
+/** Detect the popular CommonJS extension `module.exports`. */
+var moduleExports = freeModule && freeModule.exports === freeExports;
+
+/**
+ * Adds the key-value `pair` to `map`.
+ *
+ * @private
+ * @param {Object} map The map to modify.
+ * @param {Array} pair The key-value pair to add.
+ * @returns {Object} Returns `map`.
+ */
+function addMapEntry(map, pair) {
+  // Don't return `map.set` because it's not chainable in IE 11.
+  map.set(pair[0], pair[1]);
+  return map;
+}
+
+/**
+ * Adds `value` to `set`.
+ *
+ * @private
+ * @param {Object} set The set to modify.
+ * @param {*} value The value to add.
+ * @returns {Object} Returns `set`.
+ */
+function addSetEntry(set, value) {
+  // Don't return `set.add` because it's not chainable in IE 11.
+  set.add(value);
+  return set;
+}
+
+/**
+ * A specialized version of `_.forEach` for arrays without support for
+ * iteratee shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array} Returns `array`.
+ */
+function arrayEach(array, iteratee) {
+  var index = -1,
+      length = array ? array.length : 0;
+
+  while (++index < length) {
+    if (iteratee(array[index], index, array) === false) {
+      break;
+    }
+  }
+  return array;
+}
+
+/**
+ * Appends the elements of `values` to `array`.
+ *
+ * @private
+ * @param {Array} array The array to modify.
+ * @param {Array} values The values to append.
+ * @returns {Array} Returns `array`.
+ */
+function arrayPush(array, values) {
+  var index = -1,
+      length = values.length,
+      offset = array.length;
+
+  while (++index < length) {
+    array[offset + index] = values[index];
+  }
+  return array;
+}
+
+/**
+ * A specialized version of `_.reduce` for arrays without support for
+ * iteratee shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @param {*} [accumulator] The initial value.
+ * @param {boolean} [initAccum] Specify using the first element of `array` as
+ *  the initial value.
+ * @returns {*} Returns the accumulated value.
+ */
+function arrayReduce(array, iteratee, accumulator, initAccum) {
+  var index = -1,
+      length = array ? array.length : 0;
+
+  if (initAccum && length) {
+    accumulator = array[++index];
+  }
+  while (++index < length) {
+    accumulator = iteratee(accumulator, array[index], index, array);
+  }
+  return accumulator;
+}
+
+/**
+ * The base implementation of `_.times` without support for iteratee shorthands
+ * or max array length checks.
+ *
+ * @private
+ * @param {number} n The number of times to invoke `iteratee`.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array} Returns the array of results.
+ */
+function baseTimes(n, iteratee) {
+  var index = -1,
+      result = Array(n);
+
+  while (++index < n) {
+    result[index] = iteratee(index);
+  }
+  return result;
+}
+
+/**
+ * Gets the value at `key` of `object`.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function getValue(object, key) {
+  return object == null ? undefined : object[key];
+}
+
+/**
+ * Checks if `value` is a host object in IE < 9.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+ */
+function isHostObject(value) {
+  // Many host objects are `Object` objects that can coerce to strings
+  // despite having improperly defined `toString` methods.
+  var result = false;
+  if (value != null && typeof value.toString != 'function') {
+    try {
+      result = !!(value + '');
+    } catch (e) {}
+  }
+  return result;
+}
+
+/**
+ * Converts `map` to its key-value pairs.
+ *
+ * @private
+ * @param {Object} map The map to convert.
+ * @returns {Array} Returns the key-value pairs.
+ */
+function mapToArray(map) {
+  var index = -1,
+      result = Array(map.size);
+
+  map.forEach(function(value, key) {
+    result[++index] = [key, value];
+  });
+  return result;
+}
+
+/**
+ * Creates a unary function that invokes `func` with its argument transformed.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {Function} transform The argument transform.
+ * @returns {Function} Returns the new function.
+ */
+function overArg(func, transform) {
+  return function(arg) {
+    return func(transform(arg));
+  };
+}
+
+/**
+ * Converts `set` to an array of its values.
+ *
+ * @private
+ * @param {Object} set The set to convert.
+ * @returns {Array} Returns the values.
+ */
+function setToArray(set) {
+  var index = -1,
+      result = Array(set.size);
+
+  set.forEach(function(value) {
+    result[++index] = value;
+  });
+  return result;
+}
+
+/** Used for built-in method references. */
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/** Built-in value references. */
+var Buffer = moduleExports ? root.Buffer : undefined,
+    Symbol = root.Symbol,
+    Uint8Array = root.Uint8Array,
+    getPrototype = overArg(Object.getPrototypeOf, Object),
+    objectCreate = Object.create,
+    propertyIsEnumerable = objectProto.propertyIsEnumerable,
+    splice = arrayProto.splice;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeGetSymbols = Object.getOwnPropertySymbols,
+    nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
+    nativeKeys = overArg(Object.keys, Object);
+
+/* Built-in method references that are verified to be native. */
+var DataView = getNative(root, 'DataView'),
+    Map = getNative(root, 'Map'),
+    Promise = getNative(root, 'Promise'),
+    Set = getNative(root, 'Set'),
+    WeakMap = getNative(root, 'WeakMap'),
+    nativeCreate = getNative(Object, 'create');
+
+/** Used to detect maps, sets, and weakmaps. */
+var dataViewCtorString = toSource(DataView),
+    mapCtorString = toSource(Map),
+    promiseCtorString = toSource(Promise),
+    setCtorString = toSource(Set),
+    weakMapCtorString = toSource(WeakMap);
+
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol ? Symbol.prototype : undefined,
+    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
+
+/**
+ * Creates a hash object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Hash(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the hash.
+ *
+ * @private
+ * @name clear
+ * @memberOf Hash
+ */
+function hashClear() {
+  this.__data__ = nativeCreate ? nativeCreate(null) : {};
+}
+
+/**
+ * Removes `key` and its value from the hash.
+ *
+ * @private
+ * @name delete
+ * @memberOf Hash
+ * @param {Object} hash The hash to modify.
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function hashDelete(key) {
+  return this.has(key) && delete this.__data__[key];
+}
+
+/**
+ * Gets the hash value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Hash
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function hashGet(key) {
+  var data = this.__data__;
+  if (nativeCreate) {
+    var result = data[key];
+    return result === HASH_UNDEFINED ? undefined : result;
+  }
+  return hasOwnProperty.call(data, key) ? data[key] : undefined;
+}
+
+/**
+ * Checks if a hash value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Hash
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function hashHas(key) {
+  var data = this.__data__;
+  return nativeCreate ? data[key] !== undefined : hasOwnProperty.call(data, key);
+}
+
+/**
+ * Sets the hash `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Hash
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the hash instance.
+ */
+function hashSet(key, value) {
+  var data = this.__data__;
+  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
+  return this;
+}
+
+// Add methods to `Hash`.
+Hash.prototype.clear = hashClear;
+Hash.prototype['delete'] = hashDelete;
+Hash.prototype.get = hashGet;
+Hash.prototype.has = hashHas;
+Hash.prototype.set = hashSet;
+
+/**
+ * Creates an list cache object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function ListCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the list cache.
+ *
+ * @private
+ * @name clear
+ * @memberOf ListCache
+ */
+function listCacheClear() {
+  this.__data__ = [];
+}
+
+/**
+ * Removes `key` and its value from the list cache.
+ *
+ * @private
+ * @name delete
+ * @memberOf ListCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function listCacheDelete(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    return false;
+  }
+  var lastIndex = data.length - 1;
+  if (index == lastIndex) {
+    data.pop();
+  } else {
+    splice.call(data, index, 1);
+  }
+  return true;
+}
+
+/**
+ * Gets the list cache value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf ListCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function listCacheGet(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  return index < 0 ? undefined : data[index][1];
+}
+
+/**
+ * Checks if a list cache value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf ListCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function listCacheHas(key) {
+  return assocIndexOf(this.__data__, key) > -1;
+}
+
+/**
+ * Sets the list cache `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf ListCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the list cache instance.
+ */
+function listCacheSet(key, value) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    data.push([key, value]);
+  } else {
+    data[index][1] = value;
+  }
+  return this;
+}
+
+// Add methods to `ListCache`.
+ListCache.prototype.clear = listCacheClear;
+ListCache.prototype['delete'] = listCacheDelete;
+ListCache.prototype.get = listCacheGet;
+ListCache.prototype.has = listCacheHas;
+ListCache.prototype.set = listCacheSet;
+
+/**
+ * Creates a map cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function MapCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the map.
+ *
+ * @private
+ * @name clear
+ * @memberOf MapCache
+ */
+function mapCacheClear() {
+  this.__data__ = {
+    'hash': new Hash,
+    'map': new (Map || ListCache),
+    'string': new Hash
+  };
+}
+
+/**
+ * Removes `key` and its value from the map.
+ *
+ * @private
+ * @name delete
+ * @memberOf MapCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function mapCacheDelete(key) {
+  return getMapData(this, key)['delete'](key);
+}
+
+/**
+ * Gets the map value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf MapCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function mapCacheGet(key) {
+  return getMapData(this, key).get(key);
+}
+
+/**
+ * Checks if a map value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf MapCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function mapCacheHas(key) {
+  return getMapData(this, key).has(key);
+}
+
+/**
+ * Sets the map `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf MapCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the map cache instance.
+ */
+function mapCacheSet(key, value) {
+  getMapData(this, key).set(key, value);
+  return this;
+}
+
+// Add methods to `MapCache`.
+MapCache.prototype.clear = mapCacheClear;
+MapCache.prototype['delete'] = mapCacheDelete;
+MapCache.prototype.get = mapCacheGet;
+MapCache.prototype.has = mapCacheHas;
+MapCache.prototype.set = mapCacheSet;
+
+/**
+ * Creates a stack cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Stack(entries) {
+  this.__data__ = new ListCache(entries);
+}
+
+/**
+ * Removes all key-value entries from the stack.
+ *
+ * @private
+ * @name clear
+ * @memberOf Stack
+ */
+function stackClear() {
+  this.__data__ = new ListCache;
+}
+
+/**
+ * Removes `key` and its value from the stack.
+ *
+ * @private
+ * @name delete
+ * @memberOf Stack
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function stackDelete(key) {
+  return this.__data__['delete'](key);
+}
+
+/**
+ * Gets the stack value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Stack
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function stackGet(key) {
+  return this.__data__.get(key);
+}
+
+/**
+ * Checks if a stack value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Stack
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function stackHas(key) {
+  return this.__data__.has(key);
+}
+
+/**
+ * Sets the stack `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Stack
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the stack cache instance.
+ */
+function stackSet(key, value) {
+  var cache = this.__data__;
+  if (cache instanceof ListCache) {
+    var pairs = cache.__data__;
+    if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
+      pairs.push([key, value]);
+      return this;
+    }
+    cache = this.__data__ = new MapCache(pairs);
+  }
+  cache.set(key, value);
+  return this;
+}
+
+// Add methods to `Stack`.
+Stack.prototype.clear = stackClear;
+Stack.prototype['delete'] = stackDelete;
+Stack.prototype.get = stackGet;
+Stack.prototype.has = stackHas;
+Stack.prototype.set = stackSet;
+
+/**
+ * Creates an array of the enumerable property names of the array-like `value`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @param {boolean} inherited Specify returning inherited property names.
+ * @returns {Array} Returns the array of property names.
+ */
+function arrayLikeKeys(value, inherited) {
+  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
+  // Safari 9 makes `arguments.length` enumerable in strict mode.
+  var result = (isArray(value) || isArguments(value))
+    ? baseTimes(value.length, String)
+    : [];
+
+  var length = result.length,
+      skipIndexes = !!length;
+
+  for (var key in value) {
+    if ((inherited || hasOwnProperty.call(value, key)) &&
+        !(skipIndexes && (key == 'length' || isIndex(key, length)))) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+/**
+ * Assigns `value` to `key` of `object` if the existing value is not equivalent
+ * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {string} key The key of the property to assign.
+ * @param {*} value The value to assign.
+ */
+function assignValue(object, key, value) {
+  var objValue = object[key];
+  if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) ||
+      (value === undefined && !(key in object))) {
+    object[key] = value;
+  }
+}
+
+/**
+ * Gets the index at which the `key` is found in `array` of key-value pairs.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} key The key to search for.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function assocIndexOf(array, key) {
+  var length = array.length;
+  while (length--) {
+    if (eq(array[length][0], key)) {
+      return length;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The base implementation of `_.assign` without support for multiple sources
+ * or `customizer` functions.
+ *
+ * @private
+ * @param {Object} object The destination object.
+ * @param {Object} source The source object.
+ * @returns {Object} Returns `object`.
+ */
+function baseAssign(object, source) {
+  return object && copyObject(source, keys(source), object);
+}
+
+/**
+ * The base implementation of `_.clone` and `_.cloneDeep` which tracks
+ * traversed objects.
+ *
+ * @private
+ * @param {*} value The value to clone.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @param {boolean} [isFull] Specify a clone including symbols.
+ * @param {Function} [customizer] The function to customize cloning.
+ * @param {string} [key] The key of `value`.
+ * @param {Object} [object] The parent object of `value`.
+ * @param {Object} [stack] Tracks traversed objects and their clone counterparts.
+ * @returns {*} Returns the cloned value.
+ */
+function baseClone(value, isDeep, isFull, customizer, key, object, stack) {
+  var result;
+  if (customizer) {
+    result = object ? customizer(value, key, object, stack) : customizer(value);
+  }
+  if (result !== undefined) {
+    return result;
+  }
+  if (!isObject(value)) {
+    return value;
+  }
+  var isArr = isArray(value);
+  if (isArr) {
+    result = initCloneArray(value);
+    if (!isDeep) {
+      return copyArray(value, result);
     }
   } else {
-    // console.log(`不为空值, ${key}, target[key]: ${target[key]}, sources[key]: ${sources[key]}, isCover: ${isCover}`)
-    // (opts参数不为为空时，若数据类型为原始类型和数组则不做处理，对象类型时递归)
+    var tag = getTag(value),
+        isFunc = tag == funcTag || tag == genTag;
+
+    if (isBuffer(value)) {
+      return cloneBuffer(value, isDeep);
+    }
+    if (tag == objectTag || tag == argsTag || (isFunc && !object)) {
+      if (isHostObject(value)) {
+        return object ? value : {};
+      }
+      result = initCloneObject(isFunc ? {} : value);
+      if (!isDeep) {
+        return copySymbols(value, baseAssign(result, value));
+      }
+    } else {
+      if (!cloneableTags[tag]) {
+        return object ? value : {};
+      }
+      result = initCloneByTag(value, tag, baseClone, isDeep);
+    }
+  }
+  // Check for circular references and return its corresponding clone.
+  stack || (stack = new Stack);
+  var stacked = stack.get(value);
+  if (stacked) {
+    return stacked;
+  }
+  stack.set(value, result);
+
+  if (!isArr) {
+    var props = isFull ? getAllKeys(value) : keys(value);
+  }
+  arrayEach(props || value, function(subValue, key) {
+    if (props) {
+      key = subValue;
+      subValue = value[key];
+    }
+    // Recursively populate clone (susceptible to call stack limits).
+    assignValue(result, key, baseClone(subValue, isDeep, isFull, customizer, key, value, stack));
+  });
+  return result;
+}
+
+/**
+ * The base implementation of `_.create` without support for assigning
+ * properties to the created object.
+ *
+ * @private
+ * @param {Object} prototype The object to inherit from.
+ * @returns {Object} Returns the new object.
+ */
+function baseCreate(proto) {
+  return isObject(proto) ? objectCreate(proto) : {};
+}
+
+/**
+ * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
+ * `keysFunc` and `symbolsFunc` to get the enumerable property names and
+ * symbols of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Function} keysFunc The function to get the keys of `object`.
+ * @param {Function} symbolsFunc The function to get the symbols of `object`.
+ * @returns {Array} Returns the array of property names and symbols.
+ */
+function baseGetAllKeys(object, keysFunc, symbolsFunc) {
+  var result = keysFunc(object);
+  return isArray(object) ? result : arrayPush(result, symbolsFunc(object));
+}
+
+/**
+ * The base implementation of `getTag`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+function baseGetTag(value) {
+  return objectToString.call(value);
+}
+
+/**
+ * The base implementation of `_.isNative` without bad shim checks.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function,
+ *  else `false`.
+ */
+function baseIsNative(value) {
+  if (!isObject(value) || isMasked(value)) {
+    return false;
+  }
+  var pattern = (isFunction(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
+  return pattern.test(toSource(value));
+}
+
+/**
+ * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ */
+function baseKeys(object) {
+  if (!isPrototype(object)) {
+    return nativeKeys(object);
+  }
+  var result = [];
+  for (var key in Object(object)) {
+    if (hasOwnProperty.call(object, key) && key != 'constructor') {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+/**
+ * Creates a clone of  `buffer`.
+ *
+ * @private
+ * @param {Buffer} buffer The buffer to clone.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Buffer} Returns the cloned buffer.
+ */
+function cloneBuffer(buffer, isDeep) {
+  if (isDeep) {
+    return buffer.slice();
+  }
+  var result = new buffer.constructor(buffer.length);
+  buffer.copy(result);
+  return result;
+}
+
+/**
+ * Creates a clone of `arrayBuffer`.
+ *
+ * @private
+ * @param {ArrayBuffer} arrayBuffer The array buffer to clone.
+ * @returns {ArrayBuffer} Returns the cloned array buffer.
+ */
+function cloneArrayBuffer(arrayBuffer) {
+  var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
+  new Uint8Array(result).set(new Uint8Array(arrayBuffer));
+  return result;
+}
+
+/**
+ * Creates a clone of `dataView`.
+ *
+ * @private
+ * @param {Object} dataView The data view to clone.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the cloned data view.
+ */
+function cloneDataView(dataView, isDeep) {
+  var buffer = isDeep ? cloneArrayBuffer(dataView.buffer) : dataView.buffer;
+  return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
+}
+
+/**
+ * Creates a clone of `map`.
+ *
+ * @private
+ * @param {Object} map The map to clone.
+ * @param {Function} cloneFunc The function to clone values.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the cloned map.
+ */
+function cloneMap(map, isDeep, cloneFunc) {
+  var array = isDeep ? cloneFunc(mapToArray(map), true) : mapToArray(map);
+  return arrayReduce(array, addMapEntry, new map.constructor);
+}
+
+/**
+ * Creates a clone of `regexp`.
+ *
+ * @private
+ * @param {Object} regexp The regexp to clone.
+ * @returns {Object} Returns the cloned regexp.
+ */
+function cloneRegExp(regexp) {
+  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
+  result.lastIndex = regexp.lastIndex;
+  return result;
+}
+
+/**
+ * Creates a clone of `set`.
+ *
+ * @private
+ * @param {Object} set The set to clone.
+ * @param {Function} cloneFunc The function to clone values.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the cloned set.
+ */
+function cloneSet(set, isDeep, cloneFunc) {
+  var array = isDeep ? cloneFunc(setToArray(set), true) : setToArray(set);
+  return arrayReduce(array, addSetEntry, new set.constructor);
+}
+
+/**
+ * Creates a clone of the `symbol` object.
+ *
+ * @private
+ * @param {Object} symbol The symbol object to clone.
+ * @returns {Object} Returns the cloned symbol object.
+ */
+function cloneSymbol(symbol) {
+  return symbolValueOf ? Object(symbolValueOf.call(symbol)) : {};
+}
+
+/**
+ * Creates a clone of `typedArray`.
+ *
+ * @private
+ * @param {Object} typedArray The typed array to clone.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the cloned typed array.
+ */
+function cloneTypedArray(typedArray, isDeep) {
+  var buffer = isDeep ? cloneArrayBuffer(typedArray.buffer) : typedArray.buffer;
+  return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
+}
+
+/**
+ * Copies the values of `source` to `array`.
+ *
+ * @private
+ * @param {Array} source The array to copy values from.
+ * @param {Array} [array=[]] The array to copy values to.
+ * @returns {Array} Returns `array`.
+ */
+function copyArray(source, array) {
+  var index = -1,
+      length = source.length;
+
+  array || (array = Array(length));
+  while (++index < length) {
+    array[index] = source[index];
+  }
+  return array;
+}
+
+/**
+ * Copies properties of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy properties from.
+ * @param {Array} props The property identifiers to copy.
+ * @param {Object} [object={}] The object to copy properties to.
+ * @param {Function} [customizer] The function to customize copied values.
+ * @returns {Object} Returns `object`.
+ */
+function copyObject(source, props, object, customizer) {
+  object || (object = {});
+
+  var index = -1,
+      length = props.length;
+
+  while (++index < length) {
+    var key = props[index];
+
+    var newValue = customizer
+      ? customizer(object[key], source[key], key, object, source)
+      : undefined;
+
+    assignValue(object, key, newValue === undefined ? source[key] : newValue);
+  }
+  return object;
+}
+
+/**
+ * Copies own symbol properties of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy symbols from.
+ * @param {Object} [object={}] The object to copy symbols to.
+ * @returns {Object} Returns `object`.
+ */
+function copySymbols(source, object) {
+  return copyObject(source, getSymbols(source), object);
+}
+
+/**
+ * Creates an array of own enumerable property names and symbols of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names and symbols.
+ */
+function getAllKeys(object) {
+  return baseGetAllKeys(object, keys, getSymbols);
+}
+
+/**
+ * Gets the data for `map`.
+ *
+ * @private
+ * @param {Object} map The map to query.
+ * @param {string} key The reference key.
+ * @returns {*} Returns the map data.
+ */
+function getMapData(map, key) {
+  var data = map.__data__;
+  return isKeyable(key)
+    ? data[typeof key == 'string' ? 'string' : 'hash']
+    : data.map;
+}
+
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = getValue(object, key);
+  return baseIsNative(value) ? value : undefined;
+}
+
+/**
+ * Creates an array of the own enumerable symbol properties of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of symbols.
+ */
+var getSymbols = nativeGetSymbols ? overArg(nativeGetSymbols, Object) : stubArray;
+
+/**
+ * Gets the `toStringTag` of `value`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+var getTag = baseGetTag;
+
+// Fallback for data views, maps, sets, and weak maps in IE 11,
+// for data views in Edge < 14, and promises in Node.js.
+if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
+    (Map && getTag(new Map) != mapTag) ||
+    (Promise && getTag(Promise.resolve()) != promiseTag) ||
+    (Set && getTag(new Set) != setTag) ||
+    (WeakMap && getTag(new WeakMap) != weakMapTag)) {
+  getTag = function(value) {
+    var result = objectToString.call(value),
+        Ctor = result == objectTag ? value.constructor : undefined,
+        ctorString = Ctor ? toSource(Ctor) : undefined;
+
+    if (ctorString) {
+      switch (ctorString) {
+        case dataViewCtorString: return dataViewTag;
+        case mapCtorString: return mapTag;
+        case promiseCtorString: return promiseTag;
+        case setCtorString: return setTag;
+        case weakMapCtorString: return weakMapTag;
+      }
+    }
+    return result;
+  };
+}
+
+/**
+ * Initializes an array clone.
+ *
+ * @private
+ * @param {Array} array The array to clone.
+ * @returns {Array} Returns the initialized clone.
+ */
+function initCloneArray(array) {
+  var length = array.length,
+      result = array.constructor(length);
+
+  // Add properties assigned by `RegExp#exec`.
+  if (length && typeof array[0] == 'string' && hasOwnProperty.call(array, 'index')) {
+    result.index = array.index;
+    result.input = array.input;
+  }
+  return result;
+}
+
+/**
+ * Initializes an object clone.
+ *
+ * @private
+ * @param {Object} object The object to clone.
+ * @returns {Object} Returns the initialized clone.
+ */
+function initCloneObject(object) {
+  return (typeof object.constructor == 'function' && !isPrototype(object))
+    ? baseCreate(getPrototype(object))
+    : {};
+}
+
+/**
+ * Initializes an object clone based on its `toStringTag`.
+ *
+ * **Note:** This function only supports cloning values with tags of
+ * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
+ *
+ * @private
+ * @param {Object} object The object to clone.
+ * @param {string} tag The `toStringTag` of the object to clone.
+ * @param {Function} cloneFunc The function to clone values.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the initialized clone.
+ */
+function initCloneByTag(object, tag, cloneFunc, isDeep) {
+  var Ctor = object.constructor;
+  switch (tag) {
+    case arrayBufferTag:
+      return cloneArrayBuffer(object);
+
+    case boolTag:
+    case dateTag:
+      return new Ctor(+object);
+
+    case dataViewTag:
+      return cloneDataView(object, isDeep);
+
+    case float32Tag: case float64Tag:
+    case int8Tag: case int16Tag: case int32Tag:
+    case uint8Tag: case uint8ClampedTag: case uint16Tag: case uint32Tag:
+      return cloneTypedArray(object, isDeep);
+
+    case mapTag:
+      return cloneMap(object, isDeep, cloneFunc);
+
+    case numberTag:
+    case stringTag:
+      return new Ctor(object);
+
+    case regexpTag:
+      return cloneRegExp(object);
+
+    case setTag:
+      return cloneSet(object, isDeep, cloneFunc);
+
+    case symbolTag:
+      return cloneSymbol(object);
+  }
+}
+
+/**
+ * Checks if `value` is a valid array-like index.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+ * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+ */
+function isIndex(value, length) {
+  length = length == null ? MAX_SAFE_INTEGER : length;
+  return !!length &&
+    (typeof value == 'number' || reIsUint.test(value)) &&
+    (value > -1 && value % 1 == 0 && value < length);
+}
+
+/**
+ * Checks if `value` is suitable for use as unique object key.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
+ */
+function isKeyable(value) {
+  var type = typeof value;
+  return (type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean')
+    ? (value !== '__proto__')
+    : (value === null);
+}
+
+/**
+ * Checks if `func` has its source masked.
+ *
+ * @private
+ * @param {Function} func The function to check.
+ * @returns {boolean} Returns `true` if `func` is masked, else `false`.
+ */
+function isMasked(func) {
+  return !!maskSrcKey && (maskSrcKey in func);
+}
+
+/**
+ * Checks if `value` is likely a prototype object.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
+ */
+function isPrototype(value) {
+  var Ctor = value && value.constructor,
+      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
+
+  return value === proto;
+}
+
+/**
+ * Converts `func` to its source code.
+ *
+ * @private
+ * @param {Function} func The function to process.
+ * @returns {string} Returns the source code.
+ */
+function toSource(func) {
+  if (func != null) {
+    try {
+      return funcToString.call(func);
+    } catch (e) {}
+    try {
+      return (func + '');
+    } catch (e) {}
+  }
+  return '';
+}
+
+/**
+ * This method is like `_.clone` except that it recursively clones `value`.
+ *
+ * @static
+ * @memberOf _
+ * @since 1.0.0
+ * @category Lang
+ * @param {*} value The value to recursively clone.
+ * @returns {*} Returns the deep cloned value.
+ * @see _.clone
+ * @example
+ *
+ * var objects = [{ 'a': 1 }, { 'b': 2 }];
+ *
+ * var deep = _.cloneDeep(objects);
+ * console.log(deep[0] === objects[0]);
+ * // => false
+ */
+function cloneDeep(value) {
+  return baseClone(value, true, true);
+}
+
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+function eq(value, other) {
+  return value === other || (value !== value && other !== other);
+}
+
+/**
+ * Checks if `value` is likely an `arguments` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArguments(function() { return arguments; }());
+ * // => true
+ *
+ * _.isArguments([1, 2, 3]);
+ * // => false
+ */
+function isArguments(value) {
+  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
+  return isArrayLikeObject(value) && hasOwnProperty.call(value, 'callee') &&
+    (!propertyIsEnumerable.call(value, 'callee') || objectToString.call(value) == argsTag);
+}
+
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
+/**
+ * Checks if `value` is array-like. A value is considered array-like if it's
+ * not a function and has a `value.length` that's an integer greater than or
+ * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+ * @example
+ *
+ * _.isArrayLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLike(document.body.children);
+ * // => true
+ *
+ * _.isArrayLike('abc');
+ * // => true
+ *
+ * _.isArrayLike(_.noop);
+ * // => false
+ */
+function isArrayLike(value) {
+  return value != null && isLength(value.length) && !isFunction(value);
+}
+
+/**
+ * This method is like `_.isArrayLike` except that it also checks if `value`
+ * is an object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array-like object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArrayLikeObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLikeObject(document.body.children);
+ * // => true
+ *
+ * _.isArrayLikeObject('abc');
+ * // => false
+ *
+ * _.isArrayLikeObject(_.noop);
+ * // => false
+ */
+function isArrayLikeObject(value) {
+  return isObjectLike(value) && isArrayLike(value);
+}
+
+/**
+ * Checks if `value` is a buffer.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.3.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
+ * @example
+ *
+ * _.isBuffer(new Buffer(2));
+ * // => true
+ *
+ * _.isBuffer(new Uint8Array(2));
+ * // => false
+ */
+var isBuffer = nativeIsBuffer || stubFalse;
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 8-9 which returns 'object' for typed array and other constructors.
+  var tag = isObject(value) ? objectToString.call(value) : '';
+  return tag == funcTag || tag == genTag;
+}
+
+/**
+ * Checks if `value` is a valid array-like length.
+ *
+ * **Note:** This method is loosely based on
+ * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+ * @example
+ *
+ * _.isLength(3);
+ * // => true
+ *
+ * _.isLength(Number.MIN_VALUE);
+ * // => false
+ *
+ * _.isLength(Infinity);
+ * // => false
+ *
+ * _.isLength('3');
+ * // => false
+ */
+function isLength(value) {
+  return typeof value == 'number' &&
+    value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Creates an array of the own enumerable property names of `object`.
+ *
+ * **Note:** Non-object values are coerced to objects. See the
+ * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
+ * for more details.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Object
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ *   this.b = 2;
+ * }
+ *
+ * Foo.prototype.c = 3;
+ *
+ * _.keys(new Foo);
+ * // => ['a', 'b'] (iteration order is not guaranteed)
+ *
+ * _.keys('hi');
+ * // => ['0', '1']
+ */
+function keys(object) {
+  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
+}
+
+/**
+ * This method returns a new empty array.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.13.0
+ * @category Util
+ * @returns {Array} Returns the new empty array.
+ * @example
+ *
+ * var arrays = _.times(2, _.stubArray);
+ *
+ * console.log(arrays);
+ * // => [[], []]
+ *
+ * console.log(arrays[0] === arrays[1]);
+ * // => false
+ */
+function stubArray() {
+  return [];
+}
+
+/**
+ * This method returns `false`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.13.0
+ * @category Util
+ * @returns {boolean} Returns `false`.
+ * @example
+ *
+ * _.times(2, _.stubFalse);
+ * // => [false, false]
+ */
+function stubFalse() {
+  return false;
+}
+
+module.exports = cloneDeep;
+});
+
+/**
+ * 将来源对象数据补充到目标对象中
+ * @param {Object} sources // 来源对象
+ * @param {Object} sourcesKey // 来源对象属性
+ * @param {Object} target  // 目标对象
+ * @param {Object} targetKey  // 目标对象属性
+ * @param {Boolean} isCover  // 是否强制来源对象数据覆盖目标对象数据
+ */
+function replenishData(sources, sourcesKey, target, targetKey, isCover = false) {
+  if (!target[targetKey] && target[targetKey] !== 0 && target[targetKey] !== '' && typeof target[targetKey] !== 'boolean') {
+    // (目标对象为空时赋值)
+    target[targetKey] = lodash_clonedeep(sources[sourcesKey]);
+  } else {
     if (isCover) {
-      if (isObject(sources[key])) {
-        Object.keys(sources[key]).forEach(_key => {
-          replenishData(_key, sources[key], target[key], isCover);
+      if (isObject(sources[sourcesKey])) {
+        Object.keys(sources[sourcesKey]).forEach(_key => {
+          replenishData(sources[sourcesKey], _key, target[targetKey], _key, isCover);
         });
-      } else if (isArray(sources[key])) {
-        if (key == 'series') {
-          sources[key].forEach((sourcesItem, sourcesIndex) => {
+      } else if (isArray(sources[sourcesKey])) {
+        if (sourcesKey == 'series') {
+          sources[sourcesKey].forEach((sourcesItem, sourcesIndex) => {
             Object.keys(sourcesItem).forEach(_key => {
-              replenishData(_key, sources[key][sourcesIndex], target[key][sourcesIndex], true);
+              replenishData(sources[_key][sourcesIndex], _key, target[_key][sourcesIndex], _key, true);
             });
           });
         } else {
-          target[key] = [].concat(sources[key]);
+          target[targetKey] = [].concat(sources[sourcesKey]);
         }
       } else {
-        target[key] = sources[key];
+        target[targetKey] = sources[sourcesKey];
       }
     } else {
-      if (isObject(target[key])) {
-        Object.keys(sources[key]).forEach(_key => {
-          replenishData(_key, sources[key], target[key], isCover);
+      // (目标对象不为为空时，若数据为对象时递归)
+      if (isObject(target[targetKey])) {
+        Object.keys(sources[sourcesKey]).forEach(_key => {
+          replenishData(sources[sourcesKey], _key, target[targetKey], _key, isCover);
         });
       }
     }
@@ -513,49 +2429,38 @@ function replenishData(key, sources, target, isCover = false) {
  */
 function calOptions() {
   let { config, opts } = this;
-  replenishData('animation', config, opts);
-  replenishData('animationDuration', config, opts);
-  replenishData('animationTiming', config, opts);
-  replenishData('backgroundColor', config, opts);
-  replenishData('colors', config, opts);
-  replenishData('padding', config, opts);
-  replenishData('legend', config, opts);
+  replenishData(config, 'animation', opts, 'animation');
+  replenishData(config, 'animationDuration', opts, 'animationDuration');
+  replenishData(config, 'animationTiming', opts, 'animationTiming');
+  replenishData(config, 'backgroundColor', opts, 'backgroundColor');
+  replenishData(config, 'colors', opts, 'colors');
+  replenishData(config, 'padding', opts, 'padding');
+  replenishData(config, 'legend', opts, 'legend');
 
-  switch (opts.type) {
-    case 'bar':
-    case 'line':
-    case 'scatter':
-      if (opts.yAxis && opts.yAxis.type == 'category') {
-        replenishData('show', config.xAxis, opts.yAxis);
-        replenishData('type', config.xAxis, opts.yAxis);
-        replenishData('boundaryGap', config.xAxis, opts.yAxis);
-        replenishData('axisName', config.xAxis, opts.yAxis);
-        replenishData('axisLabel', config.xAxis, opts.yAxis);
-        replenishData('axisTick', config.xAxis, opts.yAxis);
-        replenishData('axisLine', config.xAxis, opts.yAxis);
-        replenishData('axisSplitLine', config.xAxis, opts.yAxis);
-      } else {
-        replenishData('yAxis', config, opts);
-      }
+  opts.series.forEach(seriesItem => {
+    switch (seriesItem.type) {
+      case 'bar':
+      case 'line':
+      case 'scatter':
+      case 'candlestick':
+      case 'k':
+      case 'heatmap':
+        if (opts.yAxis && opts.yAxis.type == 'category') {
+          replenishData(config, 'yAxisCategory', opts, 'yAxis');
+        } else {
+          replenishData(config, 'yAxisValue', opts, 'yAxis');
+        }
 
-      if (opts.xAxis && opts.xAxis.type == 'value') {
-        replenishData('show', config.yAxis, opts.xAxis);
-        replenishData('type', config.yAxis, opts.xAxis);
-        replenishData('max', config.yAxis, opts.xAxis);
-        replenishData('min', config.yAxis, opts.xAxis);
-        replenishData('splitNumber', config.yAxis, opts.xAxis);
-        replenishData('axisName', config.yAxis, opts.xAxis);
-        replenishData('axisLabel', config.yAxis, opts.xAxis);
-        replenishData('axisTick', config.yAxis, opts.xAxis);
-        replenishData('axisLine', config.yAxis, opts.xAxis);
-        replenishData('axisSplitLine', config.yAxis, opts.xAxis);
-      } else {
-        replenishData('xAxis', config, opts);
-      }
-    case 'radar':
-      replenishData('radarAxis', config, opts);
-      break
-  }
+        if (opts.xAxis && opts.xAxis.type == 'value') {
+          replenishData(config, 'xAxisValue', opts, 'xAxis');
+        } else {
+          replenishData(config, 'xAxisCategory', opts, 'xAxis');
+        }
+      case 'radar':
+        replenishData(config, 'radarAxis', opts, 'radarAxis');
+        break
+    }
+  });
 
   calSeries.call(this);
 
@@ -568,91 +2473,43 @@ function calOptions() {
 function calSeries() {
   let { config, opts } = this;
 
-  switch (opts.type) {
-    case 'bar':
-      opts.series.forEach(seriesItem => {
-        replenishData('label', config, seriesItem);
-        replenishData('barMaxWidth', config.bar, seriesItem);
-        replenishData('barMinWidth', config.bar, seriesItem);
-        replenishData('barWidth', config.bar, seriesItem);
-        replenishData('barGap', config.bar, seriesItem);
-      });
-      break
-    case 'line':
-      opts.series.forEach(seriesItem => {
-        replenishData('label', config, seriesItem);
-        replenishData('smooth', config.line, seriesItem);
-        replenishData('connectNulls', config.line, seriesItem);
-        replenishData('line', config.line, seriesItem);
-        replenishData('symbol', config.line, seriesItem);
-        replenishData('area', config.line, seriesItem);
-      });
-      break
-    case 'pie':
-      opts.series.forEach(seriesItem => {
-        replenishData('label', config, seriesItem);
-        replenishData('center', config.pie, seriesItem);
-        replenishData('radius', config.pie, seriesItem);
-        replenishData('labelLine', config.pie, seriesItem);
-        replenishData('offsetAngle', config.pie, seriesItem);
-        replenishData('disablePieStroke', config.pie, seriesItem);
-      });
-      break
-    case 'radar':
-      opts.series.forEach(seriesItem => {
-        replenishData('label', config, seriesItem);
-        replenishData('line', config.radar, seriesItem);
-        replenishData('symbol', config.radar, seriesItem);
-        replenishData('area', config.radar, seriesItem);
-      });
-      break
-    case 'scatter':
-      opts.series.forEach(seriesItem => {
-        replenishData('label', config, seriesItem);
-        replenishData('color', config.scatter, seriesItem);
-        replenishData('radius', config.scatter, seriesItem);
-        replenishData('opacity', config.scatter, seriesItem);
-        replenishData('lineWidth', config.scatter, seriesItem);
-        replenishData('strokeColor', config.scatter, seriesItem);
-      });
-      break
-    case 'funnel':
-      opts.series.forEach(seriesItem => {
-        replenishData('label', config, seriesItem);
-        replenishData('position', config.funnel.label, seriesItem.label);
-        replenishData('width', config.funnel, seriesItem);
-        replenishData('height', config.funnel, seriesItem);
-        replenishData('top', config.funnel, seriesItem);
-        replenishData('left', config.funnel, seriesItem);
-        replenishData('right', config.funnel, seriesItem);
-        replenishData('bottom', config.funnel, seriesItem);
-        replenishData('max', config.funnel, seriesItem);
-        replenishData('min', config.funnel, seriesItem);
-        replenishData('gap', config.funnel, seriesItem);
-        replenishData('sort', config.funnel, seriesItem);
-        replenishData('shape', config.funnel, seriesItem);
-        replenishData('funnelAlign', config.funnel, seriesItem);
-        replenishData('itemStyle', config.funnel, seriesItem);
-      });
-      break
-  }
+  opts.series.forEach((seriesItem, seriesIndex) => {
+    replenishData(config, 'label', seriesItem, 'label');
+    switch (seriesItem.type) {
+      case 'bar':
+      case 'line':
+      case 'pie':
+      case 'radar':
+      case 'scatter':
+      case 'funnel':
+      case 'heatmap':
+      case 'treemap':
+      case 'tagCloud':
+        replenishData(config, seriesItem.type, opts.series, seriesIndex);
+        break
+      case 'candlestick':
+      case 'k':
+        replenishData(config, 'candlestick', opts.series, seriesIndex);
+        break
+    }
+  });
 }
 
 var Timing = {
-  easeIn: function(pos) {
+  easeIn: function (pos) {
     return Math.pow(pos, 3)
   },
-  easeOut: function(pos) {
+  easeOut: function (pos) {
     return Math.pow(pos - 1, 3) + 1
   },
-  easeInOut: function(pos) {
+  easeInOut: function (pos) {
     if ((pos /= 0.5) < 1) {
       return 0.5 * Math.pow(pos, 3)
     } else {
       return 0.5 * (Math.pow(pos - 2, 3) + 2)
     }
   },
-  linear: function(pos) {
+  linear: function (pos) {
     return pos
   },
 };
@@ -661,14 +2518,14 @@ class Animation {
   constructor(opts) {
     this.isStop = false;
 
-    let { type, animation, animationDuration, animationTiming, onProcess, onAnimationFinish } = opts;
+    let { animation, animationDuration, animationTiming, onProcess, onAnimationFinish } = opts;
 
-    let createAnimationFrame = function() {
+    let createAnimationFrame = function () {
       if (typeof requestAnimationFrame !== 'undefined') {
         return requestAnimationFrame
       } else if (typeof setTimeout !== 'undefined') {
-        return function(step) {
-          setTimeout(function() {
+        return function (step) {
+          setTimeout(function () {
             let timeStamp = +new Date();
             step(timeStamp);
           }, 17);
@@ -678,24 +2535,10 @@ class Animation {
     let animationFrame = createAnimationFrame();
 
     if (animation) {
-      if (animationTiming == 'default') {
-        switch (type) {
-          case 'bar':
-          case 'line':
-          case 'scatter':
-            animationTiming = 'easeIn';
-            break
-          case 'pie':
-          case 'radar':
-          case 'funnel':
-            animationTiming = 'easeInOut';
-            break
-        }
-      }
       let timingFunction = Timing[animationTiming];
       let startTimeStamp = null;
 
-      let step = function() {
+      let step = function () {
         if (this.isStop === true) {
           onProcess(1);
           onAnimationFinish();
@@ -732,86 +2575,185 @@ class Animation {
   }
 }
 
-function calSeriesColor() {
-  let { type, colors, series } = this.opts;
-  const colorsLength = colors.length;
-
-  if (type == 'funnel') {
-    series[0].data.sort((a, b) => {
-      if (series[0].sort == 'descending') {
-        return b.value - a.value
-      } else {
-        return a.value - b.value
+function calSeriesMap() {
+  let seriesMap = {};
+  this.opts.series.forEach(seriesItem => {
+    if (seriesItem.type == 'candlestick' || seriesItem.type == 'k') {
+      if (!seriesMap['candlestick']) {
+        seriesMap['candlestick'] = [];
       }
-    });
-  }
+      seriesMap['candlestick'].push(seriesItem);
+    } else if (seriesItem.type == 'funnel') {
+      if (!seriesMap['funnel']) {
+        seriesMap['funnel'] = [];
+      }
+      seriesItem.data.sort((a, b) => {
+        if (seriesItem.sort == 'ascending') {
+          return a.value - b.value
+        } else {
+          return b.value - a.value
+        }
+      });
+      seriesMap['funnel'].push(seriesItem);
+    } else {
+      if (!seriesMap[seriesItem.type]) {
+        seriesMap[seriesItem.type] = [];
+      }
+      seriesMap[seriesItem.type].push(seriesItem);
+    }
+  });
+  this.seriesMap = seriesMap;
 
-  if (type == 'pie' || type == 'funnel') {
-    series.forEach(seriesItem => {
+  console.log('complete calSeriesMap', this.seriesMap);
+}
+
+function calSeriesColor() {
+  let { colors, series } = this.opts;
+
+  series.forEach((seriesItem, seriesIndex) => {
+    if (seriesItem.type == 'pie' || seriesItem.type == 'funnel' || seriesItem.type == 'treemap' || seriesItem.type == 'tagCloud') {
       seriesItem.data.forEach((dataItem, dataIndex) => {
         dataItem.itemStyle = dataItem.itemStyle || {};
         if (!dataItem.itemStyle.color) {
-          dataItem.itemStyle.color = colors[dataIndex % colorsLength];
+          dataItem.itemStyle.color = colors[dataIndex % colors.length];
         }
       });
-    });
-  }
-
-  series.forEach((seriesItem, seriesIndex) => {
-    seriesItem.itemStyle = seriesItem.itemStyle || {};
-    if (!seriesItem.itemStyle.color) {
-      seriesItem.itemStyle.color = colors[seriesIndex % colorsLength];
+    } else {
+      seriesItem.itemStyle = seriesItem.itemStyle || {};
+      if (!seriesItem.itemStyle.color) {
+        seriesItem.itemStyle.color = colors[seriesIndex % colors.length];
+      }
     }
   });
 
-  console.log('complete calSeriesColor');
+  console.log('complete calSeriesColor', series);
 }
 
 function calLegendData() {
   if (this.opts.legend.show) {
     let { context, opts } = this;
-    let { type, width, legend, series } = opts;
-    let { shapeWidth, shapeHeight, itemGap, marginTop, textStyle } = legend;
-    let { fontSize, padding } = textStyle;
-    let seriesDataList = [];
+    let { width, padding, legend, series } = opts;
+    let { type: legendType, shapeWidth, shapeHeight, shapeRadius, itemGap, marginTop, textStyle } = legend;
+    let { fontSize, padding: textPadding } = textStyle;
     let legendWidth = 0;
     let legendWidthNum = 0;
     let legendList = [];
     let currentRow = [];
+    let _shapeWidth = shapeWidth;
+    let legendData = [];
+    let containerWidth = width - padding[1] - padding[3];
 
-    context.font = `${fontSize}px`;
-
-    if (type == 'pie' || type == 'funnel') {
-      seriesDataList = series[0].data;
-    } else {
-      seriesDataList = series;
-    }
-
-    seriesDataList.forEach(seriesDataItem => {
-      let { name, itemStyle } = seriesDataItem;
-      let measureText = this.context.measureText(name || '').width;
-      let itemWidth = shapeWidth + padding + itemGap + measureText;
-
-      let obj = {
-        name,
-        measureText,
-        color: typeof itemStyle.color == 'string' ? itemStyle.color : '#000000',
-      };
-
-      if (legendWidthNum + itemWidth > width) {
-        legendList.push(currentRow);
-        legendWidthNum = itemWidth;
-        currentRow = [obj];
-      } else {
-        legendWidthNum += itemWidth;
-        legendWidth = Math.max(legendWidth, legendWidthNum);
-        currentRow.push(obj);
-      }
+    let dataSeriesItem = [];
+    let isDataName = series.some(seriesItem => {
+      dataSeriesItem = seriesItem;
+      return seriesItem.type == 'pie' || seriesItem.type == 'funnel' || seriesItem.type == 'treemap' || seriesItem.type == 'tagCloud'
     });
 
-    if (legendList.length == 0) {
+    if (!legend.data) {
+      if (isDataName) {
+        legendData = dataSeriesItem.data.map(dataItem => {
+          return dataItem.name
+        });
+      } else {
+        legendData = series.map(seriesItem => {
+          return seriesItem.name
+        });
+      }
+    }
+
+    context.font = `${fontSize}px`;
+    if (isDataName) {
+      if (legendType == 'default') {
+        switch (dataSeriesItem.type) {
+          case 'pie':
+            legendType = 'circle';
+            _shapeWidth = shapeRadius * 2;
+            break
+          case 'funnel':
+          case 'treemap':
+          case 'tagCloud':
+            legendType = 'rect';
+            break
+        }
+      }
+
+      legendData.forEach(name => {
+        dataSeriesItem.data.forEach(dataItem => {
+          if (name == dataItem.name) {
+            let { name, itemStyle } = dataItem;
+            let measureText = this.context.measureText(name || '').width;
+            let itemWidth = _shapeWidth + textPadding + itemGap + measureText;
+
+            let obj = {
+              legendType,
+              name,
+              measureText,
+              color: typeof itemStyle.color == 'string' ? itemStyle.color : '#000000',
+            };
+
+            if (legendWidthNum + itemWidth > containerWidth) {
+              legendList.push(currentRow);
+              legendWidthNum = itemWidth;
+              currentRow = [obj];
+            } else {
+              legendWidthNum += itemWidth;
+              legendWidth = Math.max(legendWidth, legendWidthNum);
+              currentRow.push(obj);
+            }
+          }
+        });
+      });
+    } else {
+      legendData.forEach(name => {
+        series.forEach(seriesItem => {
+          if (legendType == 'default') {
+            switch (seriesItem.type) {
+              case 'bar':
+              case 'radar':
+              case 'candlestick':
+              case 'k':
+              case 'heatmap':
+                legendType = 'rect';
+                break
+              case 'line':
+                legendType = 'line';
+                break
+              case 'scatter':
+                legendType = 'circle';
+                _shapeWidth = shapeRadius * 2;
+                break
+            }
+          }
+
+          if (name == seriesItem.name) {
+            let { name, itemStyle } = seriesItem;
+            let measureText = this.context.measureText(name || '').width;
+            let itemWidth = _shapeWidth + textPadding + itemGap + measureText;
+            let obj = {
+              legendType,
+              name,
+              measureText,
+              color: typeof itemStyle.color == 'string' ? itemStyle.color : '#000000',
+            };
+
+            if (legendWidthNum + itemWidth > containerWidth) {
+              legendList.push(currentRow);
+              legendWidthNum = itemWidth;
+              currentRow = [obj];
+            } else {
+              legendWidthNum += itemWidth;
+              legendWidth = Math.max(legendWidth, legendWidthNum);
+              currentRow.push(obj);
+            }
+          }
+        });
+      });
+    }
+
+    if (currentRow.length) {
       legendList.push(currentRow);
     }
+
     this.legendData = {
       legendList,
       legendWidth: legendWidth - itemGap,
@@ -828,8 +2770,8 @@ function calLegendData() {
   console.log('complete calLegendData', this.legendData);
 }
 
-function calAxisYData() {
-  let { context, opts, legendData, chartData } = this;
+function calAxisData() {
+  let { context, opts, legendData, chartData, seriesMap } = this;
   let { width, height, padding, xAxis, yAxis, series } = opts;
 
   let {
@@ -893,6 +2835,13 @@ function calAxisYData() {
   let xEnd = width - padding[1]; // x方向终点
   let yStart = height - padding[2] - legendData.legendHeight; // y方向起点
   let yEnd = padding[0]; // y方向终点
+
+  if (seriesMap.candlestick && seriesMap.candlestick.length) {
+    let { height, margin, lineStyle } = seriesMap['candlestick'][0].bar;
+    let { lineWidth } = lineStyle;
+    yStart -= height + margin + lineWidth; // 蜡烛图存在成交量柱状图配置则修正yStart
+  }
+
   let xStartInit = xStart;
   let yStartInit = yStart;
 
@@ -956,54 +2905,106 @@ function calAxisYData() {
   };
 
   function calAxisValue(axis = 'x') {
+    let barDataObject = {}; // 因为层叠柱状图，柱状图数据单独计算
+    let allDataObject = {};
     let allDataArr = [];
 
-    if (xAxisType == 'value' && yAxisType == 'value') {
-      allDataArr = series.reduce((allDataArr, seriesItem) => {
-        let dataArr = seriesItem.data.reduce((dataArr, dataItem) => {
-          dataArr.push(dataItem[axis]);
-          return dataArr
-        }, []);
-        return allDataArr.concat(dataArr)
-      }, []);
-    } else {
-      let allDataObject = {};
-
-      JSON.parse(JSON.stringify(series)).forEach(seriesItem => {
-        if (seriesItem.stack) {
-          if (!allDataObject[seriesItem.stack]) {
-            allDataObject[seriesItem.stack] = [];
-          }
-
-          allDataObject[seriesItem.stack].push(seriesItem.data);
-        } else {
-          if (!allDataObject[seriesItem.name]) {
-            allDataObject[seriesItem.name] = [];
-          }
-
-          allDataObject[seriesItem.name].push(seriesItem.data);
-        }
-      });
-
-      Object.keys(allDataObject).forEach(key => {
-        if (allDataObject[key].length > 1) {
-          let stackDataArr = allDataObject[key].reduce((stackDataArr, dataArr) => {
-            if (stackDataArr.length == 0) {
-              stackDataArr = dataArr;
-            } else {
-              dataArr.forEach((dataItem, dataIndex) => {
-                stackDataArr[dataIndex] += dataItem;
-              });
+    Object.keys(seriesMap).forEach(type => {
+      if (type == 'bar') {
+        seriesMap['bar'].forEach(seriesItem => {
+          if (seriesItem.stack) {
+            if (!barDataObject[seriesItem.stack]) {
+              barDataObject[seriesItem.stack] = [];
             }
-            return stackDataArr
+
+            barDataObject[seriesItem.stack].push(seriesItem.data);
+          } else {
+            if (!barDataObject[seriesItem.name]) {
+              barDataObject[seriesItem.name] = [];
+            }
+
+            barDataObject[seriesItem.name].push(seriesItem.data);
+          }
+        });
+
+        allDataObject[type] = barDataObject;
+      }
+
+      if (type == 'line' || type == 'scatter' || type == 'candlestick') {
+        seriesMap[type].forEach(seriesItem => {
+          if (!allDataObject[type]) {
+            allDataObject[type] = [];
+          }
+
+          allDataObject[type].push(seriesItem.data);
+        });
+      }
+    });
+
+    Object.keys(allDataObject).forEach(type => {
+      if (type == 'bar') {
+        Object.keys(allDataObject[type]).forEach(key => {
+          if (barDataObject[key].length > 1) {
+            let stackDataArr = barDataObject[key].reduce((stackDataArr, dataArr) => {
+              if (stackDataArr.length == 0) {
+                stackDataArr = dataArr;
+              } else {
+                dataArr.forEach((dataItem, dataIndex) => {
+                  stackDataArr[dataIndex] += dataItem;
+                });
+              }
+              return stackDataArr
+            }, []);
+            allDataArr = allDataArr.concat(stackDataArr);
+          } else {
+            let dataArr = barDataObject[key][0];
+            allDataArr = allDataArr.concat(dataArr);
+          }
+        });
+      }
+
+      if (type == 'line') {
+        allDataObject[type].forEach(dataArr => {
+          let filterData = dataArr.reduce((data, dataItem) => {
+            dataItem = Number(dataItem);
+            if (!isNaN(dataItem) && typeof dataItem == 'number') {
+              data.push(dataItem);
+            }
+            return data
           }, []);
-          allDataArr = allDataArr.concat(stackDataArr);
-        } else {
-          let dataArr = allDataObject[key][0];
-          allDataArr = allDataArr.concat(dataArr);
-        }
-      });
-    }
+
+          allDataArr = allDataArr.concat(filterData);
+        });
+      }
+
+      if (type == 'scatter') {
+        allDataObject[type].forEach(dataArr => {
+          let filterData = dataArr.reduce((data, dataItem) => {
+            dataItem = Number(dataItem[axis]);
+            if (!isNaN(dataItem) && typeof dataItem == 'number') {
+              data.push(dataItem);
+            }
+            return data
+          }, []);
+
+          allDataArr = allDataArr.concat(filterData);
+        });
+      }
+
+      if (type == 'candlestick') {
+        allDataObject[type].forEach(dataArr => {
+          let filterData = dataArr.reduce((data, dataItem) => {
+            dataItem = Number(dataItem[2]);
+            if (!isNaN(dataItem) && typeof dataItem == 'number') {
+              data.push(dataItem);
+            }
+            return data
+          }, []);
+
+          allDataArr = allDataArr.concat(filterData);
+        });
+      }
+    });
 
     let axisLabelDataArr = [];
     let splitNumber = axis == 'x' ? xAxisSplitNumber : yAxisSplitNumber;
@@ -1015,7 +3016,7 @@ function calAxisYData() {
     let dataEachRange = 0;
     let limit = 1;
     let multiple = 1;
-    console.log(`首次获取${axis}轴数据, maxData: ${maxData}, minData: ${minData}, dataRange: ${dataRange}`, allDataArr);
+    console.log(`首次获取${axis}轴数据, maxData: ${maxData}, minData: ${minData}`, allDataArr);
 
     max = max == 'auto' ? max : Number(max);
     min = min == 'auto' ? min : Number(min);
@@ -1344,7 +3345,7 @@ function calAxisYData() {
   let yAxisLabelMaxWidth = 0;
   let yAxisLabelTextArr = yAxisLabelDataArr.reduce((yAxisLabelTextArr, dataItem, dataIndex) => {
     let text = yAxisFormat ? yAxisFormat(dataItem) : dataItem;
-    yAxisLabelMaxWidth = Math.max(context.measureText(text).width, xAxisLabelMaxWidth);
+    yAxisLabelMaxWidth = Math.max(context.measureText(text).width, yAxisLabelMaxWidth);
     yAxisLabelTextArr.push(text);
     return yAxisLabelTextArr
   }, []);
@@ -2179,10 +4180,11 @@ function calAxisYData() {
 function calAxisRadarData() {
   let { context, opts, legendData, chartData } = this;
   let { width, height, padding, radarAxis, categories } = opts;
-  let { center, radius, splitNumber, axisName: radarAxisName } = JSON.parse(JSON.stringify(radarAxis));
+  let { center, radius, splitNumber, axisName: radarAxisName } = radarAxis;
   let { show: radarAxisNameShow, textStyle: radarAxisNameTextStyle } = radarAxisName;
   let { fontSize: radarAxisNameFontSize, margin: radarAxisNameMargin } = radarAxisNameTextStyle;
   let [centerX, centerY] = center;
+
   chartData.radarAxis = {
     center: [],
     radius: 0,
@@ -2244,8 +4246,9 @@ function calAxisRadarData() {
 }
 
 function calChartBarData() {
-  let { opts, chartData } = this;
-  let { series, xAxis, yAxis } = opts;
+  let { opts, chartData, seriesMap } = this;
+  let { xAxis, yAxis } = opts;
+  let seriesBar = seriesMap['bar'];
 
   let {
     xStart,
@@ -2286,7 +4289,7 @@ function calChartBarData() {
   let categoryAxisData = xAxis.type == 'category' ? xAxis.data : yAxis.data;
 
   let allDataObject = {};
-  series.forEach(seriesItem => {
+  seriesBar.forEach(seriesItem => {
     if (seriesItem.stack) {
       if (!allDataObject[seriesItem.stack]) {
         allDataObject[seriesItem.stack] = [];
@@ -2303,16 +4306,17 @@ function calChartBarData() {
   });
 
   let chartBar = [];
+
   for (let i = 0, len = categoryAxisData.length; i < len; i++) {
     let chartBarArrItem = [];
 
     Object.keys(allDataObject).forEach(key => {
-      chartBarArrItem.push(allDataObject[key]);
+      chartBarArrItem.push(lodash_clonedeep(allDataObject[key]));
     });
     chartBar.push(chartBarArrItem);
   }
 
-  chartData.chartBar = JSON.parse(JSON.stringify(chartBar)).map((barItemArr, barItemArrIndex) => {
+  chartBar.forEach((barItemArr, barItemArrIndex) => {
     barItemArr.forEach((barItem, barIndex) => {
       barItem.forEach((seriesItem, seriesIndex) => {
         let isShow = true;
@@ -2355,8 +4359,6 @@ function calChartBarData() {
         }
       }
     });
-
-    return barItemArr
   });
 
   // 计算autoWidth
@@ -2367,7 +4369,7 @@ function calChartBarData() {
   }
 
   // 修正barWidth, 计算sumWidth
-  chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+  chartBar.forEach((barItemArr, barItemArrIndex) => {
     barItemArr.forEach((barItem, barIndex) => {
       barItem.forEach((seriesItem, seriesIndex) => {
         let { barMaxWidth, barWidth } = seriesItem;
@@ -2386,7 +4388,7 @@ function calChartBarData() {
   });
 
   if (xAxis.type == 'category') {
-    chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+    chartBar.forEach((barItemArr, barItemArrIndex) => {
       let x = xAxisLabelPoint[barItemArrIndex].x - sumWidth / 2;
 
       barItemArr.forEach((barItem, barIndex) => {
@@ -2450,7 +4452,7 @@ function calChartBarData() {
       });
     });
   } else {
-    chartData.chartBar.forEach((barItemArr, barItemArrIndex) => {
+    chartBar.forEach((barItemArr, barItemArrIndex) => {
       let y = yAxisLabelPoint[barItemArrIndex].y + sumWidth / 2;
 
       barItemArr.forEach((barItem, barIndex) => {
@@ -2502,12 +4504,15 @@ function calChartBarData() {
     });
   }
 
-  console.log('complete calChartBarData', this.chartData.chartBar);
+  chartData.chartBar = chartBar;
+
+  console.log('complete calChartBarData', chartData.chartBar);
 }
 
 function calChartLineData() {
-  let { opts, chartData } = this;
-  let { series, xAxis } = opts;
+  let { opts, chartData, seriesMap } = this;
+  let { xAxis } = opts;
+  let seriesLine = lodash_clonedeep(seriesMap['line']);
 
   let {
     xStart,
@@ -2539,35 +4544,40 @@ function calChartLineData() {
   let valueAxisMinusSpacing = xAxis.type == 'value' ? xMinusSpacing : yMinusSpacing;
   let valueAxisSpacing = xAxis.type == 'value' ? xSpacing : ySpacing;
 
+  let chartLine = [];
+
   if (xAxis.type == 'category') {
-    chartData.chartLine = JSON.parse(JSON.stringify(series)).reduce((chartLineArr, seriesItem) => {
+    chartLine = seriesLine.reduce((chartLineArr, seriesItem) => {
       seriesItem.data = seriesItem.data.reduce((dataArr, dataItem, dataIndex) => {
-        let itemHeight = 0;
-        let y = 0;
+        let x, y, height;
+        if (typeof dataItem == 'number') {
+          x = xAxisLabelPoint[dataIndex].x;
 
-        dataItem = dataItem > maxData ? maxData : dataItem;
-        dataItem = dataItem < minData ? minData : dataItem;
+          dataItem = dataItem > maxData ? maxData : dataItem;
+          dataItem = dataItem < minData ? minData : dataItem;
 
-        if (maxData >= 0 && minData >= 0) {
-          itemHeight = (valueAxisSpacing * (dataItem - minData)) / dataRange;
-          y = yStart - itemHeight;
-        } else if (maxData <= 0 && minData <= 0) {
-          itemHeight = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
-          y = yEnd + itemHeight;
-        } else {
-          if (dataItem > 0) {
-            itemHeight = (valueAxisPlusSpacing * dataItem) / maxData;
-            y = yZero - itemHeight;
+          if (maxData >= 0 && minData >= 0) {
+            height = (valueAxisSpacing * (dataItem - minData)) / dataRange;
+            y = yStart - height;
+          } else if (maxData <= 0 && minData <= 0) {
+            height = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
+            y = yEnd + height;
           } else {
-            itemHeight = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
-            y = yZero + itemHeight;
+            if (dataItem > 0) {
+              height = (valueAxisPlusSpacing * dataItem) / maxData;
+              y = yZero - height;
+            } else {
+              height = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
+              y = yZero + height;
+            }
           }
         }
+
         dataArr.push({
-          x: xAxisLabelPoint[dataIndex].x,
+          x,
           y,
           data: dataItem,
-          height: itemHeight,
+          height,
         });
         return dataArr
       }, []);
@@ -2577,35 +4587,38 @@ function calChartLineData() {
       return chartLineArr
     }, []);
   } else {
-    chartData.chartLine = JSON.parse(JSON.stringify(series)).reduce((chartLineArr, seriesItem) => {
+    chartLine = seriesLine.reduce((chartLineArr, seriesItem) => {
       seriesItem.data = seriesItem.data.reduce((dataArr, dataItem, dataIndex) => {
-        let itemHeight = 0;
-        let x = 0;
+        let x, y, height;
 
-        dataItem = dataItem > maxData ? maxData : dataItem;
-        dataItem = dataItem < minData ? minData : dataItem;
+        if (typeof dataItem == 'number') {
+          y = yAxisLabelPoint[dataIndex].y;
 
-        if (maxData >= 0 && minData >= 0) {
-          itemHeight = (valueAxisSpacing * (dataItem - minData)) / dataRange;
-          x = xStart + itemHeight;
-        } else if (maxData <= 0 && minData <= 0) {
-          itemHeight = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
-          x = xEnd - itemHeight;
-        } else {
-          if (dataItem > 0) {
-            itemHeight = (valueAxisPlusSpacing * dataItem) / maxData;
-            x = xZero + itemHeight;
+          dataItem = dataItem > maxData ? maxData : dataItem;
+          dataItem = dataItem < minData ? minData : dataItem;
+
+          if (maxData >= 0 && minData >= 0) {
+            itemHeight = (valueAxisSpacing * (dataItem - minData)) / dataRange;
+            x = xStart + itemHeight;
+          } else if (maxData <= 0 && minData <= 0) {
+            itemHeight = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
+            x = xEnd - itemHeight;
           } else {
-            itemHeight = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
-            x = xZero - itemHeight;
+            if (dataItem > 0) {
+              itemHeight = (valueAxisPlusSpacing * dataItem) / maxData;
+              x = xZero + itemHeight;
+            } else {
+              itemHeight = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
+              x = xZero - itemHeight;
+            }
           }
         }
 
         dataArr.push({
           x,
-          y: yAxisLabelPoint[dataIndex].y,
+          y,
           data: dataItem,
-          height: itemHeight,
+          height,
         });
         return dataArr
       }, []);
@@ -2616,26 +4629,24 @@ function calChartLineData() {
     }, []);
   }
 
-  console.log('complete calChartLineData', this.chartData.chartLine);
+  chartData.chartLine = chartLine;
+
+  console.log('complete calChartLineData', chartData.chartLine);
 }
 
 function calChartPieData() {
-  let { opts, legendData, chartData } = this;
+  let { opts, legendData, seriesMap } = this;
   let { width, height, series, padding } = opts;
 
-  chartData.chartPie = JSON.parse(JSON.stringify(series[0]));
-
-  let { data, center, radius } = chartData.chartPie;
+  let chartPie = lodash_clonedeep(seriesMap['pie'][0]);
+  let { data, center, radius } = chartPie;
   let [centerX, centerY] = center;
   let [radius1, radius2] = radius;
-  let valueSum = 0;
 
-  valueSum = data.reduce((sum, dataItem) => {
+  let valueSum = data.reduce((sum, dataItem) => {
     sum += dataItem.value === null ? 0 : dataItem.value;
     return sum
   }, 0);
-
-  chartData.chartPie.valueSum = valueSum;
 
   if (typeof centerX == 'string') {
     centerX = width * percentToNum(centerX);
@@ -2649,15 +4660,27 @@ function calChartPieData() {
   if (typeof radius2 == 'string') {
     radius2 = ((height - legendData.legendHeight - padding[2]) * percentToNum(radius2)) / 2;
   }
-  chartData.chartPie.center = [centerX, centerY];
-  chartData.chartPie.radius = [radius1, radius2];
+
+  let sortData = data.concat([]).sort((a, b) => {
+    return b.value - a.value
+  });
+
+  chartPie.valueSum = valueSum;
+  chartPie.center = [centerX, centerY];
+  chartPie.radius = [radius1, radius2];
+  chartPie.maxData = sortData[0].value;
+  chartPie.minData = sortData[sortData.length - 1].value;
+
+  this.chartData.chartPie = chartPie;
 
   console.log('complete calChartPieData', this.chartData.chartPie);
 }
 
 function calChartRadarData() {
-  let { opts, chartData } = this;
+  let { opts, chartData, seriesMap } = this;
   let { radarAxis, categories, series } = opts;
+  let seriesRadar = lodash_clonedeep(seriesMap['radar']);
+
   let { max } = radarAxis;
   let { radius } = chartData.radarAxis;
 
@@ -2670,8 +4693,7 @@ function calChartRadarData() {
   let spacingAangle = (2 * Math.PI) / categories.length;
   let start = Math.PI / 2; // 以90度为起点, 逆时针累加
 
-  chartData.chartRadar = JSON.parse(JSON.stringify(series));
-  chartData.chartRadar.map(radarItem => {
+  seriesRadar.forEach(radarItem => {
     radarItem.dataPosition = radarItem.data.reduce((arr, dataItem, dataIndex) => {
       let scale = dataItem / maxData;
       let point = {
@@ -2684,16 +4706,15 @@ function calChartRadarData() {
       });
       return arr
     }, []);
-
-    return radarItem
   });
+
+  chartData.chartRadar = seriesRadar;
 
   console.log('complete calChartRadarData', this.chartData.chartRadar);
 }
 
 function calChartScatterData() {
-  let { opts, chartData } = this;
-  let { series } = opts;
+  let { opts, chartData, seriesMap } = this;
   let {
     xStart,
     xEnd,
@@ -2715,7 +4736,9 @@ function calChartScatterData() {
     xDataRange,
   } = chartData.axisData;
 
-  chartData.chartScatter = JSON.parse(JSON.stringify(series)).map(seriesItem => {
+  let seriesScatter = lodash_clonedeep(seriesMap['scatter']);
+
+  chartData.chartScatter = seriesScatter.map(seriesItem => {
     let { data, radius, itemStyle } = seriesItem;
     let { color: scatterItemColor } = itemStyle;
     let radiusMax, radiusMin, radiusRange;
@@ -2802,10 +4825,10 @@ function calChartScatterData() {
 }
 
 function calChartPieData$1() {
-  let { opts, legendData, chartData } = this;
+  let { opts, legendData, chartData, seriesMap } = this;
   let { width, height, series, padding } = opts;
 
-  let chartFunnel = JSON.parse(JSON.stringify(series[0]));
+  let chartFunnel = seriesMap['funnel'][0];
   let { data, width: funnelWidth, height: funnelHeight, top, left, right, bottom, max, min, gap, sort, shape, funnelAlign, label, itemStyle } = chartFunnel;
   let xStart = padding[3];
   let xEnd = width - padding[1];
@@ -3019,6 +5042,1984 @@ function calChartPieData$1() {
   console.log('complete calChartFunnelData', this.chartData.chartFunnel);
 }
 
+function calChartCandlestick() {
+  let { opts, chartData, legendData } = this;
+  let { height: chartHeight, padding, series } = opts;
+  let candlestickSeries = series.filter(seriesItem => {
+    return seriesItem.type == 'candlestick' || seriesItem.type == 'k'
+  });
+
+  if (candlestickSeries.length == 0) return
+
+  let { data, barMaxWidth, barMinWidth, barWidth, itemStyle, highLine: seriesHighLine, lowLine: seriesLowLine, bar: seriesBar } = candlestickSeries[0];
+  let { color, bordercolor, opacity, color0, bordercolor0, opacity0, borderWidth } = itemStyle;
+  let { show: highLineShow, lineStyle: highLineStyle } = seriesHighLine;
+  let { show: lowLineShow, lineStyle: lowLineStyle } = seriesLowLine;
+  let { show: barShow, height: barHeight, margin: barMargin, data: barData, lineStyle: barLineStyle } = seriesBar;
+  let {
+    xStart,
+    xEnd,
+    yStart,
+    yEnd,
+    yZero,
+    yPlusSpacing,
+    yMinusSpacing,
+    ySpacing,
+    xZero,
+    xPlusSpacing,
+    xMinusSpacing,
+    xEachSpacing,
+    xSpacing,
+    yMaxData,
+    yMinData,
+    yDataRange,
+    xMaxData,
+    xMinData,
+    xDataRange,
+    xAxisLabelPoint,
+    yAxisLabelPoint,
+  } = chartData.axisData;
+
+  let candlestickRect, candlestickHighLine, candlestickLowLine, candlestickBar;
+  let highData = 0;
+  let lowData = Infinity;
+
+  if (barWidth == 'auto') {
+    barWidth = xEachSpacing > barMaxWidth ? barMaxWidth : xEachSpacing;
+    barWidth = barWidth > 3 ? barWidth - 2 : barWidth;
+  }
+
+  candlestickRect = data.reduce((chartCandlestick, dataItem, dataIndex) => {
+    highData = Math.max(dataItem[1], highData);
+    lowData = Math.min(dataItem[1], lowData);
+
+    let candlestickItem = {};
+
+    candlestickItem.color = dataItem[0] > dataItem[1] ? color0 : color;
+    candlestickItem.bordercolor = dataItem[0] > dataItem[1] ? bordercolor0 : bordercolor;
+    candlestickItem.opacity = dataItem[0] > dataItem[1] ? opacity : opacity0;
+    candlestickItem.borderWidth = borderWidth;
+
+    candlestickItem.upLinePoint = {
+      startX: xAxisLabelPoint[dataIndex].x,
+      startY: yStart - (ySpacing * (dataItem[3] - yMinData)) / yDataRange,
+      endX: xAxisLabelPoint[dataIndex].x,
+      endY: yStart - (ySpacing * (Math.max(dataItem[0], dataItem[1]) - yMinData)) / yDataRange,
+    };
+    candlestickItem.downLinePoint = {
+      startX: xAxisLabelPoint[dataIndex].x,
+      startY: yStart - (ySpacing * (dataItem[2] - yMinData)) / yDataRange,
+      endX: xAxisLabelPoint[dataIndex].x,
+      endY: yStart - (ySpacing * (Math.min(dataItem[0], dataItem[1]) - yMinData)) / yDataRange,
+    };
+    candlestickItem.rectPoint = {
+      x: Math.floor(xAxisLabelPoint[dataIndex].x - barWidth / 2),
+      y: yStart - (ySpacing * (Math.max(dataItem[0], dataItem[1]) - yMinData)) / yDataRange,
+      width: barWidth,
+      height: (ySpacing * Math.abs(dataItem[0] - dataItem[1])) / yDataRange,
+    };
+    chartCandlestick.push(candlestickItem);
+    return chartCandlestick
+  }, []);
+
+  if (highLineShow) {
+    candlestickHighLine = {
+      data: highData,
+      startX: xStart,
+      startY: yStart - (ySpacing * (highData - yMinData)) / yDataRange,
+      endX: xEnd,
+      endY: yStart - (ySpacing * (highData - yMinData)) / yDataRange,
+    };
+  }
+
+  if (lowLineShow) {
+    candlestickLowLine = {
+      data: lowData,
+      startX: xStart,
+      startY: yStart - (ySpacing * (lowData - yMinData)) / yDataRange,
+      endX: xEnd,
+      endY: yStart - (ySpacing * (lowData - yMinData)) / yDataRange,
+    };
+  }
+
+  if (barShow) {
+    let maxData = Math.max(...barData);
+    let minData = Math.min(...barData);
+    let range = maxData - minData;
+
+    candlestickBar = candlestickRect.reduce((candlestickBar, item, index) => {
+      let { color, rectPoint } = item;
+      let { x, width } = rectPoint;
+      let y = chartHeight - padding[2] - legendData.legendHeight - barLineStyle.lineWidth / 2;
+      let height = barHeight * 0.2 + (barHeight * 0.8 * (barData[index] - minData)) / range;
+
+      candlestickBar.push({
+        color,
+        x,
+        y,
+        width,
+        height,
+        lineStartX: xStart,
+        lineStartY: y,
+        lineEndX: xEnd,
+        lineEndY: y,
+      });
+
+      return candlestickBar
+    }, []);
+  }
+
+  this.chartData.chartCandlestick = {
+    rect: candlestickRect,
+    highLine: candlestickHighLine,
+    lowhLine: candlestickLowLine,
+    bar: candlestickBar,
+  };
+
+  console.log('complete calChartCandlestick', this.chartData.chartCandlestick);
+}
+
+function calChartHeatmapData() {
+  let { chartData, seriesMap } = this;
+  let { xStart, yStart, xEachSpacing, yEachSpacing } = chartData.axisData;
+
+  let seriesHeatmap = lodash_clonedeep(seriesMap['heatmap']);
+
+  chartData.chartHeatmap = seriesHeatmap.map(seriesItem => {
+    let { data, itemStyle } = seriesItem;
+    let { color, useSplit } = itemStyle;
+    let zMax, zMin, zRange;
+    let HSLColorMax, HSLColorMin, HSLColorRange;
+
+    let sortData = data.concat([]).sort((a, b) => {
+      return a[2] - b[2]
+    });
+    zMax = sortData[sortData.length - 1][2];
+    zMin = sortData[0][2];
+    zRange = zMax - zMin;
+
+    let [HEXColorMin, HEXColorMax] = color;
+    HSLColorMax = HEX2HSL(HEXColorMax);
+    HSLColorMin = HEX2HSL(HEXColorMin);
+    HSLColorRange = [HSLColorMax[0] - HSLColorMin[0], HSLColorMax[1] - HSLColorMin[1], HSLColorMax[2] - HSLColorMin[2]];
+
+    seriesItem.data = data.map(dataItem => {
+      let [x, y, z] = dataItem;
+      let positionX, positionY;
+
+      positionX = xStart + x * xEachSpacing;
+      positionY = yStart - (y + 1) * yEachSpacing;
+      dataItem.positionX = positionX;
+      dataItem.positionY = positionY;
+
+      z = z ? z : 0;
+      let scale = (z - zMin) / zRange;
+      let HSLColor = [HSLColorMin[0] + HSLColorRange[0] * scale, HSLColorMin[1] + HSLColorRange[1] * scale, HSLColorMin[2] + HSLColorRange[2] * scale];
+      dataItem.color = HSL2HEX(HSLColor);
+      dataItem.useSplit = useSplit;
+      return dataItem
+    });
+
+    return seriesItem
+  });
+  console.log('complete calChartHeatmapData', this.chartData.chartHeatmap);
+}
+
+function defaultSeparation(a, b) {
+  return a.parent === b.parent ? 1 : 2;
+}
+
+function meanX(children) {
+  return children.reduce(meanXReduce, 0) / children.length;
+}
+
+function meanXReduce(x, c) {
+  return x + c.x;
+}
+
+function maxY(children) {
+  return 1 + children.reduce(maxYReduce, 0);
+}
+
+function maxYReduce(y, c) {
+  return Math.max(y, c.y);
+}
+
+function leafLeft(node) {
+  var children;
+  while (children = node.children) node = children[0];
+  return node;
+}
+
+function leafRight(node) {
+  var children;
+  while (children = node.children) node = children[children.length - 1];
+  return node;
+}
+
+function cluster() {
+  var separation = defaultSeparation,
+      dx = 1,
+      dy = 1,
+      nodeSize = false;
+
+  function cluster(root) {
+    var previousNode,
+        x = 0;
+
+    // First walk, computing the initial x & y values.
+    root.eachAfter(function(node) {
+      var children = node.children;
+      if (children) {
+        node.x = meanX(children);
+        node.y = maxY(children);
+      } else {
+        node.x = previousNode ? x += separation(node, previousNode) : 0;
+        node.y = 0;
+        previousNode = node;
+      }
+    });
+
+    var left = leafLeft(root),
+        right = leafRight(root),
+        x0 = left.x - separation(left, right) / 2,
+        x1 = right.x + separation(right, left) / 2;
+
+    // Second walk, normalizing x & y to the desired size.
+    return root.eachAfter(nodeSize ? function(node) {
+      node.x = (node.x - root.x) * dx;
+      node.y = (root.y - node.y) * dy;
+    } : function(node) {
+      node.x = (node.x - x0) / (x1 - x0) * dx;
+      node.y = (1 - (root.y ? node.y / root.y : 1)) * dy;
+    });
+  }
+
+  cluster.separation = function(x) {
+    return arguments.length ? (separation = x, cluster) : separation;
+  };
+
+  cluster.size = function(x) {
+    return arguments.length ? (nodeSize = false, dx = +x[0], dy = +x[1], cluster) : (nodeSize ? null : [dx, dy]);
+  };
+
+  cluster.nodeSize = function(x) {
+    return arguments.length ? (nodeSize = true, dx = +x[0], dy = +x[1], cluster) : (nodeSize ? [dx, dy] : null);
+  };
+
+  return cluster;
+}
+
+function count(node) {
+  var sum = 0,
+      children = node.children,
+      i = children && children.length;
+  if (!i) sum = 1;
+  else while (--i >= 0) sum += children[i].value;
+  node.value = sum;
+}
+
+function node_count() {
+  return this.eachAfter(count);
+}
+
+function node_each(callback) {
+  var node = this, current, next = [node], children, i, n;
+  do {
+    current = next.reverse(), next = [];
+    while (node = current.pop()) {
+      callback(node), children = node.children;
+      if (children) for (i = 0, n = children.length; i < n; ++i) {
+        next.push(children[i]);
+      }
+    }
+  } while (next.length);
+  return this;
+}
+
+function node_eachBefore(callback) {
+  var node = this, nodes = [node], children, i;
+  while (node = nodes.pop()) {
+    callback(node), children = node.children;
+    if (children) for (i = children.length - 1; i >= 0; --i) {
+      nodes.push(children[i]);
+    }
+  }
+  return this;
+}
+
+function node_eachAfter(callback) {
+  var node = this, nodes = [node], next = [], children, i, n;
+  while (node = nodes.pop()) {
+    next.push(node), children = node.children;
+    if (children) for (i = 0, n = children.length; i < n; ++i) {
+      nodes.push(children[i]);
+    }
+  }
+  while (node = next.pop()) {
+    callback(node);
+  }
+  return this;
+}
+
+function node_sum(value) {
+  return this.eachAfter(function(node) {
+    var sum = +value(node.data) || 0,
+        children = node.children,
+        i = children && children.length;
+    while (--i >= 0) sum += children[i].value;
+    node.value = sum;
+  });
+}
+
+function node_sort(compare) {
+  return this.eachBefore(function(node) {
+    if (node.children) {
+      node.children.sort(compare);
+    }
+  });
+}
+
+function node_path(end) {
+  var start = this,
+      ancestor = leastCommonAncestor(start, end),
+      nodes = [start];
+  while (start !== ancestor) {
+    start = start.parent;
+    nodes.push(start);
+  }
+  var k = nodes.length;
+  while (end !== ancestor) {
+    nodes.splice(k, 0, end);
+    end = end.parent;
+  }
+  return nodes;
+}
+
+function leastCommonAncestor(a, b) {
+  if (a === b) return a;
+  var aNodes = a.ancestors(),
+      bNodes = b.ancestors(),
+      c = null;
+  a = aNodes.pop();
+  b = bNodes.pop();
+  while (a === b) {
+    c = a;
+    a = aNodes.pop();
+    b = bNodes.pop();
+  }
+  return c;
+}
+
+function node_ancestors() {
+  var node = this, nodes = [node];
+  while (node = node.parent) {
+    nodes.push(node);
+  }
+  return nodes;
+}
+
+function node_descendants() {
+  var nodes = [];
+  this.each(function(node) {
+    nodes.push(node);
+  });
+  return nodes;
+}
+
+function node_leaves() {
+  var leaves = [];
+  this.eachBefore(function(node) {
+    if (!node.children) {
+      leaves.push(node);
+    }
+  });
+  return leaves;
+}
+
+function node_links() {
+  var root = this, links = [];
+  root.each(function(node) {
+    if (node !== root) { // Don’t include the root’s parent, if any.
+      links.push({source: node.parent, target: node});
+    }
+  });
+  return links;
+}
+
+function hierarchy(data, children) {
+  var root = new Node(data),
+      valued = +data.value && (root.value = data.value),
+      node,
+      nodes = [root],
+      child,
+      childs,
+      i,
+      n;
+
+  if (children == null) children = defaultChildren;
+
+  while (node = nodes.pop()) {
+    if (valued) node.value = +node.data.value;
+    if ((childs = children(node.data)) && (n = childs.length)) {
+      node.children = new Array(n);
+      for (i = n - 1; i >= 0; --i) {
+        nodes.push(child = node.children[i] = new Node(childs[i]));
+        child.parent = node;
+        child.depth = node.depth + 1;
+      }
+    }
+  }
+
+  return root.eachBefore(computeHeight);
+}
+
+function node_copy() {
+  return hierarchy(this).eachBefore(copyData);
+}
+
+function defaultChildren(d) {
+  return d.children;
+}
+
+function copyData(node) {
+  node.data = node.data.data;
+}
+
+function computeHeight(node) {
+  var height = 0;
+  do node.height = height;
+  while ((node = node.parent) && (node.height < ++height));
+}
+
+function Node(data) {
+  this.data = data;
+  this.depth =
+  this.height = 0;
+  this.parent = null;
+}
+
+Node.prototype = hierarchy.prototype = {
+  constructor: Node,
+  count: node_count,
+  each: node_each,
+  eachAfter: node_eachAfter,
+  eachBefore: node_eachBefore,
+  sum: node_sum,
+  sort: node_sort,
+  path: node_path,
+  ancestors: node_ancestors,
+  descendants: node_descendants,
+  leaves: node_leaves,
+  links: node_links,
+  copy: node_copy
+};
+
+var slice = Array.prototype.slice;
+
+function shuffle(array) {
+  var m = array.length,
+      t,
+      i;
+
+  while (m) {
+    i = Math.random() * m-- | 0;
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+
+  return array;
+}
+
+function enclose(circles) {
+  var i = 0, n = (circles = shuffle(slice.call(circles))).length, B = [], p, e;
+
+  while (i < n) {
+    p = circles[i];
+    if (e && enclosesWeak(e, p)) ++i;
+    else e = encloseBasis(B = extendBasis(B, p)), i = 0;
+  }
+
+  return e;
+}
+
+function extendBasis(B, p) {
+  var i, j;
+
+  if (enclosesWeakAll(p, B)) return [p];
+
+  // If we get here then B must have at least one element.
+  for (i = 0; i < B.length; ++i) {
+    if (enclosesNot(p, B[i])
+        && enclosesWeakAll(encloseBasis2(B[i], p), B)) {
+      return [B[i], p];
+    }
+  }
+
+  // If we get here then B must have at least two elements.
+  for (i = 0; i < B.length - 1; ++i) {
+    for (j = i + 1; j < B.length; ++j) {
+      if (enclosesNot(encloseBasis2(B[i], B[j]), p)
+          && enclosesNot(encloseBasis2(B[i], p), B[j])
+          && enclosesNot(encloseBasis2(B[j], p), B[i])
+          && enclosesWeakAll(encloseBasis3(B[i], B[j], p), B)) {
+        return [B[i], B[j], p];
+      }
+    }
+  }
+
+  // If we get here then something is very wrong.
+  throw new Error;
+}
+
+function enclosesNot(a, b) {
+  var dr = a.r - b.r, dx = b.x - a.x, dy = b.y - a.y;
+  return dr < 0 || dr * dr < dx * dx + dy * dy;
+}
+
+function enclosesWeak(a, b) {
+  var dr = a.r - b.r + 1e-6, dx = b.x - a.x, dy = b.y - a.y;
+  return dr > 0 && dr * dr > dx * dx + dy * dy;
+}
+
+function enclosesWeakAll(a, B) {
+  for (var i = 0; i < B.length; ++i) {
+    if (!enclosesWeak(a, B[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function encloseBasis(B) {
+  switch (B.length) {
+    case 1: return encloseBasis1(B[0]);
+    case 2: return encloseBasis2(B[0], B[1]);
+    case 3: return encloseBasis3(B[0], B[1], B[2]);
+  }
+}
+
+function encloseBasis1(a) {
+  return {
+    x: a.x,
+    y: a.y,
+    r: a.r
+  };
+}
+
+function encloseBasis2(a, b) {
+  var x1 = a.x, y1 = a.y, r1 = a.r,
+      x2 = b.x, y2 = b.y, r2 = b.r,
+      x21 = x2 - x1, y21 = y2 - y1, r21 = r2 - r1,
+      l = Math.sqrt(x21 * x21 + y21 * y21);
+  return {
+    x: (x1 + x2 + x21 / l * r21) / 2,
+    y: (y1 + y2 + y21 / l * r21) / 2,
+    r: (l + r1 + r2) / 2
+  };
+}
+
+function encloseBasis3(a, b, c) {
+  var x1 = a.x, y1 = a.y, r1 = a.r,
+      x2 = b.x, y2 = b.y, r2 = b.r,
+      x3 = c.x, y3 = c.y, r3 = c.r,
+      a2 = x1 - x2,
+      a3 = x1 - x3,
+      b2 = y1 - y2,
+      b3 = y1 - y3,
+      c2 = r2 - r1,
+      c3 = r3 - r1,
+      d1 = x1 * x1 + y1 * y1 - r1 * r1,
+      d2 = d1 - x2 * x2 - y2 * y2 + r2 * r2,
+      d3 = d1 - x3 * x3 - y3 * y3 + r3 * r3,
+      ab = a3 * b2 - a2 * b3,
+      xa = (b2 * d3 - b3 * d2) / (ab * 2) - x1,
+      xb = (b3 * c2 - b2 * c3) / ab,
+      ya = (a3 * d2 - a2 * d3) / (ab * 2) - y1,
+      yb = (a2 * c3 - a3 * c2) / ab,
+      A = xb * xb + yb * yb - 1,
+      B = 2 * (r1 + xa * xb + ya * yb),
+      C = xa * xa + ya * ya - r1 * r1,
+      r = -(A ? (B + Math.sqrt(B * B - 4 * A * C)) / (2 * A) : C / B);
+  return {
+    x: x1 + xa + xb * r,
+    y: y1 + ya + yb * r,
+    r: r
+  };
+}
+
+function place(b, a, c) {
+  var dx = b.x - a.x, x, a2,
+      dy = b.y - a.y, y, b2,
+      d2 = dx * dx + dy * dy;
+  if (d2) {
+    a2 = a.r + c.r, a2 *= a2;
+    b2 = b.r + c.r, b2 *= b2;
+    if (a2 > b2) {
+      x = (d2 + b2 - a2) / (2 * d2);
+      y = Math.sqrt(Math.max(0, b2 / d2 - x * x));
+      c.x = b.x - x * dx - y * dy;
+      c.y = b.y - x * dy + y * dx;
+    } else {
+      x = (d2 + a2 - b2) / (2 * d2);
+      y = Math.sqrt(Math.max(0, a2 / d2 - x * x));
+      c.x = a.x + x * dx - y * dy;
+      c.y = a.y + x * dy + y * dx;
+    }
+  } else {
+    c.x = a.x + c.r;
+    c.y = a.y;
+  }
+}
+
+function intersects(a, b) {
+  var dr = a.r + b.r - 1e-6, dx = b.x - a.x, dy = b.y - a.y;
+  return dr > 0 && dr * dr > dx * dx + dy * dy;
+}
+
+function score(node) {
+  var a = node._,
+      b = node.next._,
+      ab = a.r + b.r,
+      dx = (a.x * b.r + b.x * a.r) / ab,
+      dy = (a.y * b.r + b.y * a.r) / ab;
+  return dx * dx + dy * dy;
+}
+
+function Node$1(circle) {
+  this._ = circle;
+  this.next = null;
+  this.previous = null;
+}
+
+function packEnclose(circles) {
+  if (!(n = circles.length)) return 0;
+
+  var a, b, c, n, aa, ca, i, j, k, sj, sk;
+
+  // Place the first circle.
+  a = circles[0], a.x = 0, a.y = 0;
+  if (!(n > 1)) return a.r;
+
+  // Place the second circle.
+  b = circles[1], a.x = -b.r, b.x = a.r, b.y = 0;
+  if (!(n > 2)) return a.r + b.r;
+
+  // Place the third circle.
+  place(b, a, c = circles[2]);
+
+  // Initialize the front-chain using the first three circles a, b and c.
+  a = new Node$1(a), b = new Node$1(b), c = new Node$1(c);
+  a.next = c.previous = b;
+  b.next = a.previous = c;
+  c.next = b.previous = a;
+
+  // Attempt to place each remaining circle…
+  pack: for (i = 3; i < n; ++i) {
+    place(a._, b._, c = circles[i]), c = new Node$1(c);
+
+    // Find the closest intersecting circle on the front-chain, if any.
+    // “Closeness” is determined by linear distance along the front-chain.
+    // “Ahead” or “behind” is likewise determined by linear distance.
+    j = b.next, k = a.previous, sj = b._.r, sk = a._.r;
+    do {
+      if (sj <= sk) {
+        if (intersects(j._, c._)) {
+          b = j, a.next = b, b.previous = a, --i;
+          continue pack;
+        }
+        sj += j._.r, j = j.next;
+      } else {
+        if (intersects(k._, c._)) {
+          a = k, a.next = b, b.previous = a, --i;
+          continue pack;
+        }
+        sk += k._.r, k = k.previous;
+      }
+    } while (j !== k.next);
+
+    // Success! Insert the new circle c between a and b.
+    c.previous = a, c.next = b, a.next = b.previous = b = c;
+
+    // Compute the new closest circle pair to the centroid.
+    aa = score(a);
+    while ((c = c.next) !== b) {
+      if ((ca = score(c)) < aa) {
+        a = c, aa = ca;
+      }
+    }
+    b = a.next;
+  }
+
+  // Compute the enclosing circle of the front chain.
+  a = [b._], c = b; while ((c = c.next) !== b) a.push(c._); c = enclose(a);
+
+  // Translate the circles to put the enclosing circle around the origin.
+  for (i = 0; i < n; ++i) a = circles[i], a.x -= c.x, a.y -= c.y;
+
+  return c.r;
+}
+
+function siblings(circles) {
+  packEnclose(circles);
+  return circles;
+}
+
+function optional(f) {
+  return f == null ? null : required(f);
+}
+
+function required(f) {
+  if (typeof f !== "function") throw new Error;
+  return f;
+}
+
+function constantZero() {
+  return 0;
+}
+
+function constant(x) {
+  return function() {
+    return x;
+  };
+}
+
+function defaultRadius(d) {
+  return Math.sqrt(d.value);
+}
+
+function index() {
+  var radius = null,
+      dx = 1,
+      dy = 1,
+      padding = constantZero;
+
+  function pack(root) {
+    root.x = dx / 2, root.y = dy / 2;
+    if (radius) {
+      root.eachBefore(radiusLeaf(radius))
+          .eachAfter(packChildren(padding, 0.5))
+          .eachBefore(translateChild(1));
+    } else {
+      root.eachBefore(radiusLeaf(defaultRadius))
+          .eachAfter(packChildren(constantZero, 1))
+          .eachAfter(packChildren(padding, root.r / Math.min(dx, dy)))
+          .eachBefore(translateChild(Math.min(dx, dy) / (2 * root.r)));
+    }
+    return root;
+  }
+
+  pack.radius = function(x) {
+    return arguments.length ? (radius = optional(x), pack) : radius;
+  };
+
+  pack.size = function(x) {
+    return arguments.length ? (dx = +x[0], dy = +x[1], pack) : [dx, dy];
+  };
+
+  pack.padding = function(x) {
+    return arguments.length ? (padding = typeof x === "function" ? x : constant(+x), pack) : padding;
+  };
+
+  return pack;
+}
+
+function radiusLeaf(radius) {
+  return function(node) {
+    if (!node.children) {
+      node.r = Math.max(0, +radius(node) || 0);
+    }
+  };
+}
+
+function packChildren(padding, k) {
+  return function(node) {
+    if (children = node.children) {
+      var children,
+          i,
+          n = children.length,
+          r = padding(node) * k || 0,
+          e;
+
+      if (r) for (i = 0; i < n; ++i) children[i].r += r;
+      e = packEnclose(children);
+      if (r) for (i = 0; i < n; ++i) children[i].r -= r;
+      node.r = e + r;
+    }
+  };
+}
+
+function translateChild(k) {
+  return function(node) {
+    var parent = node.parent;
+    node.r *= k;
+    if (parent) {
+      node.x = parent.x + k * node.x;
+      node.y = parent.y + k * node.y;
+    }
+  };
+}
+
+function roundNode(node) {
+  node.x0 = Math.round(node.x0);
+  node.y0 = Math.round(node.y0);
+  node.x1 = Math.round(node.x1);
+  node.y1 = Math.round(node.y1);
+}
+
+function treemapDice(parent, x0, y0, x1, y1) {
+  var nodes = parent.children,
+      node,
+      i = -1,
+      n = nodes.length,
+      k = parent.value && (x1 - x0) / parent.value;
+
+  while (++i < n) {
+    node = nodes[i], node.y0 = y0, node.y1 = y1;
+    node.x0 = x0, node.x1 = x0 += node.value * k;
+  }
+}
+
+function partition() {
+  var dx = 1,
+      dy = 1,
+      padding = 0,
+      round = false;
+
+  function partition(root) {
+    var n = root.height + 1;
+    root.x0 =
+    root.y0 = padding;
+    root.x1 = dx;
+    root.y1 = dy / n;
+    root.eachBefore(positionNode(dy, n));
+    if (round) root.eachBefore(roundNode);
+    return root;
+  }
+
+  function positionNode(dy, n) {
+    return function(node) {
+      if (node.children) {
+        treemapDice(node, node.x0, dy * (node.depth + 1) / n, node.x1, dy * (node.depth + 2) / n);
+      }
+      var x0 = node.x0,
+          y0 = node.y0,
+          x1 = node.x1 - padding,
+          y1 = node.y1 - padding;
+      if (x1 < x0) x0 = x1 = (x0 + x1) / 2;
+      if (y1 < y0) y0 = y1 = (y0 + y1) / 2;
+      node.x0 = x0;
+      node.y0 = y0;
+      node.x1 = x1;
+      node.y1 = y1;
+    };
+  }
+
+  partition.round = function(x) {
+    return arguments.length ? (round = !!x, partition) : round;
+  };
+
+  partition.size = function(x) {
+    return arguments.length ? (dx = +x[0], dy = +x[1], partition) : [dx, dy];
+  };
+
+  partition.padding = function(x) {
+    return arguments.length ? (padding = +x, partition) : padding;
+  };
+
+  return partition;
+}
+
+var keyPrefix = "$", // Protect against keys like “__proto__”.
+    preroot = {depth: -1},
+    ambiguous = {};
+
+function defaultId(d) {
+  return d.id;
+}
+
+function defaultParentId(d) {
+  return d.parentId;
+}
+
+function stratify() {
+  var id = defaultId,
+      parentId = defaultParentId;
+
+  function stratify(data) {
+    var d,
+        i,
+        n = data.length,
+        root,
+        parent,
+        node,
+        nodes = new Array(n),
+        nodeId,
+        nodeKey,
+        nodeByKey = {};
+
+    for (i = 0; i < n; ++i) {
+      d = data[i], node = nodes[i] = new Node(d);
+      if ((nodeId = id(d, i, data)) != null && (nodeId += "")) {
+        nodeKey = keyPrefix + (node.id = nodeId);
+        nodeByKey[nodeKey] = nodeKey in nodeByKey ? ambiguous : node;
+      }
+    }
+
+    for (i = 0; i < n; ++i) {
+      node = nodes[i], nodeId = parentId(data[i], i, data);
+      if (nodeId == null || !(nodeId += "")) {
+        if (root) throw new Error("multiple roots");
+        root = node;
+      } else {
+        parent = nodeByKey[keyPrefix + nodeId];
+        if (!parent) throw new Error("missing: " + nodeId);
+        if (parent === ambiguous) throw new Error("ambiguous: " + nodeId);
+        if (parent.children) parent.children.push(node);
+        else parent.children = [node];
+        node.parent = parent;
+      }
+    }
+
+    if (!root) throw new Error("no root");
+    root.parent = preroot;
+    root.eachBefore(function(node) { node.depth = node.parent.depth + 1; --n; }).eachBefore(computeHeight);
+    root.parent = null;
+    if (n > 0) throw new Error("cycle");
+
+    return root;
+  }
+
+  stratify.id = function(x) {
+    return arguments.length ? (id = required(x), stratify) : id;
+  };
+
+  stratify.parentId = function(x) {
+    return arguments.length ? (parentId = required(x), stratify) : parentId;
+  };
+
+  return stratify;
+}
+
+function defaultSeparation$1(a, b) {
+  return a.parent === b.parent ? 1 : 2;
+}
+
+// function radialSeparation(a, b) {
+//   return (a.parent === b.parent ? 1 : 2) / a.depth;
+// }
+
+// This function is used to traverse the left contour of a subtree (or
+// subforest). It returns the successor of v on this contour. This successor is
+// either given by the leftmost child of v or by the thread of v. The function
+// returns null if and only if v is on the highest level of its subtree.
+function nextLeft(v) {
+  var children = v.children;
+  return children ? children[0] : v.t;
+}
+
+// This function works analogously to nextLeft.
+function nextRight(v) {
+  var children = v.children;
+  return children ? children[children.length - 1] : v.t;
+}
+
+// Shifts the current subtree rooted at w+. This is done by increasing
+// prelim(w+) and mod(w+) by shift.
+function moveSubtree(wm, wp, shift) {
+  var change = shift / (wp.i - wm.i);
+  wp.c -= change;
+  wp.s += shift;
+  wm.c += change;
+  wp.z += shift;
+  wp.m += shift;
+}
+
+// All other shifts, applied to the smaller subtrees between w- and w+, are
+// performed by this function. To prepare the shifts, we have to adjust
+// change(w+), shift(w+), and change(w-).
+function executeShifts(v) {
+  var shift = 0,
+      change = 0,
+      children = v.children,
+      i = children.length,
+      w;
+  while (--i >= 0) {
+    w = children[i];
+    w.z += shift;
+    w.m += shift;
+    shift += w.s + (change += w.c);
+  }
+}
+
+// If vi-’s ancestor is a sibling of v, returns vi-’s ancestor. Otherwise,
+// returns the specified (default) ancestor.
+function nextAncestor(vim, v, ancestor) {
+  return vim.a.parent === v.parent ? vim.a : ancestor;
+}
+
+function TreeNode(node, i) {
+  this._ = node;
+  this.parent = null;
+  this.children = null;
+  this.A = null; // default ancestor
+  this.a = this; // ancestor
+  this.z = 0; // prelim
+  this.m = 0; // mod
+  this.c = 0; // change
+  this.s = 0; // shift
+  this.t = null; // thread
+  this.i = i; // number
+}
+
+TreeNode.prototype = Object.create(Node.prototype);
+
+function treeRoot(root) {
+  var tree = new TreeNode(root, 0),
+      node,
+      nodes = [tree],
+      child,
+      children,
+      i,
+      n;
+
+  while (node = nodes.pop()) {
+    if (children = node._.children) {
+      node.children = new Array(n = children.length);
+      for (i = n - 1; i >= 0; --i) {
+        nodes.push(child = node.children[i] = new TreeNode(children[i], i));
+        child.parent = node;
+      }
+    }
+  }
+
+  (tree.parent = new TreeNode(null, 0)).children = [tree];
+  return tree;
+}
+
+// Node-link tree diagram using the Reingold-Tilford "tidy" algorithm
+function tree() {
+  var separation = defaultSeparation$1,
+      dx = 1,
+      dy = 1,
+      nodeSize = null;
+
+  function tree(root) {
+    var t = treeRoot(root);
+
+    // Compute the layout using Buchheim et al.’s algorithm.
+    t.eachAfter(firstWalk), t.parent.m = -t.z;
+    t.eachBefore(secondWalk);
+
+    // If a fixed node size is specified, scale x and y.
+    if (nodeSize) root.eachBefore(sizeNode);
+
+    // If a fixed tree size is specified, scale x and y based on the extent.
+    // Compute the left-most, right-most, and depth-most nodes for extents.
+    else {
+      var left = root,
+          right = root,
+          bottom = root;
+      root.eachBefore(function(node) {
+        if (node.x < left.x) left = node;
+        if (node.x > right.x) right = node;
+        if (node.depth > bottom.depth) bottom = node;
+      });
+      var s = left === right ? 1 : separation(left, right) / 2,
+          tx = s - left.x,
+          kx = dx / (right.x + s + tx),
+          ky = dy / (bottom.depth || 1);
+      root.eachBefore(function(node) {
+        node.x = (node.x + tx) * kx;
+        node.y = node.depth * ky;
+      });
+    }
+
+    return root;
+  }
+
+  // Computes a preliminary x-coordinate for v. Before that, FIRST WALK is
+  // applied recursively to the children of v, as well as the function
+  // APPORTION. After spacing out the children by calling EXECUTE SHIFTS, the
+  // node v is placed to the midpoint of its outermost children.
+  function firstWalk(v) {
+    var children = v.children,
+        siblings = v.parent.children,
+        w = v.i ? siblings[v.i - 1] : null;
+    if (children) {
+      executeShifts(v);
+      var midpoint = (children[0].z + children[children.length - 1].z) / 2;
+      if (w) {
+        v.z = w.z + separation(v._, w._);
+        v.m = v.z - midpoint;
+      } else {
+        v.z = midpoint;
+      }
+    } else if (w) {
+      v.z = w.z + separation(v._, w._);
+    }
+    v.parent.A = apportion(v, w, v.parent.A || siblings[0]);
+  }
+
+  // Computes all real x-coordinates by summing up the modifiers recursively.
+  function secondWalk(v) {
+    v._.x = v.z + v.parent.m;
+    v.m += v.parent.m;
+  }
+
+  // The core of the algorithm. Here, a new subtree is combined with the
+  // previous subtrees. Threads are used to traverse the inside and outside
+  // contours of the left and right subtree up to the highest common level. The
+  // vertices used for the traversals are vi+, vi-, vo-, and vo+, where the
+  // superscript o means outside and i means inside, the subscript - means left
+  // subtree and + means right subtree. For summing up the modifiers along the
+  // contour, we use respective variables si+, si-, so-, and so+. Whenever two
+  // nodes of the inside contours conflict, we compute the left one of the
+  // greatest uncommon ancestors using the function ANCESTOR and call MOVE
+  // SUBTREE to shift the subtree and prepare the shifts of smaller subtrees.
+  // Finally, we add a new thread (if necessary).
+  function apportion(v, w, ancestor) {
+    if (w) {
+      var vip = v,
+          vop = v,
+          vim = w,
+          vom = vip.parent.children[0],
+          sip = vip.m,
+          sop = vop.m,
+          sim = vim.m,
+          som = vom.m,
+          shift;
+      while (vim = nextRight(vim), vip = nextLeft(vip), vim && vip) {
+        vom = nextLeft(vom);
+        vop = nextRight(vop);
+        vop.a = v;
+        shift = vim.z + sim - vip.z - sip + separation(vim._, vip._);
+        if (shift > 0) {
+          moveSubtree(nextAncestor(vim, v, ancestor), v, shift);
+          sip += shift;
+          sop += shift;
+        }
+        sim += vim.m;
+        sip += vip.m;
+        som += vom.m;
+        sop += vop.m;
+      }
+      if (vim && !nextRight(vop)) {
+        vop.t = vim;
+        vop.m += sim - sop;
+      }
+      if (vip && !nextLeft(vom)) {
+        vom.t = vip;
+        vom.m += sip - som;
+        ancestor = v;
+      }
+    }
+    return ancestor;
+  }
+
+  function sizeNode(node) {
+    node.x *= dx;
+    node.y = node.depth * dy;
+  }
+
+  tree.separation = function(x) {
+    return arguments.length ? (separation = x, tree) : separation;
+  };
+
+  tree.size = function(x) {
+    return arguments.length ? (nodeSize = false, dx = +x[0], dy = +x[1], tree) : (nodeSize ? null : [dx, dy]);
+  };
+
+  tree.nodeSize = function(x) {
+    return arguments.length ? (nodeSize = true, dx = +x[0], dy = +x[1], tree) : (nodeSize ? [dx, dy] : null);
+  };
+
+  return tree;
+}
+
+function treemapSlice(parent, x0, y0, x1, y1) {
+  var nodes = parent.children,
+      node,
+      i = -1,
+      n = nodes.length,
+      k = parent.value && (y1 - y0) / parent.value;
+
+  while (++i < n) {
+    node = nodes[i], node.x0 = x0, node.x1 = x1;
+    node.y0 = y0, node.y1 = y0 += node.value * k;
+  }
+}
+
+var phi = (1 + Math.sqrt(5)) / 2;
+
+function squarifyRatio(ratio, parent, x0, y0, x1, y1) {
+  var rows = [],
+      nodes = parent.children,
+      row,
+      nodeValue,
+      i0 = 0,
+      i1 = 0,
+      n = nodes.length,
+      dx, dy,
+      value = parent.value,
+      sumValue,
+      minValue,
+      maxValue,
+      newRatio,
+      minRatio,
+      alpha,
+      beta;
+
+  while (i0 < n) {
+    dx = x1 - x0, dy = y1 - y0;
+
+    // Find the next non-empty node.
+    do sumValue = nodes[i1++].value; while (!sumValue && i1 < n);
+    minValue = maxValue = sumValue;
+    alpha = Math.max(dy / dx, dx / dy) / (value * ratio);
+    beta = sumValue * sumValue * alpha;
+    minRatio = Math.max(maxValue / beta, beta / minValue);
+
+    // Keep adding nodes while the aspect ratio maintains or improves.
+    for (; i1 < n; ++i1) {
+      sumValue += nodeValue = nodes[i1].value;
+      if (nodeValue < minValue) minValue = nodeValue;
+      if (nodeValue > maxValue) maxValue = nodeValue;
+      beta = sumValue * sumValue * alpha;
+      newRatio = Math.max(maxValue / beta, beta / minValue);
+      if (newRatio > minRatio) { sumValue -= nodeValue; break; }
+      minRatio = newRatio;
+    }
+
+    // Position and record the row orientation.
+    rows.push(row = {value: sumValue, dice: dx < dy, children: nodes.slice(i0, i1)});
+    if (row.dice) treemapDice(row, x0, y0, x1, value ? y0 += dy * sumValue / value : y1);
+    else treemapSlice(row, x0, y0, value ? x0 += dx * sumValue / value : x1, y1);
+    value -= sumValue, i0 = i1;
+  }
+
+  return rows;
+}
+
+var squarify = (function custom(ratio) {
+
+  function squarify(parent, x0, y0, x1, y1) {
+    squarifyRatio(ratio, parent, x0, y0, x1, y1);
+  }
+
+  squarify.ratio = function(x) {
+    return custom((x = +x) > 1 ? x : 1);
+  };
+
+  return squarify;
+})(phi);
+
+function index$1() {
+  var tile = squarify,
+      round = false,
+      dx = 1,
+      dy = 1,
+      paddingStack = [0],
+      paddingInner = constantZero,
+      paddingTop = constantZero,
+      paddingRight = constantZero,
+      paddingBottom = constantZero,
+      paddingLeft = constantZero;
+
+  function treemap(root) {
+    root.x0 =
+    root.y0 = 0;
+    root.x1 = dx;
+    root.y1 = dy;
+    root.eachBefore(positionNode);
+    paddingStack = [0];
+    if (round) root.eachBefore(roundNode);
+    return root;
+  }
+
+  function positionNode(node) {
+    var p = paddingStack[node.depth],
+        x0 = node.x0 + p,
+        y0 = node.y0 + p,
+        x1 = node.x1 - p,
+        y1 = node.y1 - p;
+    if (x1 < x0) x0 = x1 = (x0 + x1) / 2;
+    if (y1 < y0) y0 = y1 = (y0 + y1) / 2;
+    node.x0 = x0;
+    node.y0 = y0;
+    node.x1 = x1;
+    node.y1 = y1;
+    if (node.children) {
+      p = paddingStack[node.depth + 1] = paddingInner(node) / 2;
+      x0 += paddingLeft(node) - p;
+      y0 += paddingTop(node) - p;
+      x1 -= paddingRight(node) - p;
+      y1 -= paddingBottom(node) - p;
+      if (x1 < x0) x0 = x1 = (x0 + x1) / 2;
+      if (y1 < y0) y0 = y1 = (y0 + y1) / 2;
+      tile(node, x0, y0, x1, y1);
+    }
+  }
+
+  treemap.round = function(x) {
+    return arguments.length ? (round = !!x, treemap) : round;
+  };
+
+  treemap.size = function(x) {
+    return arguments.length ? (dx = +x[0], dy = +x[1], treemap) : [dx, dy];
+  };
+
+  treemap.tile = function(x) {
+    return arguments.length ? (tile = required(x), treemap) : tile;
+  };
+
+  treemap.padding = function(x) {
+    return arguments.length ? treemap.paddingInner(x).paddingOuter(x) : treemap.paddingInner();
+  };
+
+  treemap.paddingInner = function(x) {
+    return arguments.length ? (paddingInner = typeof x === "function" ? x : constant(+x), treemap) : paddingInner;
+  };
+
+  treemap.paddingOuter = function(x) {
+    return arguments.length ? treemap.paddingTop(x).paddingRight(x).paddingBottom(x).paddingLeft(x) : treemap.paddingTop();
+  };
+
+  treemap.paddingTop = function(x) {
+    return arguments.length ? (paddingTop = typeof x === "function" ? x : constant(+x), treemap) : paddingTop;
+  };
+
+  treemap.paddingRight = function(x) {
+    return arguments.length ? (paddingRight = typeof x === "function" ? x : constant(+x), treemap) : paddingRight;
+  };
+
+  treemap.paddingBottom = function(x) {
+    return arguments.length ? (paddingBottom = typeof x === "function" ? x : constant(+x), treemap) : paddingBottom;
+  };
+
+  treemap.paddingLeft = function(x) {
+    return arguments.length ? (paddingLeft = typeof x === "function" ? x : constant(+x), treemap) : paddingLeft;
+  };
+
+  return treemap;
+}
+
+function binary(parent, x0, y0, x1, y1) {
+  var nodes = parent.children,
+      i, n = nodes.length,
+      sum, sums = new Array(n + 1);
+
+  for (sums[0] = sum = i = 0; i < n; ++i) {
+    sums[i + 1] = sum += nodes[i].value;
+  }
+
+  partition(0, n, parent.value, x0, y0, x1, y1);
+
+  function partition(i, j, value, x0, y0, x1, y1) {
+    if (i >= j - 1) {
+      var node = nodes[i];
+      node.x0 = x0, node.y0 = y0;
+      node.x1 = x1, node.y1 = y1;
+      return;
+    }
+
+    var valueOffset = sums[i],
+        valueTarget = (value / 2) + valueOffset,
+        k = i + 1,
+        hi = j - 1;
+
+    while (k < hi) {
+      var mid = k + hi >>> 1;
+      if (sums[mid] < valueTarget) k = mid + 1;
+      else hi = mid;
+    }
+
+    if ((valueTarget - sums[k - 1]) < (sums[k] - valueTarget) && i + 1 < k) --k;
+
+    var valueLeft = sums[k] - valueOffset,
+        valueRight = value - valueLeft;
+
+    if ((x1 - x0) > (y1 - y0)) {
+      var xk = (x0 * valueRight + x1 * valueLeft) / value;
+      partition(i, k, valueLeft, x0, y0, xk, y1);
+      partition(k, j, valueRight, xk, y0, x1, y1);
+    } else {
+      var yk = (y0 * valueRight + y1 * valueLeft) / value;
+      partition(i, k, valueLeft, x0, y0, x1, yk);
+      partition(k, j, valueRight, x0, yk, x1, y1);
+    }
+  }
+}
+
+function sliceDice(parent, x0, y0, x1, y1) {
+  (parent.depth & 1 ? treemapSlice : treemapDice)(parent, x0, y0, x1, y1);
+}
+
+var resquarify = (function custom(ratio) {
+
+  function resquarify(parent, x0, y0, x1, y1) {
+    if ((rows = parent._squarify) && (rows.ratio === ratio)) {
+      var rows,
+          row,
+          nodes,
+          i,
+          j = -1,
+          n,
+          m = rows.length,
+          value = parent.value;
+
+      while (++j < m) {
+        row = rows[j], nodes = row.children;
+        for (i = row.value = 0, n = nodes.length; i < n; ++i) row.value += nodes[i].value;
+        if (row.dice) treemapDice(row, x0, y0, x1, y0 += (y1 - y0) * row.value / value);
+        else treemapSlice(row, x0, y0, x0 += (x1 - x0) * row.value / value, y1);
+        value -= row.value;
+      }
+    } else {
+      parent._squarify = rows = squarifyRatio(ratio, parent, x0, y0, x1, y1);
+      rows.ratio = ratio;
+    }
+  }
+
+  resquarify.ratio = function(x) {
+    return custom((x = +x) > 1 ? x : 1);
+  };
+
+  return resquarify;
+})(phi);
+
+
+
+var d3Hierarchy = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  cluster: cluster,
+  hierarchy: hierarchy,
+  pack: index,
+  packSiblings: siblings,
+  packEnclose: enclose,
+  partition: partition,
+  stratify: stratify,
+  tree: tree,
+  treemap: index$1,
+  treemapBinary: binary,
+  treemapDice: treemapDice,
+  treemapSlice: treemapSlice,
+  treemapSliceDice: sliceDice,
+  treemapSquarify: squarify,
+  treemapResquarify: resquarify
+});
+
+function calChartTreemapData() {
+  let { opts, legendData, chartData, seriesMap } = this;
+  let { width, height, padding } = opts;
+  let chartTreemap = seriesMap['treemap'][0];
+
+  chartTreemap.tile =
+    chartTreemap.tile == 'treemapBinary' || 'treemapDice' || 'treemapResquarify' || 'treemapSlice' || 'treemapSliceDice' || 'treemapSquarify'
+      ? chartTreemap.tile
+      : 'treemapSquarify';
+
+  let hierarchydata = hierarchy(chartTreemap, function (d) {
+      return d.data
+    })
+    .sum(function (d) {
+      return d.value
+    });
+  let treemapGen = index$1()
+    .tile(d3Hierarchy[chartTreemap.tile])
+    .size([width, height])
+    .paddingTop(padding[0])
+    .paddingRight(padding[1])
+    .paddingBottom(padding[2] + legendData.legendHeight)
+    .paddingLeft(padding[3]);
+  let treemapData = treemapGen(hierarchydata);
+
+  chartData.chartTreemap = treemapData;
+
+  console.log('complete calChartTreemapData', chartData.chartTreemap);
+}
+
+// Word cloud layout by Jason Davies, https://www.jasondavies.com/wordcloud/
+// Algorithm due to Jonathan Feinberg, http://static.mrfeinberg.com/bv_ch03.pdf
+
+const cloudRadians = Math.PI / 180;
+// cw = (1 << 11) >> 5, // wt
+// ch = 1 << 11; // wt
+let cw, ch;
+
+function cloudText(d) {
+  return d.text
+}
+
+function cloudFont() {
+  return 'Serif'
+}
+
+function cloudFontNormal() {
+  return 'normal'
+}
+
+function cloudFontSize(d) {
+  return d.value
+}
+
+function cloudRotate() {
+  return ~~(Math.random() * 2) * 90
+}
+
+function cloudPadding() {
+  return 1
+}
+
+// Fetches a monochrome sprite bitmap for the specified text.
+// Load in batches for speed.
+function cloudSprite(contextAndRatio, d, data, di) {
+  if (d.sprite) return
+  const c = contextAndRatio.context,
+    ratio = contextAndRatio.ratio;
+  c.clearRect(0, 0, (cw << 5) / ratio, ch / ratio);
+  let x = 0,
+    y = 0,
+    maxh = 0;
+  const n = data.length;
+  --di;
+  while (++di < n) {
+    d = data[di];
+    c.save();
+    c.fillStyle = c.strokeStyle = '#ff0000';
+    c.textAlign = 'center';
+    c.font = `${d.style} ${d.weight} ${~~((d.size + 1) / ratio)}px ${d.font}`;
+    let w = c.measureText(d.text + 'm').width * ratio,
+      h = d.size << 1;
+    if (d.rotate) {
+      const sr = Math.sin(d.rotate * cloudRadians),
+        cr = Math.cos(d.rotate * cloudRadians),
+        wcr = w * cr,
+        wsr = w * sr,
+        hcr = h * cr,
+        hsr = h * sr;
+      w = ((Math.max(Math.abs(wcr + hsr), Math.abs(wcr - hsr)) + 0x1f) >> 5) << 5;
+      h = ~~Math.max(Math.abs(wsr + hcr), Math.abs(wsr - hcr));
+    } else {
+      w = ((w + 0x1f) >> 5) << 5;
+    }
+    if (h > maxh) maxh = h;
+    if (x + w >= cw << 5) {
+      x = 0;
+      y += maxh;
+      maxh = 0;
+    }
+    if (y + h >= ch) break
+    c.translate((x + (w >> 1)) / ratio, (y + (h >> 1)) / ratio);
+    if (d.rotate) c.rotate(d.rotate * cloudRadians);
+    c.fillText(d.text, 0, 0);
+    if (d.padding) {
+      c.lineWidth = 2 * d.padding;
+      c.strokeText(d.text, 0, 0);
+    }
+
+    c.restore();
+    d.width = w;
+    d.height = h;
+    d.xoff = x;
+    d.yoff = y;
+    d.x1 = w >> 1;
+    d.y1 = h >> 1;
+    d.x0 = -d.x1;
+    d.y0 = -d.y1;
+    d.hasText = true;
+    x += w;
+  }
+  const pixels = c.getImageData(0, 0, (cw << 5) / ratio, ch / ratio).data,
+    sprite = [];
+  while (--di >= 0) {
+    d = data[di];
+    if (!d.hasText) continue
+    const w = d.width,
+      w32 = w >> 5;
+    let h = d.y1 - d.y0;
+    // Zero the buffer
+    for (let i = 0; i < h * w32; i++) sprite[i] = 0;
+    x = d.xoff;
+    if (x == null) return
+    y = d.yoff;
+    let seen = 0,
+      seenRow = -1;
+    for (let j = 0; j < h; j++) {
+      for (let i = 0; i < w; i++) {
+        let k = w32 * j + (i >> 5),
+          m = pixels[((y + j) * (cw << 5) + (x + i)) << 2] ? 1 << (31 - (i % 32)) : 0;
+        sprite[k] |= m;
+        seen |= m;
+      }
+      if (seen) seenRow = j;
+      else {
+        d.y0++;
+        h--;
+        j--;
+        y++;
+      }
+    }
+    d.y1 = d.y0 + seenRow;
+    d.sprite = sprite.slice(0, (d.y1 - d.y0) * w32);
+  }
+}
+
+// Use mask-based collision detection.
+function cloudCollide(tag, board, sw) {
+  sw >>= 5;
+  const sprite = tag.sprite,
+    w = tag.width >> 5,
+    lx = tag.x - (w << 4),
+    sx = lx & 0x7f,
+    msx = 32 - sx,
+    h = tag.y1 - tag.y0;
+  let x = (tag.y + tag.y0) * sw + (lx >> 5),
+    last;
+  for (let j = 0; j < h; j++) {
+    last = 0;
+    for (let i = 0; i <= w; i++) {
+      if (((last << msx) | (i < w ? (last = sprite[j * w + i]) >>> sx : 0)) & board[x + i]) return true
+    }
+    x += sw;
+  }
+  return false
+}
+
+function cloudBounds(bounds, d) {
+  const b0 = bounds[0],
+    b1 = bounds[1];
+  if (d.x + d.x0 < b0.x) b0.x = d.x + d.x0;
+  if (d.y + d.y0 < b0.y) b0.y = d.y + d.y0;
+  if (d.x + d.x1 > b1.x) b1.x = d.x + d.x1;
+  if (d.y + d.y1 > b1.y) b1.y = d.y + d.y1;
+}
+
+function collideRects(a, b) {
+  return a.x + a.x1 > b[0].x && a.x + a.x0 < b[1].x && a.y + a.y1 > b[0].y && a.y + a.y0 < b[1].y
+}
+
+function archimedeanSpiral(size) {
+  let e = size[0] / size[1];
+  return function (t) {
+    return [e * (t *= 0.1) * Math.cos(t), t * Math.sin(t)]
+  }
+}
+
+function rectangularSpiral(size) {
+  const dy = 4,
+    dx = (dy * size[0]) / size[1];
+  let x = 0,
+    y = 0;
+  return function (t) {
+    const sign = t < 0 ? -1 : 1;
+    // See triangular numbers: T_n = n * (n + 1) / 2.
+    switch ((Math.sqrt(1 + 4 * sign * t) - sign) & 3) {
+      case 0:
+        x += dx;
+        break
+      case 1:
+        y += dy;
+        break
+      case 2:
+        x -= dx;
+        break
+      default:
+        y -= dy;
+        break
+    }
+    return [x, y]
+  }
+}
+
+// TODO reuse arrays?
+function zeroArray(n) {
+  const a = [];
+  let i = -1;
+  while (++i < n) a[i] = 0;
+  return a
+}
+
+function functor(d) {
+  return typeof d === 'function'
+    ? d
+    : function () {
+        return d
+      }
+}
+
+const spirals = {
+  archimedean: archimedeanSpiral,
+  rectangular: rectangularSpiral,
+};
+
+function tagCloud () {
+  let size = [256, 256],
+    text = cloudText,
+    font = cloudFont,
+    fontSize = cloudFontSize,
+    fontStyle = cloudFontNormal,
+    fontWeight = cloudFontNormal,
+    rotate = cloudRotate,
+    padding = cloudPadding,
+    spiral = archimedeanSpiral,
+    words = [],
+    timeInterval = Infinity,
+    random = Math.random,
+    canvas = null,
+    end = function () {};
+  const cloud = {};
+
+  cloud.end = function (_) {
+    return arguments.length ? ((end = functor(_)), cloud) : end
+  };
+
+  cloud.canvas = function (_) {
+    return arguments.length ? ((canvas = functor(_)), cloud) : canvas
+  };
+
+  cloud.start = function () {
+    const minSize = Math.min(...size);
+    cw = minSize >> 5;
+    ch = minSize;
+
+    const contextAndRatio = getContext(canvas()),
+      board = cloud.board ? cloud.board : zeroArray((size[0] >> 5) * size[1]),
+      n = words.length,
+      tags = [],
+      data = words
+        .map(function (d, i) {
+          d.text = text.call(this, d, i);
+          d.font = font.call(this, d, i);
+          d.style = fontStyle.call(this, d, i);
+          d.weight = fontWeight.call(this, d, i);
+          d.rotate = rotate.call(this, d, i);
+          d.size = ~~fontSize.call(this, d, i);
+          d.padding = padding.call(this, d, i);
+          return d
+        })
+        .sort(function (a, b) {
+          return b.size - a.size
+        });
+    let i = -1,
+      bounds = !cloud.board
+        ? null
+        : [
+            {
+              x: 0,
+              y: 0,
+            },
+            {
+              x: size[0],
+              y: size[1],
+            },
+          ];
+
+    step();
+
+    function step() {
+      const start = Date.now();
+      while (Date.now() - start < timeInterval && ++i < n) {
+        const d = data[i];
+        d.x = (size[0] * (random() + 0.5)) >> 1;
+        d.y = (size[1] * (random() + 0.5)) >> 1;
+        cloudSprite(contextAndRatio, d, data, i);
+        if (d.hasText && place(board, d, bounds)) {
+          tags.push(d);
+          if (bounds) {
+            if (!cloud.hasImage) {
+              // update bounds if image mask not set
+              cloudBounds(bounds, d);
+            }
+          } else {
+            bounds = [
+              { x: d.x + d.x0, y: d.y + d.y0 },
+              { x: d.x + d.x1, y: d.y + d.y1 },
+            ];
+          }
+          // Temporary hack
+          d.x -= size[0] >> 1;
+          d.y -= size[1] >> 1;
+        }
+      }
+
+      if (i >= n) {
+        console.log('END', tags);
+        end(tags);
+      }
+
+      cloud._tags = tags;
+      cloud._bounds = bounds;
+    }
+
+    return cloud
+  };
+
+  function getContext(canvas) {
+    canvas.width = canvas.height = 1;
+    const ratio = Math.sqrt(canvas.getContext('2d').getImageData(0, 0, 1, 1).data.length >> 2);
+    canvas.width = (cw << 5) / ratio;
+    canvas.height = ch / ratio;
+    const context = canvas.getContext('2d');
+    context.fillStyle = context.strokeStyle = '#ff0000';
+    context.textAlign = 'center';
+    return { context, ratio }
+  }
+
+  function place(board, tag, bounds) {
+    // const perimeter = [{ x: 0, y: 0 }, { x: size[0], y: size[1] }],
+    const startX = tag.x,
+      startY = tag.y,
+      maxDelta = Math.sqrt(size[0] * size[0] + size[1] * size[1]),
+      s = spiral(size),
+      dt = random() < 0.5 ? 1 : -1;
+    let dxdy,
+      t = -dt,
+      dx,
+      dy;
+
+    while ((dxdy = s((t += dt)))) {
+      dx = ~~dxdy[0];
+      dy = ~~dxdy[1];
+
+      if (Math.min(Math.abs(dx), Math.abs(dy)) >= maxDelta) break
+
+      tag.x = startX + dx;
+      tag.y = startY + dy;
+
+      if (tag.x + tag.x0 < 0 || tag.y + tag.y0 < 0 || tag.x + tag.x1 > size[0] || tag.y + tag.y1 > size[1]) continue
+      // TODO only check for collisions within current bounds.
+      if (!bounds || !cloudCollide(tag, board, size[0])) {
+        if (!bounds || collideRects(tag, bounds)) {
+          const sprite = tag.sprite,
+            w = tag.width >> 5,
+            sw = size[0] >> 5,
+            lx = tag.x - (w << 4),
+            sx = lx & 0x7f,
+            msx = 32 - sx,
+            h = tag.y1 - tag.y0;
+          let last,
+            x = (tag.y + tag.y0) * sw + (lx >> 5);
+          for (let j = 0; j < h; j++) {
+            last = 0;
+            for (let i = 0; i <= w; i++) {
+              board[x + i] |= (last << msx) | (i < w ? (last = sprite[j * w + i]) >>> sx : 0);
+            }
+            x += sw;
+          }
+          delete tag.sprite;
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  cloud.createMask = img => {
+    const can = canvas();
+    const [width, height] = size;
+    const w32 = width >> 5;
+    const board = zeroArray((width >> 5) * height);
+    can.width = width;
+    can.height = height;
+    const cxt = can.getContext('2d');
+    cxt.drawImage(img, 0, 0, img.width, img.height, 0, 0, width, height);
+    const imageData = cxt.getImageData(0, 0, width, height).data;
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
+        const k = w32 * j + (i >> 5);
+        const tmp = (j * width + i) << 2;
+        const flag = imageData[tmp] >= 250 && imageData[tmp + 1] >= 250 && imageData[tmp + 2] >= 250;
+        const m = flag ? 1 << (31 - (i % 32)) : 0;
+        board[k] |= m;
+      }
+    }
+    cloud.board = board;
+    cloud.hasImage = true;
+
+    return cloud
+  };
+
+  cloud.timeInterval = function (_) {
+    return arguments.length ? ((timeInterval = _ == null ? Infinity : _), cloud) : timeInterval
+  };
+
+  cloud.words = function (_) {
+    return arguments.length ? ((words = _), cloud) : words
+  };
+
+  cloud.size = function (_) {
+    return arguments.length ? ((size = [+_[0], +_[1]]), cloud) : size
+  };
+
+  cloud.font = function (_) {
+    return arguments.length ? ((font = functor(_)), cloud) : font
+  };
+
+  cloud.fontStyle = function (_) {
+    return arguments.length ? ((fontStyle = functor(_)), cloud) : fontStyle
+  };
+
+  cloud.fontWeight = function (_) {
+    return arguments.length ? ((fontWeight = functor(_)), cloud) : fontWeight
+  };
+
+  cloud.rotate = function (_) {
+    return arguments.length ? ((rotate = functor(_)), cloud) : rotate
+  };
+
+  cloud.text = function (_) {
+    return arguments.length ? ((text = functor(_)), cloud) : text
+  };
+
+  cloud.spiral = function (_) {
+    return arguments.length ? ((spiral = spirals[_] || _), cloud) : spiral
+  };
+
+  cloud.fontSize = function (_) {
+    return arguments.length ? ((fontSize = functor(_)), cloud) : fontSize
+  };
+
+  cloud.padding = function (_) {
+    return arguments.length ? ((padding = functor(_)), cloud) : padding
+  };
+
+  cloud.random = function (_) {
+    return arguments.length ? ((random = _), cloud) : random
+  };
+
+  return cloud
+}
+
+function calChartTagCloudData() {
+  let { opts, chartData, seriesMap } = this;
+  let { element, width, height } = opts;
+  let chartTagCloud = lodash_clonedeep(seriesMap['tagCloud'][0]);
+
+  const layout = tagCloud();
+  layout.canvas(chartTagCloud.canvas || element);
+  layout.size(chartTagCloud.size || [width, height]);
+  layout.words(chartTagCloud.data);
+  layout.end(end);
+  if (chartTagCloud.font) layout.font(chartTagCloud.font);
+  if (chartTagCloud.fontSize) layout.fontSize(chartTagCloud.fontSize);
+  if (chartTagCloud.padding) layout.padding(chartTagCloud.padding);
+  if (chartTagCloud.rotate) layout.rotate(chartTagCloud.rotate);
+  if (chartTagCloud.spiral) layout.spiral(chartTagCloud.spiral);
+  if (chartTagCloud.timeInterval) layout.timeInterval(chartTagCloud.timeInterval);
+  if (chartTagCloud.imageMask) layout.createMask(chartTagCloud.imageMask);
+
+  layout.start();
+
+  function end(data) {
+    chartTagCloud.data = data;
+    chartData.chartTagCloud = chartTagCloud;
+  }
+
+  console.log('complete calChartTagCloudData', chartData.chartTagCloud);
+}
+
 /**
  * 绘制背景图
  */
@@ -3038,52 +7039,34 @@ function drawLegend() {
   if (!this.opts.legend.show) return
 
   let { context, opts, legendData } = this;
-  let { type, legend } = opts;
-  let { type: legendType, shapeWidth, shapeHeight, itemGap, marginTop, textStyle } = legend;
-  let { fontSize, color, padding } = textStyle;
+  let { width, height, legend, padding } = opts;
+  let { shapeWidth, shapeHeight, shapeRadius, itemGap, marginTop, textStyle } = legend;
+  let { fontSize, color, padding: textPadding } = textStyle;
   let { legendList, legendWidth, legendHeight } = legendData;
+  let startY = height - padding[2] - legendHeight + marginTop;
+  let startX = padding[3] + (width - padding[1] - padding[3] - legendWidth) / 2;
+  let legendHeightMax;
 
-  if (legendType == 'default') {
-    switch (type) {
-      case 'bar':
-        legendType = 'rect';
-        break
-      case 'line':
-        legendType = 'line';
-        break
-      case 'pie':
-        legendType = 'circle';
-        break
-      case 'radar':
-        legendType = 'rect';
-        break
-      case 'scatter':
-        legendType = 'circle';
-        break
-      case 'funnel':
-        legendType = 'rect';
-        break
-    }
-  }
-
-  let legendHeightMax = Math.max(shapeHeight, fontSize);
-  let startY = opts.height - opts.padding[2] - legendHeight + marginTop;
-  let startX = (opts.width - legendWidth) / 2;
   legendList.forEach((listItem, listIndex) => {
-    startX = (opts.width - legendWidth) / 2; // 重置startX
+    startX = padding[3] + (width - padding[1] - padding[3] - legendWidth) / 2;
 
     listItem.forEach(legendItem => {
+      let { legendType, color, name, measureText } = legendItem;
       switch (legendType) {
         case 'circle':
+          legendHeightMax = Math.max(shapeRadius * 2, fontSize);
           context.beginPath();
-          context.moveTo(startX + shapeWidth / 2, startY + legendHeightMax / 2);
-          context.arc(startX + shapeWidth / 2, startY + legendHeightMax / 2, shapeWidth / 2, 0, 2 * Math.PI);
+          context.moveTo(startX + shapeRadius, startY + legendHeightMax / 2);
+          context.arc(startX + shapeRadius, startY + legendHeightMax / 2, shapeRadius, 0, 2 * Math.PI);
           context.closePath();
 
-          context.fillStyle = legendItem.color;
+          context.fillStyle = color;
           context.fill();
+
+          startX += shapeRadius * 2 + textPadding;
           break
         case 'line':
+          legendHeightMax = Math.max(shapeHeight, fontSize);
           let lineLength = (shapeWidth - shapeHeight) / 2;
 
           context.beginPath();
@@ -3091,14 +7074,14 @@ function drawLegend() {
           context.lineTo(startX + lineLength - 2, startY + legendHeightMax / 2);
           context.closePath();
           context.lineWidth = 2;
-          context.strokeStyle = legendItem.color;
+          context.strokeStyle = color;
           context.stroke();
 
           context.beginPath();
           context.moveTo(startX + shapeWidth / 2, startY + legendHeightMax / 2);
           context.arc(startX + shapeWidth / 2, startY + legendHeightMax / 2, shapeHeight / 2, 0, 2 * Math.PI);
           context.closePath();
-          context.fillStyle = legendItem.color;
+          context.fillStyle = color;
           context.fill();
 
           context.beginPath();
@@ -3106,31 +7089,29 @@ function drawLegend() {
           context.lineTo(startX + shapeWidth, startY + legendHeightMax / 2);
           context.closePath();
           context.lineWidth = 2;
-          context.strokeStyle = legendItem.color;
+          context.strokeStyle = color;
           context.stroke();
 
+          startX += shapeWidth + textPadding;
           break
         case 'rect':
-          context.fillStyle = legendItem.color;
-          if (shapeHeight >= fontSize) {
-            context.fillRect(startX, startY, shapeWidth, shapeHeight);
-          } else {
-            context.fillRect(startX, startY + (fontSize - shapeHeight) / 2, shapeWidth, shapeHeight);
-          }
+          legendHeightMax = Math.max(shapeHeight, fontSize);
+          context.fillStyle = color;
+          context.fillRect(startX, startY + legendHeightMax / 2 - shapeHeight / 2, shapeWidth, shapeHeight);
+
+          startX += shapeWidth + textPadding;
           break
       }
-
-      startX += shapeWidth + padding;
 
       context.save();
       context.textAlign = 'left';
       context.textBaseline = 'middle';
       context.font = `${fontSize}px`;
       context.fillStyle = color;
-      context.fillText(legendItem.name, startX, startY + legendHeightMax / 2);
+      context.fillText(name, startX, startY + legendHeightMax / 2);
       context.restore();
 
-      startX += legendItem.measureText + itemGap;
+      startX += measureText + itemGap;
     });
 
     startY += legendHeightMax + itemGap;
@@ -3142,7 +7123,7 @@ function drawLegend() {
 /**
  * 绘制Y轴, 包括 axisName(名称), axisLabel(标签), axisTick(刻度线), axisLine(轴线)
  */
-function drawAxisY() {
+function drawAxis() {
   let { context, opts, chartData } = this;
   let { xAxis, yAxis } = opts;
 
@@ -3235,7 +7216,6 @@ function drawAxisY() {
     if (yAxisNameShow) {
       context.save();
       context.font = `${yAxisNameFontSize}px`;
-      console.log(123, this.opts.yAxis,yAxisName,yAxisNameFontSize);
       context.fillStyle = yAxisNameColor;
       context.textAlign = 'center';
       context.textBaseline = 'bottom';
@@ -3703,7 +7683,7 @@ function drawChartLine(process) {
     }
   }
 
-  JSON.parse(JSON.stringify(chartData.chartLine)).forEach(lineItem => {
+  lodash_clonedeep(chartData.chartLine).forEach(lineItem => {
     let { itemStyle, line, symbol, area, label, smooth, connectNulls } = lineItem;
     let { color: lineItemColor } = itemStyle;
     let { show: symbolShow, type: symbolType, size: symbolSize, color: symbolColor } = symbol;
@@ -3741,8 +7721,10 @@ function drawChartLine(process) {
             }
           }
         }
+
         return dataItem
       });
+
       // 获取有效data
       lineItem.validData = lineItem.data.filter(dataItem => {
         return typeof dataItem.data == 'number'
@@ -3941,22 +7923,29 @@ function drawChartLine(process) {
 function drawChartPie$1(process) {
   let { context, opts, chartData } = this;
   let { backgroundColor, label: globalLabel } = opts;
-  let { data, center, radius, format, offsetAngle, disablePieStroke, valueSum } = chartData.chartPie;
+  let { data, center, radius, format, offsetAngle, disablePieStroke, valueSum, maxData, roseType } = chartData.chartPie;
   let [centerX, centerY] = center;
   let [radiusMin, radiusMax] = radius;
-  let _start_ = 0;
+  let _start_ = offsetAngle !== 0 ? (offsetAngle * Math.PI) / 180 : 0;
 
   data.forEach(dataItem => {
-    dataItem._proportion_ = (dataItem.value / valueSum) * process;
     dataItem._start_ = _start_;
-    if (offsetAngle !== 0) {
-      dataItem._start_ += (offsetAngle * Math.PI) / 180;
+
+    if (roseType == 'area') {
+      dataItem._proportion_ = (1 / data.length) * process;
+    } else {
+      dataItem._proportion_ = (dataItem.value / valueSum) * process;
     }
 
-    context.beginPath();
+    let radius = radiusMax;
+    if (roseType == 'radius' || roseType == 'area') {
+      radius = radiusMin + ((radiusMax - radiusMin) * dataItem.value) / maxData;
+    }
+    dataItem.radius = radius;
 
+    context.beginPath();
     context.moveTo(centerX, centerY);
-    context.arc(centerX, centerY, radiusMax, dataItem._start_, dataItem._start_ + 2 * dataItem._proportion_ * Math.PI);
+    context.arc(centerX, centerY, radius, dataItem._start_, dataItem._start_ + 2 * dataItem._proportion_ * Math.PI);
     context.lineWidth = 2;
     context.strokeStyle = backgroundColor;
     context.fillStyle = dataItem.itemStyle.color;
@@ -3981,7 +7970,7 @@ function drawChartPie$1(process) {
   // 绘制文本标签
   if (process == 1) {
     let { label: seriesLabel, labelLine } = chartData.chartPie;
-    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = seriesLabel;
+    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin, format: labelFormat } = seriesLabel;
     let { length1, length2, lineWidth, lineDotRadius } = labelLine;
     let lineRadius = radiusMax + length1;
     let lastOrigin = null;
@@ -3991,16 +7980,19 @@ function drawChartPie$1(process) {
     labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
     labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
     labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+    labelFormat = globalLabel && globalLabel.format ? globalLabel.format : labelFormat;
 
     if (labelShow) {
       data.forEach((dataItem, dataIndex) => {
         let arc = 2 * Math.PI - (dataItem._start_ + (2 * Math.PI * dataItem._proportion_) / 2);
-        let text = format ? format(dataItem.value, name) : `${(+dataItem._proportion_ * 100).toFixed(2)}%`;
+        let text = labelFormat
+          ? labelFormat({ name: dataItem.name, value: dataItem.value, percent: ((dataItem.value / valueSum) * 100).toFixed(2) })
+          : `${((dataItem.value / valueSum) * 100).toFixed(2)}%`;
 
         // length1 start
         let length1StartOrigin = {
-          x: Math.cos(arc) * radiusMax,
-          y: Math.sin(arc) * radiusMax,
+          x: Math.cos(arc) * dataItem.radius,
+          y: Math.sin(arc) * dataItem.radius,
         };
         // length2 start
         let length2StartOrigin = {
@@ -4061,7 +8053,7 @@ function drawChartRadar(process) {
   let { label: globalLabel } = opts;
   let { center } = chartData.radarAxis;
 
-  chartData.chartRadar.forEach(radarItem => {
+  lodash_clonedeep(chartData.chartRadar).forEach(radarItem => {
     let { dataPosition, itemStyle, area, line, symbol, label } = radarItem;
     let { show: areaShow, color: areaColor, opacity: areaOpactiy } = area;
     let { show: lineShow, lineWidht, color: lineColor, opacity: lineOpacity } = line;
@@ -4070,7 +8062,7 @@ function drawChartRadar(process) {
 
     context.beginPath();
     dataPosition.forEach((dataItem, dataIndex) => {
-      let point = JSON.parse(JSON.stringify(dataItem.point));
+      let point = dataItem.point;
       point.x = point.x * process;
       point.y = point.y * process;
 
@@ -4283,104 +8275,339 @@ function drawChartPie$2(process) {
   console.log('complete drawChartFunnel', process);
 }
 
-function drawCharts() {
-  let { type, animation, animationDuration, animationTiming } = this.opts;
-  let onProcessFn = function() {};
+function drawChartCandlestick(process) {
+  let { context, opts, chartData, seriesMap } = this;
+  let seriesCandlestick = lodash_clonedeep(seriesMap['candlestick']);
+  let { highLine: seriesHighLine, lowLine: seriesLowLine, bar: seriesBar } = seriesCandlestick[0];
+  let { rect, highLine, lowhLine, bar } = chartData.chartCandlestick;
 
-  this.animationInstance && this.animationInstance.stop();
+  context.save();
+  rect.forEach(item => {
+    let { color, bordercolor, opacity, borderWidth, rectPoint, upLinePoint, downLinePoint } = item;
+    let { x, y, width, height } = rectPoint;
+    let { startX: upLineStartX, startY: upLineStartY, endX: upLineEndX, endY: upLineEndY } = upLinePoint;
+    let { startX: downLineStartX, startY: downLineStartY, endX: downLineEndX, endY: downLineEndY } = downLinePoint;
 
-  calSeriesColor.call(this);
-  calLegendData.call(this);
+    context.strokeStyle = bordercolor;
+    context.fillStyle = color;
+    context.globalAlpha = opacity;
+    context.strokeRect(x + borderWidth / 2, y + borderWidth / 2, width - borderWidth, height - borderWidth);
+    context.fillRect(x, y, width, height);
 
-  switch (type) {
-    case 'bar':
-      calAxisYData.call(this);
-      calChartBarData.call(this);
+    context.beginPath();
+    context.lineWidth = 1;
+    context.strokeStyle = bordercolor;
+    context.moveTo(upLineStartX, upLineStartY);
+    context.lineTo(upLineEndX, upLineEndY);
+    context.stroke();
 
-      onProcessFn = process => {
-        drawBackground.call(this);
-        drawAxisY.call(this);
-        drawChartPie.call(this, process);
+    context.moveTo(downLineStartX, downLineStartY);
+    context.lineTo(downLineEndX, downLineEndY);
+    context.stroke();
+  });
+  context.restore();
 
-        if (process == 1) {
-          drawLegend.call(this);
-        }
-      };
-      break
-    case 'line':
-      calAxisYData.call(this);
-      calChartLineData.call(this);
+  if (process == 1) {
+    let { show: highLineShow, lineStyle: highLineStyle } = seriesHighLine;
+    let { show: lowLineShow, lineStyle: lowLineStyle } = seriesLowLine;
+    let { show: barShow, itemStyle: barItemStyle, lineStyle: barLineStyle } = seriesBar;
+    let { color: highLineColor, lineWidth: highLineWidth, lineDash: highLineDash, opacity: highLineOpacity } = highLineStyle;
+    let { color: lowLineColor, lineWidth: lowLineWidth, lineDash: lowLineDash, opacity: lowLineOpacity } = lowLineStyle;
+    let { startX: highLineStartX, startY: highLineStartY, endX: highLineEndX, endY: highLineEndY } = highLine;
+    let { startX: lowLineStartX, startY: lowLineStartY, endX: lowLineEndX, endY: lowLineEndY } = lowhLine;
+    let { color: barColor, opacity: barOpacity } = barItemStyle;
+    let { lineWidth: barLineWidth, lineColor: barLineColor } = barLineStyle;
 
-      onProcessFn = process => {
-        drawBackground.call(this);
-        drawAxisY.call(this);
-        drawChartLine.call(this, process);
+    if (highLineShow) {
+      context.save();
+      context.beginPath();
+      context.moveTo(highLineStartX, highLineStartY);
+      context.lineTo(highLineEndX, highLineEndY);
+      context.strokeStyle = highLineColor;
+      context.lineWidth = highLineWidth;
+      context.setLineDash(highLineDash);
+      context.globalAlpha = highLineOpacity;
+      context.stroke();
+      context.restore();
+    }
 
-        if (process == 1) {
-          drawLegend.call(this);
-        }
-      };
-      break
-    case 'pie':
-      calChartPieData.call(this);
+    if (lowLineShow) {
+      context.save();
+      context.beginPath();
+      context.moveTo(lowLineStartX, lowLineStartY);
+      context.lineTo(lowLineEndX, lowLineEndY);
+      context.strokeStyle = lowLineColor;
+      context.lineWidth = lowLineWidth;
+      context.setLineDash(lowLineDash);
+      context.globalAlpha = lowLineOpacity;
+      context.stroke();
+      context.restore();
+    }
 
-      onProcessFn = process => {
-        drawBackground.call(this);
-        drawChartPie$1.call(this, process);
+    if (barShow) {
+      bar.forEach(barItem => {
+        let { color, x, y, width, height, lineStartX, lineStartY, lineEndX, lineEndY } = barItem;
 
-        if (process == 1) {
-          drawLegend.call(this);
-        }
-      };
-      break
-    case 'radar':
-      calAxisRadarData.call(this);
-      calChartRadarData.call(this);
+        context.save();
+        context.beginPath();
+        context.fillStyle = barColor == 'auto' ? color : barColor;
+        context.globalAlpha = barOpacity;
+        context.fillRect(x, y, width, -height);
 
-      onProcessFn = process => {
-        drawBackground.call(this);
-        drawAxisRadar.call(this);
-        drawChartRadar.call(this, process);
-
-        if (process == 1) {
-          drawLegend.call(this);
-        }
-      };
-      break
-    case 'scatter':
-      calAxisYData.call(this);
-      calChartScatterData.call(this);
-
-      onProcessFn = process => {
-        drawBackground.call(this);
-        drawAxisY.call(this);
-        drawChartScatter.call(this, process);
-
-        if (process == 1) {
-          drawLegend.call(this);
-        }
-      };
-      break
-    case 'funnel':
-      calChartPieData$1.call(this);
-
-      onProcessFn = process => {
-        drawBackground.call(this);
-        drawChartPie$2.call(this, process);
-
-        if (process == 1) {
-          drawLegend.call(this);
-        }
-      };
-      break
+        context.lineWidth = barLineWidth;
+        context.strokeStyle = barLineColor;
+        context.moveTo(lineStartX, lineStartY);
+        context.lineTo(lineEndX, lineEndY);
+        context.stroke();
+        context.restore();
+      });
+    }
   }
 
+  console.log('complete drawChartCandlestick', process);
+}
+
+function drawChartHeatmap(process) {
+  let { context, opts, chartData } = this;
+  let { xEachSpacing, yEachSpacing } = chartData.axisData;
+  let { label: globalLabel } = opts;
+
+  const xSplitLineWidth = opts.xAxis.axisSplitLine.lineStyle.lineWidth;
+  const ySplitLineWidth = opts.yAxis.axisSplitLine.lineStyle.lineWidth;
+
+  chartData.chartHeatmap.forEach(HeatmapItem => {
+    let { data, label } = HeatmapItem;
+    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+
+    data.forEach(dataItem => {
+      let { positionX, positionY, color: dataItemColor, useSplit } = dataItem;
+      context.save();
+      context.beginPath();
+      if (useSplit) {
+        context.rect(positionX + ySplitLineWidth * 2, positionY + xSplitLineWidth * 2, xEachSpacing - ySplitLineWidth * 4, yEachSpacing - xSplitLineWidth * 4);
+      } else {
+        context.rect(positionX, positionY, xEachSpacing, yEachSpacing);
+      }
+      context.fillStyle = dataItemColor;
+      context.globalAlpha = process;
+      context.fill();
+      context.restore();
+    });
+
+    if (process == 1) {
+      // globalLabel 权重大于 seriesLabel
+      labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+      labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+      labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+      labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+
+      if (labelShow) {
+        context.save();
+        context.font = `${labelFontSize}px`;
+        context.fillStyle = labelColor == 'auto' ? '#ffffff' : labelColor;
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+
+        data.forEach(dataItem => {
+          let { positionX, positionY } = dataItem;
+          let text = dataItem[2];
+          context.fillText(text, positionX + xEachSpacing / 2, positionY + yEachSpacing / 2);
+        });
+        context.restore();
+      }
+    }
+  });
+  console.log('complete drawChartHeatmap', process);
+}
+
+// import cloneDeep from 'lodash.clonedeep'
+
+function drawChartTreemap(process) {
+  let { context, opts, chartData } = this;
+  let { label: globalLabel } = opts;
+  let { label: seriesLabel, splitLine } = chartData.chartTreemap.data;
+  let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = seriesLabel;
+  let { show: splitLineShow, lineWidth: splitLineWidth, color: splitLineColor } = splitLine;
+
+  context.save();
+  chartData.chartTreemap.children.forEach((item, index) => {
+    let { x0, y0, x1, y1, data } = item;
+    let width = x1 - x0;
+    let height = y1 - y0;
+
+    context.fillStyle = data.itemStyle.color;
+    context.globalAlpha = process;
+    if (splitLineShow) {
+      context.lineWidth = splitLineWidth;
+      context.strokeStyle = splitLineColor;
+      context.strokeRect(x0, y0, width, height);
+    }
+    context.fillRect(x0, y0, width, height);
+  });
+  context.restore();
+
+  // 绘制文本标签
+  if (process == 1) {
+    // globalLabel 权重大于 seriesLabel
+    labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
+    labelFontSize = globalLabel && globalLabel.fontSize ? globalLabel.fontSize : labelFontSize;
+    labelColor = globalLabel && globalLabel.color ? globalLabel.color : labelColor;
+    labelMargin = globalLabel && globalLabel.margin ? globalLabel.margin : labelMargin;
+
+    if (labelShow) {
+      context.save();
+      chartData.chartTreemap.children.forEach(item => {
+        let { x0, y0, x1, y1, data } = item;
+        let { name, itemStyle } = data;
+        let x = x0 + (x1 - x0) / 2;
+        let y = y0 + (y1 - y0) / 2;
+
+        let min = Math.min(x1 - x0, y1 - y0);
+
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.font = `${min * 0.2}px`;
+        context.strokeStyle = labelColor == 'auto' ? itemStyle.color : labelColor;
+        context.fillStyle = '#ffffff';
+        context.strokeText(name, x, y);
+        context.fillText(name, x, y);
+      });
+      context.restore();
+    }
+  }
+
+  console.log('complete drawChartTreemap', process);
+}
+
+// import cloneDeep from 'lodash.clonedeep'
+
+function drawChartTagCloud(process) {
+  let { opts, chartData } = this;
+  let { element, width, height } = opts;
+
+  element.width = width;
+  element.height = height;
+  const context = element.getContext('2d');
+
+  chartData.chartTagCloud.data.forEach(item => {
+    let { text, x, y, font, size, rotate, itemStyle } = item;
+
+    context.save();
+    context.beginPath();
+    context.font = `${size}px ${font}`;
+    context.fillStyle = itemStyle.color;
+    context.textAlign = 'center';
+    context.translate(width / 2 + x, height / 2 + y);
+    context.rotate((rotate * Math.PI) / 180);
+    context.fillText(text, 0, 0);
+    context.restore();
+  });
+
+  console.log('complete drawChartTagCloud', process);
+}
+
+function drawCharts() {
+  // 计算数据
+  calSeriesMap.call(this);
+  calSeriesColor.call(this);
+  calLegendData.call(this);
+  // 有相同xy轴的图表，只计算一次
+  if (this.seriesMap.line || this.seriesMap.bar || this.seriesMap.scatter || this.seriesMap.candlestick || this.seriesMap.heatmap) {
+    calAxisData.call(this);
+  }
+  Object.keys(this.seriesMap).forEach(type => {
+    if (this.seriesMap[type]) {
+      switch (type) {
+        case 'bar':
+          calChartBarData.call(this);
+          break
+        case 'line':
+          calChartLineData.call(this);
+          break
+        case 'pie':
+          calChartPieData.call(this);
+          break
+        case 'radar':
+          calAxisRadarData.call(this);
+          calChartRadarData.call(this);
+          break
+        case 'scatter':
+          calChartScatterData.call(this);
+          break
+        case 'funnel':
+          calChartPieData$1.call(this);
+          break
+        case 'candlestick':
+          calChartCandlestick.call(this);
+          break
+        case 'heatmap':
+          calChartHeatmapData.call(this);
+          break
+        case 'treemap':
+          calChartTreemapData.call(this);
+          break
+        case 'tagCloud':
+          calChartTagCloudData.call(this);
+          break
+      }
+    }
+  });
+
+  let { animation, animationDuration, animationTiming } = this.opts;
+  this.animationInstance && this.animationInstance.stop();
+
   this.animationInstance = new Animation({
-    type,
     animation,
     animationDuration,
     animationTiming,
-    onProcess: onProcessFn,
+    onProcess: process => {
+      // 绘制图表
+      drawBackground.call(this);
+      // 有相同xy轴的图表，只绘制一次
+      if (this.seriesMap.line || this.seriesMap.bar || this.seriesMap.scatter || this.seriesMap.candlestick || this.seriesMap.heatmap) {
+        drawAxis.call(this);
+      }
+
+      Object.keys(this.seriesMap).forEach(type => {
+        switch (type) {
+          case 'bar':
+            drawChartPie.call(this, process);
+            break
+          case 'line':
+            drawChartLine.call(this, process);
+            break
+          case 'pie':
+            drawChartPie$1.call(this, process);
+            break
+          case 'radar':
+            drawAxisRadar.call(this);
+            drawChartRadar.call(this, process);
+            break
+          case 'scatter':
+            drawChartScatter.call(this, process);
+            break
+          case 'funnel':
+            drawChartPie$2.call(this, process);
+            break
+          case 'candlestick':
+            drawChartCandlestick.call(this, process);
+            break
+          case 'heatmap':
+            drawChartHeatmap.call(this, process);
+            break
+          case 'treemap':
+            drawChartTreemap.call(this, process);
+            break
+          case 'tagCloud':
+            drawChartTagCloud.call(this, process);
+            break
+        }
+      });
+
+      if (process == 1) {
+        drawLegend.call(this);
+      }
+    },
     onAnimationFinish: () => {
       this.event.trigger('renderComplete');
     },
@@ -4392,6 +8619,8 @@ class Charts {
     this.config = Object.assign({}, Config);
     this.opts = Object.assign({}, opts);
     this.context = this.opts.element.getContext('2d');
+    this.legendData = {};
+    this.seriesMap = {};
     this.chartData = {};
 
     // 绑定事件
@@ -4405,21 +8634,15 @@ class Charts {
     drawCharts.call(this);
   }
 
-  updateData(data = {}) {
-    if (this.opts.type == 'pie' || this.opts.type == 'funnel') {
-      Object.keys(data).forEach(dataKey => {
-        replenishData(dataKey, data, this.opts, true);
-      });
-    } else {
-      Object.keys(data).forEach(dataKey => {
-        if (dataKey == 'series') {
-          this.opts.series = JSON.parse(JSON.stringify(data.series));
-          calSeries.call(this);
-        } else {
-          replenishData(dataKey, data, this.opts, true);
-        }
-      });
-    }
+  updateData(updateOpts = {}) {
+    Object.keys(updateOpts).forEach(key => {
+      if (key == 'series') {
+        this.opts.series = lodash_clonedeep(updateOpts.series);
+        calSeries.call(this);
+      } else {
+        replenishData(updateOpts, key, this.opts, key, true);
+      }
+    });
 
     console.log('complete updateData', this);
 
