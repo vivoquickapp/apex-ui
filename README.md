@@ -1,5 +1,5 @@
 # Apex-UI组件库
-欢迎使用调试器扫描以下二维码体验。如果调试器扫码不成功，可以用浏览器扫码下载到本地后安装查看。
+欢迎使用调试器或浏览器扫描以下二维码体验。
 
 <img width="200" src="https://quickapp.vivo.com.cn/content/images/2020/06/qrcode-1.png" alt="qrcode" />
 
