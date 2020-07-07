@@ -53,6 +53,46 @@ var Config = {
   animationTiming: 'easeInOut', // easeIn, easeOut, easeInOut, linear
   backgroundColor: '#ffffff',
   colors: ['#7cb5ec', '#f7a35c', '#434348', '#90ed7d', '#f15c80', '#8085e9'], // wxcharts调色盘
+  tooltip: {
+    show: false,
+    data: [],
+    maxTextWidth: 0,
+    backgroundColor: '#000000',
+    backgroundRadius: 5,
+    backgroundOpacity: 0.7,
+    padding: 10,
+    itemGap: 5,
+    iconRadius: 5,
+    iconGap: 5,
+    textStyle: {
+      fontSize: 15,
+      color: '#ffffff',
+      lineHeight: 15,
+    },
+    axisPointer: {
+      type: 'line', // line shadow
+      lineStyle: {
+        lineWidth: 1,
+        color: '#808080',
+        opacity: 1,
+      },
+      shadowStyle: {
+        color: '#969696',
+        opacity: 0.3,
+      },
+      cross: {
+        show: true,
+        lineWidth: 1,
+        lineColor: '#808080',
+        lineDash: [5, 10],
+        lineOpacity: 1,
+        backgroundColor: '#999999',
+        backgroundOpacity: 1,
+        fontColor: '#ffffff',
+        fontPadding: 5,
+      },
+    },
+  },
   label: {
     show: true,
     fontSize: 10,
@@ -345,6 +385,22 @@ var Config = {
       length1: 25,
       length2: 15,
     },
+    title: {
+      show: false,
+      text: '主标题',
+      textStyle: {
+        fontSize: 30,
+        color: '#666666',
+        lineHeight: 30,
+      },
+      subtext: '副标题',
+      subtextStyle: {
+        fontSize: 20,
+        color: '#999999',
+        lineHeight: 20,
+      },
+      itemGap: 5,
+    },
   },
   radar: {
     line: {
@@ -459,6 +515,35 @@ var Config = {
     spiral: 'archimedean', // archimedean rectangular {function}
   },
 };
+
+/**
+ * getColor 颜色参数为对象则返回渐变色
+ * @param {Object} color
+ * @param {Object} context
+ * @param {Number} xStart
+ * @param {Number} yStart
+ * @param {Number} xEnd
+ * @param {Number} yEnd
+ */
+function getColor(color, context, xStart, yStart, xEnd, yEnd) {
+  if (isObject(color)) {
+    const { linearGradient, colors } = color;
+    const [x0, y0, x1, y1] = linearGradient;
+
+    const xSpacing = xEnd - xStart;
+    const ySpacing = yEnd - yStart;
+
+    const gradientColor = context.createLinearGradient(xStart + xSpacing * x0, yStart + ySpacing * y0, xStart + xSpacing * x1, yStart + ySpacing * y1);
+    colors.forEach(item => {
+      const { offset, color } = item;
+      gradientColor.addColorStop(offset, color);
+    });
+
+    return gradientColor
+  }
+
+  return color
+}
 
 /**
  * HEX to HSL
@@ -2415,7 +2500,7 @@ function replenishData(sources, sourcesKey, target, targetKey, isCover = false) 
       }
     } else {
       // (目标对象不为为空时，若数据为对象时递归)
-      if (isObject(target[targetKey])) {
+      if (isObject(target[targetKey]) && isObject(sources[sourcesKey])) {
         Object.keys(sources[sourcesKey]).forEach(_key => {
           replenishData(sources[sourcesKey], _key, target[targetKey], _key, isCover);
         });
@@ -2436,6 +2521,7 @@ function calOptions() {
   replenishData(config, 'colors', opts, 'colors');
   replenishData(config, 'padding', opts, 'padding');
   replenishData(config, 'legend', opts, 'legend');
+  replenishData(config, 'tooltip', opts, 'tooltip');
 
   opts.series.forEach(seriesItem => {
     switch (seriesItem.type) {
@@ -2495,84 +2581,576 @@ function calSeries() {
   });
 }
 
-var Timing = {
-  easeIn: function (pos) {
-    return Math.pow(pos, 3)
-  },
-  easeOut: function (pos) {
-    return Math.pow(pos - 1, 3) + 1
-  },
-  easeInOut: function (pos) {
-    if ((pos /= 0.5) < 1) {
-      return 0.5 * Math.pow(pos, 3)
+/**
+ * 获取存在xy轴图表的点击位置下标
+ * @param {Object} offset
+ */
+function getAxisChartCurrentIndex(offset) {
+  const { x, y } = offset;
+  const { opts, chartData } = this;
+  const { yAxis, xAxis } = opts;
+  const { xStart, xEnd, yStart, yEnd, xAxisLabelPoint, yAxisLabelPoint } = chartData.axisData;
+  const isInExactChartArea = x < xEnd && x > xStart && y > yEnd && y < yStart;
+  let currentIndex = -1;
+
+  if (isInExactChartArea) {
+    // 点击有效范围
+    if (xAxis.type == 'category' && yAxis.type == 'value') {
+      xAxisLabelPoint.forEach((item, index) => {
+        if (x > item.x) {
+          currentIndex = index;
+        }
+      });
+
+      if (x < xAxisLabelPoint[0].x) {
+        currentIndex = 0;
+      }
+    } else if (xAxis.type == 'value' && yAxis.type == 'category') {
+      yAxisLabelPoint.forEach((item, index) => {
+        if (y < item.y) {
+          currentIndex = index;
+        }
+      });
+
+      if (y > yAxisLabelPoint[0].y) {
+        currentIndex = 0;
+      }
+    } else if (xAxis.type == 'value' && yAxis.type == 'value') ;
+  }
+
+  console.log('complete getAxisChartCurrentIndex');
+
+  return currentIndex
+}
+
+/**
+ * 获取饼图的点击位置下标
+ * @param {Object} offset
+ */
+function getPieChartCurrentIndex(offset) {
+  const { x, y } = offset;
+  const { data, center, radius, offsetAngle } = this.chartData.chartPie;
+  const [centerX, centerY] = center;
+  const [raidusMin, raidusMax] = radius;
+  const length = Math.hypot(Math.abs(x - centerX), Math.abs(y - centerY)); // 点击点距离圆心的长度
+  const isInExactChartArea = length >= raidusMin && length <= raidusMax;
+  let currentIndex = -1;
+
+  if (isInExactChartArea) {
+    // 点击有效范围
+    let currentRadian; // 点击点的弧度
+    if (Math.atan2(x - centerX, centerY - y) > 0) {
+      currentRadian = Math.atan2(x - centerX, centerY - y);
     } else {
-      return 0.5 * (Math.pow(pos - 2, 3) + 2)
+      currentRadian = Math.PI + (Math.PI - Math.abs(Math.atan2(x - centerX, centerY - y)));
     }
-  },
-  linear: function (pos) {
-    return pos
-  },
-};
+    if (currentRadian > ((90 + offsetAngle) * Math.PI) / 180) {
+      currentRadian -= ((90 + offsetAngle) * Math.PI) / 180;
+    } else {
+      currentRadian = 2 * Math.PI + (currentRadian - ((90 + offsetAngle) * Math.PI) / 180);
+    }
 
-class Animation {
-  constructor(opts) {
-    this.isStop = false;
+    data.forEach((item, index) => {
+      if (currentRadian > item._start_) {
+        currentIndex = index;
+      }
+    });
+  }
 
-    let { animation, animationDuration, animationTiming, onProcess, onAnimationFinish } = opts;
+  console.log('complete getPieChartCurrentIndex');
 
-    let createAnimationFrame = function () {
-      if (typeof requestAnimationFrame !== 'undefined') {
-        return requestAnimationFrame
-      } else if (typeof setTimeout !== 'undefined') {
-        return function (step) {
-          setTimeout(function () {
-            let timeStamp = +new Date();
-            step(timeStamp);
-          }, 17);
+  return currentIndex
+}
+
+/**
+ * 获取雷达图的点击位置下标
+ * @param {Object} offset
+ */
+function getRadarChartCurrentIndex(offset) {
+  const { x, y } = offset;
+  const { chartRadar, radarAxis } = this.chartData;
+  const { center, radius } = radarAxis;
+  const [centerX, centerY] = center;
+  const length = Math.hypot(Math.abs(x - centerX), Math.abs(y - centerY)); // 点击点距离圆心的长度
+  const isInExactChartArea = length <= radius;
+  let currentIndex = -1;
+
+  if (isInExactChartArea) {
+    // 点击有效范围
+    let currentRadian; // 点击点的弧度
+    if (Math.atan2(x - centerX, centerY - y) > 0) {
+      currentRadian = Math.atan2(x - centerX, centerY - y);
+    } else {
+      currentRadian = Math.PI + (Math.PI - Math.abs(Math.atan2(x - centerX, centerY - y)));
+    }
+
+    chartRadar[0].dataPosition.forEach((item, index, arr) => {
+      const { spacingRadian, _start_ } = item;
+      if (index == 0) {
+        if (currentRadian >= 2 * Math.PI - spacingRadian / 2 || currentRadian < _start_ + spacingRadian / 2) {
+          currentIndex = 0;
+        }
+      } else {
+        if (currentRadian > _start_ - spacingRadian / 2 && currentRadian <= _start_ + spacingRadian / 2) {
+          currentIndex = arr.length - index;
         }
       }
-    };
-    let animationFrame = createAnimationFrame();
+    });
+  }
 
-    if (animation) {
-      let timingFunction = Timing[animationTiming];
-      let startTimeStamp = null;
+  console.log('complete getRadarChartCurrentIndex');
 
-      let step = function () {
-        if (this.isStop === true) {
-          onProcess(1);
-          onAnimationFinish();
-          return
-        }
+  return currentIndex
+}
 
-        let timeStamp = +new Date();
-        if (!startTimeStamp) startTimeStamp = timeStamp;
+/**
+ * 计算 tooltip 容器数据
+ */
+function calTooltipContainerData() {
+  const { opts, tooltipData } = this;
+  const { width, height, tooltip } = opts;
+  const { padding, itemGap, iconRadius, iconGap, textStyle } = tooltip;
+  const { offset, data, maxTextWidth, tooltipTitle } = tooltipData;
+  const { x: offsetX, y: offsetY } = offset;
 
-        if (timeStamp - startTimeStamp < animationDuration) {
-          let process = (timeStamp - startTimeStamp) / animationDuration;
-          process = timingFunction(process);
-          opts.onProcess(process);
-          animationFrame(step);
-        } else {
-          onProcess(1);
-          onAnimationFinish();
-        }
-      };
-      step = step.bind(this);
+  let tooltipWidth = padding * 2 + iconRadius * 2 + iconGap + maxTextWidth;
+  let tooltipHeight = padding * 2;
+  let tooltipContainerOffset = 10; // 偏移量
+  let tooltipX, tooltipY;
 
-      animationFrame(step);
+  if (tooltipTitle) {
+    tooltipHeight += textStyle.lineHeight + itemGap;
+  }
+
+  data.forEach((item, index, arr) => {
+    if (item.type == 'candlestick' || item.type == 'k') {
+      const contentLength = item.volumn ? 6 : 5;
+      tooltipHeight += textStyle.lineHeight * contentLength + itemGap * contentLength - 1;
     } else {
-      onProcess(1);
-      onAnimationFinish();
+      if (index + 1 == arr.length) {
+        tooltipHeight += textStyle.lineHeight;
+      } else {
+        tooltipHeight += textStyle.lineHeight + itemGap;
+      }
+    }
+  });
+
+  if (offsetX + tooltipContainerOffset + tooltipWidth <= width) {
+    // 优先显示右边
+    tooltipX = offsetX + tooltipContainerOffset;
+  } else if (offsetX - tooltipContainerOffset - tooltipWidth >= 0) {
+    // 左边
+    tooltipX = offsetX - tooltipContainerOffset - tooltipWidth;
+  } else {
+    // 左右都放不下
+    if (offsetX <= width / 2) {
+      // 边界靠右边
+      tooltipX = width - tooltipWidth;
+    } else {
+      // 边界靠左边
+      tooltipX = 0;
     }
   }
 
-  /**
-   * 停止动画
-   */
-  stop() {
-    this.isStop = true;
+  if (offsetY + tooltipContainerOffset + tooltipHeight <= height) {
+    // 优先显示下边
+    tooltipY = offsetY + tooltipContainerOffset;
+  } else if (offsetY - tooltipContainerOffset - tooltipHeight >= 0) {
+    // 上边
+    tooltipY = offsetY - tooltipContainerOffset - tooltipHeight;
+  } else {
+    // 上下都放不下
+    if (offsetY <= height / 2) {
+      // 边界靠下边
+      tooltipY = height - tooltipHeight;
+    } else {
+      // 边界靠上边
+      tooltipY = 0;
+    }
   }
+
+  this.tooltipData = {
+    ...this.tooltipData,
+    tooltipX,
+    tooltipY,
+    tooltipWidth,
+    tooltipHeight,
+    tooltipTitle,
+  };
+  console.log('complete calTooltipContainerData');
+}
+
+/**
+ * 计算轴线指示器数据
+ * @param {Number} currentIndex
+ * @param {Object} offset
+ */
+
+function calAxisPointerData(currentIndex) {
+  if (currentIndex == -1) return
+
+  const { context, opts, chartData, tooltipData } = this;
+  const { xAxis, yAxis, tooltip } = opts;
+  const { x: offsetX, y: offsetY } = tooltipData.offset;
+  const { type, cross } = tooltip.axisPointer;
+  const { fontPadding: crossFontPadding } = cross;
+  const {
+    xStart,
+    xEnd,
+    xEachSpacing,
+    xSpacing,
+    xDataRange,
+    xMinData,
+    yStart,
+    yEnd,
+    yEachSpacing,
+    ySpacing,
+    yDataRange,
+    yMinData,
+    xAxisLabelPoint,
+    yAxisLabelPoint,
+  } = chartData.axisData;
+  const isExistCandlestick = tooltipData.data.some(item => item.type == 'candlestick' || item.type == 'k');
+
+  let curerntAxisLabel, currentAxisLabelX, currentAxisLabelY;
+
+  if (xAxis.type == 'category' && yAxis.type == 'value') {
+    curerntAxisLabel = xAxisLabelPoint[currentIndex].text;
+    currentAxisLabelX = xAxisLabelPoint[currentIndex].x;
+    currentAxisLabelY = xAxisLabelPoint[currentIndex].y;
+  } else if (xAxis.type == 'value' && yAxis.type == 'category') {
+    curerntAxisLabel = yAxisLabelPoint[currentIndex].text;
+    currentAxisLabelX = yAxisLabelPoint[currentIndex].x;
+    currentAxisLabelY = yAxisLabelPoint[currentIndex].y;
+  } else if (xAxis.type == 'value' && yAxis.type == 'value') ;
+
+  let crossPointer, xAxisPointer, yAxisPointer;
+
+  if (xAxis.type == 'category' && yAxis.type == 'value') {
+    const yAxisLabel = (yMinData + ((yStart - offsetY) * yDataRange) / ySpacing).toFixed(2);
+    const yAxisLabelX = yAxisLabelPoint[0].x;
+    const yAxisLabelFontSize = yAxis.axisLabel.textStyle.fontSize;
+    const xAxisLabelFontSize = xAxis.axisLabel.textStyle.fontSize;
+
+    context.font = `${yAxisLabelFontSize}px`;
+    const yAxisLabelWidth = context.measureText(yAxisLabel).width + 2 * crossFontPadding;
+    const yAxisLabelHeight = yAxisLabelFontSize + 2 * crossFontPadding;
+
+    context.font = `${xAxisLabelFontSize}px`;
+    const xAxisLabelWidth = context.measureText(curerntAxisLabel).width + 2 * crossFontPadding;
+    const xAxisLabelHeight = xAxisLabelFontSize + 2 * crossFontPadding;
+
+    this.tooltipData.offset = { x: currentAxisLabelX, y: offsetY }; // 修改 offset 为 cross 交点位置
+
+    context.font = `${tooltip.textStyle.fontSize}px`;
+    this.tooltipData.maxTextWidth = Math.max(this.tooltipData.maxTextWidth, context.measureText(curerntAxisLabel).width);
+    this.tooltipData.tooltipTitle = curerntAxisLabel;
+
+    crossPointer = {
+      yAxisLabel,
+      yAxisLabelWidth,
+      yAxisLabelHeight,
+      yAxisLabelX,
+      yAxisLabelY: offsetY,
+      yAxisLineX0: xStart,
+      yAxisLineY0: offsetY,
+      yAxisLineX1: xEnd,
+      yAxisLineY1: offsetY,
+      xAxisLabel: curerntAxisLabel,
+      xAxisLabelWidth,
+      xAxisLabelHeight,
+      xAxisLabelX: currentAxisLabelX,
+      xAxisLabelY: currentAxisLabelY,
+      xAxisLineX0: currentAxisLabelX,
+      xAxisLineY0: yStart,
+      xAxisLineX1: currentAxisLabelX,
+      xAxisLineY1: yEnd,
+    };
+
+    if (type == 'line') {
+      xAxisPointer = {
+        x0: currentAxisLabelX,
+        y0: yStart,
+        x1: currentAxisLabelX,
+        y1: yEnd,
+      };
+    } else if (type == 'shadow') {
+      xAxisPointer = {
+        x: xStart + xEachSpacing * currentIndex,
+        y: yEnd,
+        width: xEachSpacing,
+        height: ySpacing,
+      };
+    }
+  } else if (xAxis.type == 'value' && yAxis.type == 'category') {
+    const xAxisLabel = (xMinData + ((offsetX - xStart) * xDataRange) / xSpacing).toFixed(2);
+    const xAxisLabelY = xAxisLabelPoint[0].y;
+    const yAxisLabelFontSize = yAxis.axisLabel.textStyle.fontSize;
+    const xAxisLabelFontSize = xAxis.axisLabel.textStyle.fontSize;
+
+    context.font = `${yAxisLabelFontSize}px`;
+    const yAxisLabelWidth = context.measureText(curerntAxisLabel).width + 2 * crossFontPadding;
+    const yAxisLabelHeight = yAxisLabelFontSize + 2 * crossFontPadding;
+
+    context.font = `${xAxisLabelFontSize}px`;
+    const xAxisLabelWidth = context.measureText(xAxisLabel).width + 2 * crossFontPadding;
+    const xAxisLabelHeight = xAxisLabelFontSize + 2 * crossFontPadding;
+
+    this.tooltipData.offset = { x: offsetX, y: currentAxisLabelY }; // 修改 offset 为 cross 交点位置
+
+    context.font = `${tooltip.textStyle.fontSize}px`;
+    this.tooltipData.maxTextWidth = Math.max(this.tooltipData.maxTextWidth, context.measureText(curerntAxisLabel).width);
+    this.tooltipData.tooltipTitle = curerntAxisLabel;
+
+    crossPointer = {
+      yAxisLabel: curerntAxisLabel,
+      yAxisLabelWidth,
+      yAxisLabelHeight,
+      yAxisLabelX: currentAxisLabelX,
+      yAxisLabelY: currentAxisLabelY,
+      yAxisLineX0: xStart,
+      yAxisLineY0: currentAxisLabelY,
+      yAxisLineX1: xEnd,
+      yAxisLineY1: currentAxisLabelY,
+      xAxisLabel,
+      xAxisLabelWidth,
+      xAxisLabelHeight,
+      xAxisLabelX: offsetX,
+      xAxisLabelY,
+      xAxisLineX0: offsetX,
+      xAxisLineY0: yStart,
+      xAxisLineX1: offsetX,
+      xAxisLineY1: yEnd,
+    };
+
+    if (type == 'line') {
+      yAxisPointer = {
+        x0: xStart,
+        y0: currentAxisLabelY,
+        x1: xEnd,
+        y1: currentAxisLabelY,
+      };
+    } else if (type == 'shadow') {
+      yAxisPointer = {
+        x: xStart,
+        y: yEnd - yEachSpacing * currentIndex,
+        width: xSpacing,
+        height: yEachSpacing,
+      };
+    }
+  } else if (xAxis.type == 'value' && yAxis.type == 'value') ;
+
+  if (isExistCandlestick) {
+    if (chartData.chartCandlestick.bar) {
+      crossPointer.xAxisLineY0 = chartData.chartCandlestick.bar.lineStartY;
+    }
+  }
+
+  tooltipData.axisPointerData = {
+    crossPointer,
+    xAxisPointer,
+    yAxisPointer,
+  };
+
+  console.log('complete calAxisPointerData');
+}
+
+/**
+ * 计算线图 tooltipData
+ * @param {Number} currentIndex
+ */
+function calLineChartTooltipData(currentIndex) {
+  if (currentIndex == -1) return
+
+  const { context, opts, chartData, tooltipData } = this;
+  let maxTextWidth = tooltipData.maxTextWidth;
+
+  context.font = `${opts.tooltip.textStyle.fontSize}px`;
+  chartData.chartLine.forEach(item => {
+    const { type, name, data, itemStyle, label, symbol } = item;
+    const { type: symbolType, size: symbolSize, color: symbolColor } = symbol;
+    const { x, y, data: value } = data[currentIndex];
+
+    if (typeof value !== 'number') return
+
+    const text = `${name}: ${label.format ? label.format(value) : value}`;
+    const textWidth = context.measureText(text).width;
+    maxTextWidth = Math.max(maxTextWidth, textWidth);
+
+    tooltipData.data.push({
+      type,
+      name,
+      text,
+      color: itemStyle.color,
+      x,
+      y,
+      symbolType,
+      symbolSize,
+      symbolColor,
+    });
+  });
+
+  this.tooltipData.maxTextWidth = maxTextWidth;
+
+  console.log('complete calLineChartTooltipData');
+}
+
+/**
+ * 计算柱状图 tooltipData
+ * @param {Number} currentIndex
+ */
+function calBarChartTooltipData(currentIndex) {
+  if (currentIndex == -1) return
+
+  const { context, opts, chartData, tooltipData } = this;
+  let maxTextWidth = tooltipData.maxTextWidth;
+
+  context.font = `${opts.tooltip.textStyle.fontSize}px`;
+  chartData.chartBar[currentIndex].forEach(barItem => {
+    barItem.forEach(seriesItem => {
+      const { type, name, data, itemStyle, label } = seriesItem;
+      const text = `${name}: ${label.format ? label.format(data) : data}`;
+      const textWidth = context.measureText(text).width;
+      maxTextWidth = Math.max(maxTextWidth, textWidth);
+
+      tooltipData.data.push({
+        type,
+        name,
+        text,
+        color: itemStyle.color,
+      });
+    });
+  });
+
+  this.tooltipData.maxTextWidth = maxTextWidth;
+
+  console.log('complete calBarChartTooltipData');
+}
+
+/**
+ * 计算饼图 tooltipData
+ * @param {Number} currentIndex
+ */
+function calPieChartTooltipData(currentIndex) {
+  if (currentIndex == -1) return
+
+  const { context, opts, chartData, tooltipData } = this;
+  const { name, type, data, center, radius, label } = chartData.chartPie;
+  const { name: itemName, value, itemStyle, _proportion_, _start_, _end_ } = data[currentIndex];
+  const text = `${itemName}: ${label.format ? label.format(value) : value}`;
+
+  context.font = `${opts.tooltip.textStyle.fontSize}px`;
+  const textWidth = context.measureText(text).width;
+  const maxTextWidth = Math.max(tooltipData.maxTextWidth, textWidth);
+  this.tooltipData.maxTextWidth = maxTextWidth;
+  this.tooltipData.tooltipTitle = name;
+
+  tooltipData.data.push({
+    type,
+    name: itemName,
+    text,
+    color: itemStyle.color,
+    center,
+    radius,
+    _proportion_,
+    _start_,
+    _end_,
+  });
+
+  console.log('complete calPieChartTooltipData');
+}
+
+/**
+ * 计算雷达图 tooltipData
+ * @param {Number} currentIndex
+ */
+function calRadarChartTooltipData(currentIndex) {
+  if (currentIndex == -1) return
+
+  const { context, opts, chartData, tooltipData } = this;
+  let maxTextWidth = tooltipData.maxTextWidth;
+
+  context.font = `${opts.tooltip.textStyle.fontSize}px`;
+  chartData.chartRadar.forEach(item => {
+    const { type, name, data, dataPosition, itemStyle, label, symbol } = item;
+    const { type: symbolType, size: symbolSize, color: symbolColor } = symbol;
+    const value = data[currentIndex];
+    const { x, y } = dataPosition[currentIndex].position;
+
+    if (typeof value !== 'number') return
+
+    const text = `${name}: ${label.format ? label.format(value) : value}`;
+    const textWidth = context.measureText(text).width;
+    maxTextWidth = Math.max(maxTextWidth, textWidth);
+
+    tooltipData.data.push({
+      type,
+      name,
+      text,
+      color: itemStyle.color,
+      x,
+      y,
+      symbolType,
+      symbolSize,
+      symbolColor,
+    });
+  });
+
+  this.tooltipData.maxTextWidth = maxTextWidth;
+  this.tooltipData.tooltipTitle = chartData.radarAxis.namePosition[currentIndex].text;
+}
+
+/**
+ * 计算蜡烛图 tooltipData
+ * @param {Number} currentIndex
+ */
+function calCandlestickChartTooltipData(currentIndex) {
+  if (currentIndex == -1) return
+
+  const { context, opts, chartData, tooltipData } = this;
+  const { type, name, rect } = chartData.chartCandlestick;
+  const { start, end, low, high, volumn, color } = rect[currentIndex];
+  const _start = `开盘价：${start}`,
+    _end = `收盘价：${end}`,
+    _low = `最低价：${low}`,
+    _high = `最高价：${high}`,
+    _volumn = `成交量：${volumn}`;
+  let textWidth,
+    maxTextWidth = tooltipData.maxTextWidth;
+
+  context.font = `${opts.tooltip.textStyle.fontSize}px`;
+
+  textWidth = context.measureText(_start).width;
+  maxTextWidth = Math.max(maxTextWidth, textWidth);
+
+  textWidth = context.measureText(_end).width;
+  maxTextWidth = Math.max(maxTextWidth, textWidth);
+
+  textWidth = context.measureText(_low).width;
+  maxTextWidth = Math.max(maxTextWidth, textWidth);
+
+  textWidth = context.measureText(_high).width;
+  maxTextWidth = Math.max(maxTextWidth, textWidth);
+
+  if (volumn) {
+    textWidth = context.measureText(_volumn).width;
+    maxTextWidth = Math.max(maxTextWidth, textWidth);
+  }
+
+  tooltipData.data.push({
+    type,
+    name,
+    start: _start,
+    end: _end,
+    low: _low,
+    high: _high,
+    volumn: _volumn,
+    color,
+  });
+
+  this.tooltipData.maxTextWidth = maxTextWidth;
+
+  console.log('complete calCandlestickChartTooltipData');
 }
 
 function calSeriesMap() {
@@ -2633,14 +3211,14 @@ function calLegendData() {
   if (this.opts.legend.show) {
     let { context, opts } = this;
     let { width, padding, legend, series } = opts;
-    let { type: legendType, shapeWidth, shapeHeight, shapeRadius, itemGap, marginTop, textStyle } = legend;
+    let { type: legendType, data: legendData, shapeWidth, shapeHeight, shapeRadius, itemGap, marginTop, textStyle } = legend;
     let { fontSize, padding: textPadding } = textStyle;
     let legendWidth = 0;
     let legendWidthNum = 0;
     let legendList = [];
     let currentRow = [];
     let _shapeWidth = shapeWidth;
-    let legendData = [];
+    let _legendData = [];
     let containerWidth = width - padding[1] - padding[3];
 
     let dataSeriesItem = [];
@@ -2649,46 +3227,49 @@ function calLegendData() {
       return seriesItem.type == 'pie' || seriesItem.type == 'funnel' || seriesItem.type == 'treemap' || seriesItem.type == 'tagCloud'
     });
 
-    if (!legend.data) {
+    if (!legendData) {
       if (isDataName) {
-        legendData = dataSeriesItem.data.map(dataItem => {
+        _legendData = dataSeriesItem.data.map(dataItem => {
           return dataItem.name
         });
       } else {
-        legendData = series.map(seriesItem => {
+        _legendData = series.map(seriesItem => {
           return seriesItem.name
         });
       }
+    } else {
+      _legendData = legendData;
     }
 
     context.font = `${fontSize}px`;
     if (isDataName) {
-      if (legendType == 'default') {
-        switch (dataSeriesItem.type) {
-          case 'pie':
-            legendType = 'circle';
-            _shapeWidth = shapeRadius * 2;
-            break
-          case 'funnel':
-          case 'treemap':
-          case 'tagCloud':
-            legendType = 'rect';
-            break
-        }
-      }
-
-      legendData.forEach(name => {
+      _legendData.forEach(name => {
         dataSeriesItem.data.forEach(dataItem => {
           if (name == dataItem.name) {
+            let _legendType;
+            if (legendType == 'default') {
+              switch (dataSeriesItem.type) {
+                case 'pie':
+                  _legendType = 'circle';
+                  _shapeWidth = shapeRadius * 2;
+                  break
+                case 'funnel':
+                case 'treemap':
+                case 'tagCloud':
+                  _legendType = 'rect';
+                  break
+              }
+            }
+
             let { name, itemStyle } = dataItem;
             let measureText = this.context.measureText(name || '').width;
             let itemWidth = _shapeWidth + textPadding + itemGap + measureText;
 
             let obj = {
-              legendType,
+              legendType: _legendType,
               name,
               measureText,
-              color: typeof itemStyle.color == 'string' ? itemStyle.color : '#000000',
+              color: itemStyle.color,
             };
 
             if (legendWidthNum + itemWidth > containerWidth) {
@@ -2704,8 +3285,9 @@ function calLegendData() {
         });
       });
     } else {
-      legendData.forEach(name => {
+      _legendData.forEach(name => {
         series.forEach(seriesItem => {
+          let _legendType;
           if (legendType == 'default') {
             switch (seriesItem.type) {
               case 'bar':
@@ -2713,13 +3295,13 @@ function calLegendData() {
               case 'candlestick':
               case 'k':
               case 'heatmap':
-                legendType = 'rect';
+                _legendType = 'rect';
                 break
               case 'line':
-                legendType = 'line';
+                _legendType = 'line';
                 break
               case 'scatter':
-                legendType = 'circle';
+                _legendType = 'circle';
                 _shapeWidth = shapeRadius * 2;
                 break
             }
@@ -2730,10 +3312,10 @@ function calLegendData() {
             let measureText = this.context.measureText(name || '').width;
             let itemWidth = _shapeWidth + textPadding + itemGap + measureText;
             let obj = {
-              legendType,
+              legendType: _legendType,
               name,
               measureText,
-              color: typeof itemStyle.color == 'string' ? itemStyle.color : '#000000',
+              color: itemStyle.color,
             };
 
             if (legendWidthNum + itemWidth > containerWidth) {
@@ -2771,9 +3353,9 @@ function calLegendData() {
 }
 
 function calAxisData() {
-  let { context, opts, legendData, chartData, seriesMap } = this;
-  let { width, height, padding, xAxis, yAxis, series } = opts;
-
+  let seriesMap = lodash_clonedeep(this.seriesMap);
+  let { context, opts, legendData, chartData } = this;
+  let { width, height, padding, xAxis, yAxis } = opts;
   let {
     show: xAxisShow,
     type: xAxisType,
@@ -2782,7 +3364,6 @@ function calAxisData() {
     max: xAxisMax,
     min: xAxisMin,
     splitNumber: xAxisSplitNumber,
-    format: xAxisFormat,
     axisName: xAxisName,
     axisLabel: xAxisLabel,
     axisTick: xAxisTick,
@@ -2798,7 +3379,6 @@ function calAxisData() {
     max: yAxisMax,
     min: yAxisMin,
     splitNumber: yAxisSplitNumber,
-    format: yAxisFormat,
     axisName: yAxisName,
     axisLabel: yAxisLabel,
     axisTick: yAxisTick,
@@ -2807,13 +3387,20 @@ function calAxisData() {
   } = yAxis;
 
   let { show: xAxisNameShow, textStyle: xAxisNameTextStyle, gap: xAxisNameGap, text: xAxisNameText } = xAxisName;
-  let { show: xAxisLabelShow, textStyle: xAxisLabelTextStyle, gap: xAxisLabelGap, rotate: xAxisLabelRotate, showIndex: xAxisLabelShowIndex } = xAxisLabel;
+  let {
+    show: xAxisLabelShow,
+    textStyle: xAxisLabelTextStyle,
+    gap: xAxisLabelGap,
+    rotate: xAxisLabelRotate,
+    showIndex: xAxisLabelShowIndex,
+    format: xAxisLabelFormat,
+  } = xAxisLabel;
   let { show: xAxisTickShow, lineStyle: xAxisTickStyle, length: xAxisTickLength, alignWithLabel: xAxisTickAlign, showIndex: xAxisTickShowIndex } = xAxisTick;
   let { show: xAxisLineShow, lineStyle: xAxisLineStyle } = xAxisLine;
   let { show: xAxisSplitLineShow, lineStyle: xAxisSplitLineStyle, alignWithLabel: xAxisSplitLineAlign, showIndex: xAxisSplitLineShowIndex } = xAxisSplitLine;
 
   let { show: yAxisNameShow, textStyle: yAxisNameTextStyle, gap: yAxisNameGap, text: yAxisNameText } = yAxisName;
-  let { show: yAxisLabelShow, textStyle: yAxisLabelTextStyle, gap: yAxisLabelGap, showIndex: yAxisLabelShowIndex } = yAxisLabel;
+  let { show: yAxisLabelShow, textStyle: yAxisLabelTextStyle, gap: yAxisLabelGap, showIndex: yAxisLabelShowIndex, format: yAxisLabelFormat } = yAxisLabel;
   let { show: yAxisTickShow, lineStyle: yAxisTickStyle, length: yAxisTickLength, alignWithLabel: yAxisTickAlign, showIndex: yAxisTickShowIndex } = yAxisTick;
   let { show: yAxisLineShow, lineStyle: yAxisLineStyle } = yAxisLine;
   let { show: yAxisSplitLineShow, lineStyle: yAxisSplitLineStyle, alignWithLabel: yAxisSplitLineAlign, showIndex: yAxisSplitLineShowIndex } = yAxisSplitLine;
@@ -2837,9 +3424,12 @@ function calAxisData() {
   let yEnd = padding[0]; // y方向终点
 
   if (seriesMap.candlestick && seriesMap.candlestick.length) {
-    let { height, margin, lineStyle } = seriesMap['candlestick'][0].bar;
+    let { show, height, margin, lineStyle } = seriesMap['candlestick'][0].bar;
     let { lineWidth } = lineStyle;
-    yStart -= height + margin + lineWidth; // 蜡烛图存在成交量柱状图配置则修正yStart
+
+    if (show) {
+      yStart -= height + margin + lineWidth; // 蜡烛图存在成交量柱状图配置则修正yStart
+    }
   }
 
   let xStartInit = xStart;
@@ -3325,7 +3915,7 @@ function calAxisData() {
   let xAxisLabelMaxWidth = 0;
   let xAxisLabelMaxHeight = 0;
   let xAxisLabelTextArr = xAxisLabelDataArr.reduce((xAxisLabelTextArr, dataItem, dataIndex) => {
-    let text = xAxisFormat ? xAxisFormat(dataItem) : dataItem;
+    let text = xAxisLabelFormat ? xAxisLabelFormat(dataItem) : dataItem;
     xAxisLabelMaxWidth = Math.max(context.measureText(text).width, xAxisLabelMaxWidth);
     xAxisLabelTextArr.push(text);
     return xAxisLabelTextArr
@@ -3344,7 +3934,7 @@ function calAxisData() {
   context.font = `${yAxisLabelFontSize}px`;
   let yAxisLabelMaxWidth = 0;
   let yAxisLabelTextArr = yAxisLabelDataArr.reduce((yAxisLabelTextArr, dataItem, dataIndex) => {
-    let text = yAxisFormat ? yAxisFormat(dataItem) : dataItem;
+    let text = yAxisLabelFormat ? yAxisLabelFormat(dataItem) : dataItem;
     yAxisLabelMaxWidth = Math.max(context.measureText(text).width, yAxisLabelMaxWidth);
     yAxisLabelTextArr.push(text);
     return yAxisLabelTextArr
@@ -4190,6 +4780,7 @@ function calAxisRadarData() {
     radius: 0,
     lineEndPosition: [],
     namePosition: [],
+    axisNameStyle: radarAxisNameTextStyle,
   };
 
   if (typeof centerX == 'string') {
@@ -4220,27 +4811,24 @@ function calAxisRadarData() {
       return arr
     }, []);
   }
-
   chartData.radarAxis.lineEndPosition = arr;
 
-  if (radarAxisNameShow) {
-    chartData.radarAxis.namePosition = categories.reduce((arr, item, index) => {
-      let point = {
-        x: (radius + radarAxisNameFontSize / 2 + radarAxisNameMargin) * Math.cos(start + spacingAangle * index),
-        y: (radius + radarAxisNameFontSize / 2 + radarAxisNameMargin) * Math.sin(start + spacingAangle * index),
-      };
-      let position = convertCoordinateOrigin(point, chartData.radarAxis.center);
+  chartData.radarAxis.namePosition = categories.reduce((arr, item, index) => {
+    let point = {
+      x: (radius + radarAxisNameFontSize / 2 + radarAxisNameMargin) * Math.cos(start + spacingAangle * index),
+      y: (radius + radarAxisNameFontSize / 2 + radarAxisNameMargin) * Math.sin(start + spacingAangle * index),
+    };
+    let position = convertCoordinateOrigin(point, chartData.radarAxis.center);
 
-      context.font = `${radarAxisNameFontSize}px`;
+    context.font = `${radarAxisNameFontSize}px`;
 
-      arr.push({
-        text: item,
-        point,
-        position,
-      });
-      return arr
-    }, []);
-  }
+    arr.push({
+      text: item,
+      point,
+      position,
+    });
+    return arr
+  }, []);
 
   console.log('complete calAxisRadarData', this.chartData.radarAxis);
 }
@@ -4598,18 +5186,18 @@ function calChartLineData() {
           dataItem = dataItem < minData ? minData : dataItem;
 
           if (maxData >= 0 && minData >= 0) {
-            itemHeight = (valueAxisSpacing * (dataItem - minData)) / dataRange;
-            x = xStart + itemHeight;
+            height = (valueAxisSpacing * (dataItem - minData)) / dataRange;
+            x = xStart + height;
           } else if (maxData <= 0 && minData <= 0) {
-            itemHeight = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
-            x = xEnd - itemHeight;
+            height = (valueAxisSpacing * (Math.abs(dataItem) - Math.abs(maxData))) / dataRange;
+            x = xEnd - height;
           } else {
             if (dataItem > 0) {
-              itemHeight = (valueAxisPlusSpacing * dataItem) / maxData;
-              x = xZero + itemHeight;
+              height = (valueAxisPlusSpacing * dataItem) / maxData;
+              x = xZero + height;
             } else {
-              itemHeight = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
-              x = xZero - itemHeight;
+              height = (valueAxisMinusSpacing * Math.abs(dataItem)) / Math.abs(minData);
+              x = xZero - height;
             }
           }
         }
@@ -4636,8 +5224,7 @@ function calChartLineData() {
 
 function calChartPieData() {
   let { opts, legendData, seriesMap } = this;
-  let { width, height, series, padding } = opts;
-
+  let { width, height, padding } = opts;
   let chartPie = lodash_clonedeep(seriesMap['pie'][0]);
   let { data, center, radius } = chartPie;
   let [centerX, centerY] = center;
@@ -4690,20 +5277,23 @@ function calChartRadarData() {
   });
   maxData = max == 'auto' ? maxData : max;
 
-  let spacingAangle = (2 * Math.PI) / categories.length;
+  let spacingRadian = (2 * Math.PI) / categories.length;
   let start = Math.PI / 2; // 以90度为起点, 逆时针累加
 
   seriesRadar.forEach(radarItem => {
     radarItem.dataPosition = radarItem.data.reduce((arr, dataItem, dataIndex) => {
       let scale = dataItem / maxData;
       let point = {
-        x: radius * Math.cos(start + spacingAangle * dataIndex) * scale,
-        y: radius * Math.sin(start + spacingAangle * dataIndex) * scale,
+        x: radius * Math.cos(start + spacingRadian * dataIndex) * scale,
+        y: radius * Math.sin(start + spacingRadian * dataIndex) * scale,
       };
       arr.push({
         data: dataItem,
         point,
+        spacingRadian,
+        _start_: spacingRadian * dataIndex,
       });
+
       return arr
     }, []);
   });
@@ -5051,7 +5641,18 @@ function calChartCandlestick() {
 
   if (candlestickSeries.length == 0) return
 
-  let { data, barMaxWidth, barMinWidth, barWidth, itemStyle, highLine: seriesHighLine, lowLine: seriesLowLine, bar: seriesBar } = candlestickSeries[0];
+  let {
+    name,
+    type,
+    data,
+    barMaxWidth,
+    barMinWidth,
+    barWidth,
+    itemStyle,
+    highLine: seriesHighLine,
+    lowLine: seriesLowLine,
+    bar: seriesBar,
+  } = candlestickSeries[0];
   let { color, bordercolor, opacity, color0, bordercolor0, opacity0, borderWidth } = itemStyle;
   let { show: highLineShow, lineStyle: highLineStyle } = seriesHighLine;
   let { show: lowLineShow, lineStyle: lowLineStyle } = seriesLowLine;
@@ -5090,33 +5691,45 @@ function calChartCandlestick() {
   }
 
   candlestickRect = data.reduce((chartCandlestick, dataItem, dataIndex) => {
-    highData = Math.max(dataItem[1], highData);
-    lowData = Math.min(dataItem[1], lowData);
+    const [
+      start, // 开盘价
+      end, // 收盘价
+      low, // 最低价
+      high, // 最高价
+      volumn, // 交易量
+    ] = dataItem;
+    highData = Math.max(end, highData);
+    lowData = Math.min(end, lowData);
 
     let candlestickItem = {};
 
-    candlestickItem.color = dataItem[0] > dataItem[1] ? color0 : color;
-    candlestickItem.bordercolor = dataItem[0] > dataItem[1] ? bordercolor0 : bordercolor;
-    candlestickItem.opacity = dataItem[0] > dataItem[1] ? opacity : opacity0;
+    candlestickItem.start = start;
+    candlestickItem.end = end;
+    candlestickItem.low = low;
+    candlestickItem.high = high;
+    candlestickItem.volumn = volumn;
+    candlestickItem.color = start > end ? color0 : color;
+    candlestickItem.bordercolor = start > end ? bordercolor0 : bordercolor;
+    candlestickItem.opacity = start > end ? opacity : opacity0;
     candlestickItem.borderWidth = borderWidth;
 
     candlestickItem.upLinePoint = {
       startX: xAxisLabelPoint[dataIndex].x,
-      startY: yStart - (ySpacing * (dataItem[3] - yMinData)) / yDataRange,
+      startY: yStart - (ySpacing * (low - yMinData)) / yDataRange,
       endX: xAxisLabelPoint[dataIndex].x,
-      endY: yStart - (ySpacing * (Math.max(dataItem[0], dataItem[1]) - yMinData)) / yDataRange,
+      endY: yStart - (ySpacing * (Math.max(start, end) - yMinData)) / yDataRange,
     };
     candlestickItem.downLinePoint = {
       startX: xAxisLabelPoint[dataIndex].x,
-      startY: yStart - (ySpacing * (dataItem[2] - yMinData)) / yDataRange,
+      startY: yStart - (ySpacing * (high - yMinData)) / yDataRange,
       endX: xAxisLabelPoint[dataIndex].x,
-      endY: yStart - (ySpacing * (Math.min(dataItem[0], dataItem[1]) - yMinData)) / yDataRange,
+      endY: yStart - (ySpacing * (Math.min(start, end) - yMinData)) / yDataRange,
     };
     candlestickItem.rectPoint = {
       x: Math.floor(xAxisLabelPoint[dataIndex].x - barWidth / 2),
-      y: yStart - (ySpacing * (Math.max(dataItem[0], dataItem[1]) - yMinData)) / yDataRange,
+      y: yStart - (ySpacing * (Math.max(start, end) - yMinData)) / yDataRange,
       width: barWidth,
-      height: (ySpacing * Math.abs(dataItem[0] - dataItem[1])) / yDataRange,
+      height: (ySpacing * Math.abs(start - end)) / yDataRange,
     };
     chartCandlestick.push(candlestickItem);
     return chartCandlestick
@@ -5147,29 +5760,37 @@ function calChartCandlestick() {
     let minData = Math.min(...barData);
     let range = maxData - minData;
 
-    candlestickBar = candlestickRect.reduce((candlestickBar, item, index) => {
+    candlestickBar = {
+      data: [],
+      lineStartX: xStart,
+      lineStartY: null,
+      lineEndX: xEnd,
+      lineEndY: null,
+    };
+    candlestickBar.data = candlestickRect.reduce((arr, item, index) => {
       let { color, rectPoint } = item;
       let { x, width } = rectPoint;
       let y = chartHeight - padding[2] - legendData.legendHeight - barLineStyle.lineWidth / 2;
       let height = barHeight * 0.2 + (barHeight * 0.8 * (barData[index] - minData)) / range;
 
-      candlestickBar.push({
+      arr.push({
         color,
         x,
         y,
         width,
         height,
-        lineStartX: xStart,
-        lineStartY: y,
-        lineEndX: xEnd,
-        lineEndY: y,
       });
 
-      return candlestickBar
+      candlestickBar.lineStartY = y;
+      candlestickBar.lineEndY = y;
+
+      return arr
     }, []);
   }
 
   this.chartData.chartCandlestick = {
+    type,
+    name,
     rect: candlestickRect,
     highLine: candlestickHighLine,
     lowhLine: candlestickLowLine,
@@ -7020,11 +7641,421 @@ function calChartTagCloudData() {
   console.log('complete calChartTagCloudData', chartData.chartTagCloud);
 }
 
+function calChartsData() {
+  // 将opts的数据补充完整
+  calOptions.call(this);
+
+  // 计算数据
+  calSeriesMap.call(this);
+  calSeriesColor.call(this);
+  calLegendData.call(this);
+
+  // 有相同xy轴的图表，只计算一次
+  if (this.seriesMap.line || this.seriesMap.bar || this.seriesMap.scatter || this.seriesMap.candlestick || this.seriesMap.heatmap) {
+    calAxisData.call(this);
+  }
+  Object.keys(this.seriesMap).forEach(type => {
+    if (this.seriesMap[type]) {
+      switch (type) {
+        case 'bar':
+          calChartBarData.call(this);
+          break
+        case 'line':
+          calChartLineData.call(this);
+          break
+        case 'pie':
+          calChartPieData.call(this);
+          break
+        case 'radar':
+          calAxisRadarData.call(this);
+          calChartRadarData.call(this);
+          break
+        case 'scatter':
+          calChartScatterData.call(this);
+          break
+        case 'funnel':
+          calChartPieData$1.call(this);
+          break
+        case 'candlestick':
+          calChartCandlestick.call(this);
+          break
+        case 'heatmap':
+          calChartHeatmapData.call(this);
+          break
+        case 'treemap':
+          calChartTreemapData.call(this);
+          break
+        case 'tagCloud':
+          calChartTagCloudData.call(this);
+          break
+      }
+    }
+  });
+
+  console.log('complete calChartsData');
+}
+
+var Timing = {
+  easeIn: function (pos) {
+    return Math.pow(pos, 3)
+  },
+  easeOut: function (pos) {
+    return Math.pow(pos - 1, 3) + 1
+  },
+  easeInOut: function (pos) {
+    if ((pos /= 0.5) < 1) {
+      return 0.5 * Math.pow(pos, 3)
+    } else {
+      return 0.5 * (Math.pow(pos - 2, 3) + 2)
+    }
+  },
+  linear: function (pos) {
+    return pos
+  },
+};
+
+class Animation {
+  constructor(opts) {
+    this.isStop = false;
+
+    let { animation, animationDuration, animationTiming, onProcess, onAnimationFinish } = opts;
+
+    let createAnimationFrame = function () {
+      if (typeof requestAnimationFrame !== 'undefined') {
+        return requestAnimationFrame
+      } else if (typeof setTimeout !== 'undefined') {
+        return function (step) {
+          setTimeout(function () {
+            let timeStamp = +new Date();
+            step(timeStamp);
+          }, 17);
+        }
+      }
+    };
+    let animationFrame = createAnimationFrame();
+
+    if (animation) {
+      let timingFunction = Timing[animationTiming];
+      let startTimeStamp = null;
+
+      let step = function () {
+        if (this.isStop === true) {
+          onProcess(1);
+          onAnimationFinish();
+          return
+        }
+
+        let timeStamp = +new Date();
+        if (!startTimeStamp) startTimeStamp = timeStamp;
+
+        if (timeStamp - startTimeStamp < animationDuration) {
+          let process = (timeStamp - startTimeStamp) / animationDuration;
+          process = timingFunction(process);
+          opts.onProcess(process);
+          animationFrame(step);
+        } else {
+          onProcess(1);
+          onAnimationFinish();
+        }
+      };
+      step = step.bind(this);
+
+      animationFrame(step);
+    } else {
+      onProcess(1);
+      onAnimationFinish();
+    }
+  }
+
+  /**
+   * 停止动画
+   */
+  stop() {
+    this.isStop = true;
+  }
+}
+
+function drawTooltip() {
+  const { context, opts, tooltipData } = this;
+  const { yAxis, xAxis, tooltip } = opts;
+  const { data, axisPointerData, tooltipX, tooltipY, tooltipWidth, tooltipHeight } = tooltipData;
+  const { show, axisPointer, backgroundColor, backgroundRadius, backgroundOpacity, padding, itemGap, iconRadius, iconGap, textStyle } = tooltip;
+  const { fontSize: textFontSize, color: textColor, lineHeight: textLineHeight } = textStyle;
+  const { type: axisPointerType, lineStyle: axisPointerLineStyle, shadowStyle: axisPointerShadowStyle, cross: axisPointerCross } = axisPointer;
+  const { lineWdith: axisPointerLineWidth, lineDash: axisPointerLineDash, color: axisPointerLineColor, opacity: axisPointerLineOpacity } = axisPointerLineStyle;
+  const { color: axisPointerShadowColor, opacity: axisPointerShadowOpacity } = axisPointerShadowStyle;
+  const {
+    show: crossShow,
+    lineWidth: crossLineWidth,
+    lineDash: crossLineDash,
+    lineColor: crossLineColor,
+    lineOpacity: crossLineOpacity,
+    backgroundColor: crossBakcgroundColor,
+    backgroundOpacity: crossBackgroundOpacity,
+    fontColor: crossFontColor,
+    fontPadding: crossFontPadding,
+  } = axisPointerCross;
+
+  if (!show || data.length == 0) return
+
+  // draw axisPointer
+  if (axisPointerData) {
+    const { xAxisPointer, yAxisPointer, crossPointer } = axisPointerData;
+    const {
+      yAxisLabel,
+      yAxisLabelWidth,
+      yAxisLabelHeight,
+      yAxisLabelX,
+      yAxisLabelY,
+      yAxisLineX0,
+      yAxisLineY0,
+      yAxisLineX1,
+      yAxisLineY1,
+      xAxisLabel,
+      xAxisLabelWidth,
+      xAxisLabelHeight,
+      xAxisLabelX,
+      xAxisLabelY,
+      xAxisLineX0,
+      xAxisLineY0,
+      xAxisLineX1,
+      xAxisLineY1,
+    } = crossPointer;
+
+    if (crossShow) {
+      const yAxisLabelFontSize = yAxis.axisLabel.textStyle.fontSize;
+      const xAxisLabelFontSize = xAxis.axisLabel.textStyle.fontSize;
+
+      // draw cross lineY
+      context.save();
+      context.lineWidth = crossLineWidth;
+      context.setLineDash(crossLineDash);
+      context.strokeStyle = crossLineColor;
+      context.globalAlpha = crossLineOpacity;
+      context.beginPath();
+      context.moveTo(yAxisLineX0, yAxisLineY0);
+      context.lineTo(yAxisLineX1, yAxisLineY1);
+      context.stroke();
+      context.restore();
+
+      // draw cross lineX
+      context.save();
+      context.lineWidth = crossLineWidth;
+      context.setLineDash(crossLineDash);
+      context.strokeStyle = crossLineColor;
+      context.globalAlpha = crossLineOpacity;
+      context.beginPath();
+      context.moveTo(xAxisLineX0, xAxisLineY0);
+      context.lineTo(xAxisLineX1, xAxisLineY1);
+      context.stroke();
+      context.restore();
+
+      // draw cross backgroundY
+      context.save();
+      context.fillStyle = crossBakcgroundColor;
+      context.globalAlpha = crossBackgroundOpacity;
+      context.fillRect(yAxisLabelX + crossFontPadding, yAxisLabelY - yAxisLabelFontSize / 2 - crossFontPadding, -yAxisLabelWidth, yAxisLabelHeight);
+      context.restore();
+
+      // draw cross backgroundX
+      context.save();
+      context.fillStyle = crossBakcgroundColor;
+      context.globalAlpha = crossBackgroundOpacity;
+      context.fillRect(xAxisLabelX - xAxisLabelWidth / 2, xAxisLabelY - crossFontPadding, xAxisLabelWidth, xAxisLabelHeight);
+      context.restore();
+
+      // draw cross labelY
+      context.save();
+      context.fillStyle = crossFontColor;
+      context.font = `${yAxisLabelFontSize}px`;
+      context.textBaseline = 'middle';
+      context.textAlign = 'right';
+      context.fillText(yAxisLabel, yAxisLabelX, yAxisLabelY);
+      context.restore();
+
+      // draw cross labelX
+      context.save();
+      context.fillStyle = crossFontColor;
+      context.font = `${xAxisLabelFontSize}px`;
+      context.textBaseline = 'top';
+      context.textAlign = 'center';
+      context.fillText(xAxisLabel, xAxisLabelX, xAxisLabelY);
+      context.restore();
+    }
+
+    if (axisPointerType == 'line') {
+      if (xAxisPointer) {
+        const { x0, y0, x1, y1 } = xAxisPointer;
+
+        context.save();
+        context.globalAlpha = axisPointerLineOpacity;
+        if (axisPointerLineDash) {
+          context.setLineDash(axisPointerLineDash);
+        }
+        context.lineWidth = axisPointerLineWidth;
+        context.strokeStyle = axisPointerLineColor;
+        context.beginPath();
+        context.moveTo(x0, y0);
+        context.lineTo(x1, y1);
+        context.stroke();
+        context.restore();
+      }
+    } else if (axisPointerType == 'shadow') {
+      if (xAxisPointer) {
+        const { x, y, width, height } = xAxisPointer;
+
+        context.save();
+        context.globalAlpha = axisPointerShadowOpacity;
+        context.fillStyle = axisPointerShadowColor;
+        context.fillRect(x, y, width, height);
+        context.restore();
+      }
+    }
+  }
+
+  data.forEach(item => {
+    if (item.type == 'line' || item.type == 'radar') {
+      // 放大 symbol
+      const { x, y, color, symbolType, symbolSize, symbolColor } = item;
+
+      switch (symbolType) {
+        case 'circle':
+          context.beginPath();
+          context.fillStyle = symbolColor == 'auto' ? color : symbolColor;
+          context.arc(x, y, (symbolSize + 5) / 2, 0, 2 * Math.PI);
+          context.fill();
+          context.beginPath();
+          context.fillStyle = '#ffffff';
+          context.arc(x, y, (symbolSize + 6) / 4, 0, 2 * Math.PI);
+          context.fill();
+          context.restore();
+          break
+      }
+    }
+
+    if (item.type == 'pie') {
+      // 放大 itemArea
+      const { color, center, radius, _start_, _end_ } = item;
+      const [centerX, centerY] = center;
+      const [radiusMin, radiusMax] = radius;
+
+      context.save();
+      context.beginPath();
+      context.moveTo(centerX, centerY);
+      context.fillStyle = color;
+      context.arc(centerX, centerY, radiusMax + 8, _start_, _end_);
+      context.fill();
+      if (radiusMin > 0) {
+        context.beginPath();
+        context.moveTo(centerX, centerY);
+        context.fillStyle = this.opts.backgroundColor;
+        context.arc(centerX, centerY, radiusMin, _start_, _end_);
+        context.fill();
+      }
+      context.restore();
+    }
+  });
+
+  // draw tooltip container
+  drawRadiusRect(context, tooltipX, tooltipY, tooltipWidth, tooltipHeight, backgroundRadius, backgroundColor, backgroundOpacity);
+
+  // draw tooltip content
+  let _contentX = tooltipX + padding + iconRadius;
+  let _contentY = tooltipY + padding + textLineHeight / 2;
+
+  if (tooltipData.tooltipTitle) {
+    // 存在标题
+    context.save();
+    context.fillStyle = textColor;
+    context.font = `${textFontSize}px`;
+    context.textBaseline = 'middle';
+    context.textAlign = 'left';
+    context.fillText(tooltipData.tooltipTitle, _contentX - iconRadius, _contentY);
+    context.save();
+
+    _contentY += textLineHeight + itemGap;
+  }
+
+  data.forEach(item => {
+    if (item.type == 'candlestick' || item.type == 'k') {
+      const { name, start, end, high, low, volumn, color } = item;
+
+      context.save();
+      context.beginPath();
+      context.fillStyle = color;
+      context.arc(_contentX, _contentY, iconRadius, 0, 2 * Math.PI);
+      context.fill();
+      _contentX += iconRadius + iconGap;
+
+      context.beginPath();
+      context.fillStyle = textColor;
+      context.font = `${textFontSize}px`;
+      context.textBaseline = 'middle';
+      context.textAlign = 'left';
+      context.fillText(name, _contentX, _contentY);
+      _contentY += textLineHeight + itemGap;
+      context.fillText(start, _contentX, _contentY);
+      _contentY += textLineHeight + itemGap;
+      context.fillText(end, _contentX, _contentY);
+      _contentY += textLineHeight + itemGap;
+      context.fillText(low, _contentX, _contentY);
+      _contentY += textLineHeight + itemGap;
+      context.fillText(high, _contentX, _contentY);
+      _contentY += textLineHeight + itemGap;
+      if (volumn) {
+        context.fillText(volumn, _contentX, _contentY);
+        _contentY += textLineHeight + itemGap;
+      }
+      context.restore();
+      _contentX = tooltipX + padding + iconRadius;
+    } else {
+      const { text, color } = item;
+
+      context.save();
+      context.beginPath();
+      context.fillStyle = color;
+      context.arc(_contentX, _contentY, iconRadius, 0, 2 * Math.PI);
+      context.fill();
+      _contentX += iconRadius + iconGap;
+      context.beginPath();
+      context.fillStyle = textColor;
+      context.font = `${textFontSize}px`;
+      context.textBaseline = 'middle';
+      context.textAlign = 'left';
+      context.fillText(text, _contentX, _contentY);
+      context.restore();
+
+      _contentX = tooltipX + padding + iconRadius;
+      _contentY += textLineHeight + itemGap;
+    }
+  });
+
+  console.log('complete drawTooltip');
+}
+
+function drawRadiusRect(context, x, y, width, height, radius, backgroundColor = '#000000', opacity = 0.7) {
+  context.save();
+  context.fillStyle = backgroundColor;
+  context.globalAlpha = opacity;
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.arcTo(x + width, y, x + width, y + height, radius);
+  context.lineTo(x + width, y + height - radius);
+  context.arcTo(x + width, y + height, x, y + height, radius);
+  context.lineTo(x + radius, y + height);
+  context.arcTo(x, y + height, x, y, radius);
+  context.lineTo(x, y + radius);
+  context.arcTo(x, y, x + radius, y, radius);
+  context.fill();
+  context.restore();
+}
+
 /**
  * 绘制背景图
  */
 
 function drawBackground(startX = 0, startY = 0, endX = this.opts.width, endY = this.opts.height) {
+  this.context.clearRect(startX, startY, endX, endY);
   this.context.fillStyle = this.opts.backgroundColor;
   this.context.fillRect(startX, startY, endX, endY);
 
@@ -7096,7 +8127,14 @@ function drawLegend() {
           break
         case 'rect':
           legendHeightMax = Math.max(shapeHeight, fontSize);
-          context.fillStyle = color;
+          context.fillStyle = getColor(
+            color,
+            context,
+            startX,
+            startY + legendHeightMax / 2 - shapeHeight / 2,
+            startX + shapeWidth,
+            startY + legendHeightMax / 2 + shapeHeight / 2
+          );
           context.fillRect(startX, startY + legendHeightMax / 2 - shapeHeight / 2, shapeWidth, shapeHeight);
 
           startX += shapeWidth + textPadding;
@@ -7507,7 +8545,7 @@ function drawChartPie(process) {
           let { color: barItemColor } = itemStyle;
 
           context.save();
-          context.fillStyle = barItemColor;
+          context.fillStyle = getColor(barItemColor, context, x - barWidth / 2, y - barHeight, x + barWidth, y);
           if (data >= 0) {
             context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
           } else {
@@ -7524,8 +8562,9 @@ function drawChartPie(process) {
         barItemArr.forEach((barItem, barIndex) => {
           barItem.forEach((seriesItem, seriesIndex) => {
             let { show: barItemShow, x, y, barWidth, barHeight, data, label, itemStyle } = seriesItem;
-            let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+            let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin, format: labelFormat } = label;
             let { color: barItemColor } = itemStyle;
+            const text = labelFormat ? labelFormat(data) : data;
 
             // globalLabel 权重大于 seriesLabel
             labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
@@ -7542,11 +8581,11 @@ function drawChartPie(process) {
               context.textAlign = 'center';
 
               if (data >= 0) {
-                context.strokeText(data, x, y - barHeight / 2);
-                context.fillText(data, x, y - barHeight / 2);
+                context.strokeText(text, x, y - barHeight / 2);
+                context.fillText(text, x, y - barHeight / 2);
               } else {
-                context.strokeText(data, x, y + barHeight / 2);
-                context.fillText(data, x, y + barHeight / 2);
+                context.strokeText(text, x, y + barHeight / 2);
+                context.fillText(text, x, y + barHeight / 2);
               }
               context.restore();
             }
@@ -7579,8 +8618,9 @@ function drawChartPie(process) {
         barItemArr.forEach((barItem, barIndex) => {
           barItem.forEach((seriesItem, seriesIndex) => {
             let { show: barItemShow, x, y, barWidth, barHeight, data, label, itemStyle } = seriesItem;
-            let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+            let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin, format: labelFormat } = label;
             let { color: barItemColor } = itemStyle;
+            const text = labelFormat ? labelFormat(data) : data;
 
             // globalLabel 权重大于 seriesLabel
             labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
@@ -7597,11 +8637,11 @@ function drawChartPie(process) {
               context.textAlign = 'center';
 
               if (data >= 0) {
-                context.strokeText(data, x + barHeight / 2, y);
-                context.fillText(data, x + barHeight / 2, y);
+                context.strokeText(text, x + barHeight / 2, y);
+                context.fillText(text, x + barHeight / 2, y);
               } else {
-                context.strokeText(data, x - barHeight / 2, y);
-                context.fillText(data, x - barHeight / 2, y);
+                context.strokeText(text, x - barHeight / 2, y);
+                context.fillText(text, x - barHeight / 2, y);
               }
               context.restore();
             }
@@ -7677,7 +8717,7 @@ function drawChartLine(process) {
       context.closePath();
       context.save();
       context.globalAlpha = areaOpacity;
-      context.fillStyle = areaColor == 'auto' ? lineItemColor : areaColor;
+      context.fillStyle = getColor(areaColor == 'auto' ? lineItemColor : areaColor, context, xStart, yEnd, xEnd, yStart);
       context.fill();
       context.restore();
     }
@@ -7687,7 +8727,7 @@ function drawChartLine(process) {
     let { itemStyle, line, symbol, area, label, smooth, connectNulls } = lineItem;
     let { color: lineItemColor } = itemStyle;
     let { show: symbolShow, type: symbolType, size: symbolSize, color: symbolColor } = symbol;
-    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin } = label;
+    let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin, format: labelFormat } = label;
 
     let lineStartX, lineStartY, lineEndX, lineEndY;
 
@@ -7865,7 +8905,7 @@ function drawChartLine(process) {
 
               context.beginPath();
               context.arc(x, y, symbolSize / 4, 0, 2 * Math.PI);
-              context.fillStyle = '#fff';
+              context.fillStyle = '#ffffff';
               context.fill();
               break
           }
@@ -7890,20 +8930,22 @@ function drawChartLine(process) {
 
           if (typeof data !== 'number') return
 
+          const text = labelFormat ? labelFormat(data) : data;
+
           if (xAxis.type == 'category') {
             if (maxData >= 0 && minData >= 0) {
               context.textBaseline = 'bottom';
-              context.fillText(data, x, y - labelMargin);
+              context.fillText(text, x, y - labelMargin);
             } else if (maxData <= 0 && minData <= 0) {
               context.textBaseline = 'top';
-              context.fillText(data, x, y + labelMargin);
+              context.fillText(text, x, y + labelMargin);
             } else {
               if (data) {
                 context.textBaseline = 'bottom';
-                context.fillText(data, x, y - labelMargin);
+                context.fillText(text, x, y - labelMargin);
               } else {
                 context.textBaseline = 'top';
-                context.fillText(data, x, y + labelMargin);
+                context.fillText(text, x, y + labelMargin);
               }
             }
           } else {
@@ -7923,12 +8965,12 @@ function drawChartLine(process) {
 function drawChartPie$1(process) {
   let { context, opts, chartData } = this;
   let { backgroundColor, label: globalLabel } = opts;
-  let { data, center, radius, format, offsetAngle, disablePieStroke, valueSum, maxData, roseType } = chartData.chartPie;
+  let { data, center, radius, offsetAngle, disablePieStroke, valueSum, maxData, roseType } = chartData.chartPie;
   let [centerX, centerY] = center;
   let [radiusMin, radiusMax] = radius;
   let _start_ = offsetAngle !== 0 ? (offsetAngle * Math.PI) / 180 : 0;
 
-  data.forEach(dataItem => {
+  data.forEach((dataItem, dataIndex) => {
     dataItem._start_ = _start_;
 
     if (roseType == 'area') {
@@ -7936,6 +8978,7 @@ function drawChartPie$1(process) {
     } else {
       dataItem._proportion_ = (dataItem.value / valueSum) * process;
     }
+    dataItem._end_ = _start_ + 2 * dataItem._proportion_ * Math.PI;
 
     let radius = radiusMax;
     if (roseType == 'radius' || roseType == 'area') {
@@ -7945,7 +8988,7 @@ function drawChartPie$1(process) {
 
     context.beginPath();
     context.moveTo(centerX, centerY);
-    context.arc(centerX, centerY, radius, dataItem._start_, dataItem._start_ + 2 * dataItem._proportion_ * Math.PI);
+    context.arc(centerX, centerY, radius, dataItem._start_, dataItem._end_);
     context.lineWidth = 2;
     context.strokeStyle = backgroundColor;
     context.fillStyle = dataItem.itemStyle.color;
@@ -7957,23 +9000,26 @@ function drawChartPie$1(process) {
     if (radiusMin > 0) {
       context.beginPath();
       context.moveTo(centerX, centerY);
-      context.arc(centerX, centerY, radiusMin, dataItem._start_, dataItem._start_ + 2 * dataItem._proportion_ * Math.PI);
+      context.arc(centerX, centerY, radiusMin, dataItem._start_, dataItem._end_);
       context.fillStyle = backgroundColor;
       context.strokeStyle = backgroundColor;
       context.stroke();
       context.fill();
     }
 
-    _start_ += 2 * dataItem._proportion_ * Math.PI;
+    _start_ = dataItem._end_;
   });
 
   // 绘制文本标签
   if (process == 1) {
-    let { label: seriesLabel, labelLine } = chartData.chartPie;
+    let { label: seriesLabel, labelLine, title } = chartData.chartPie;
     let { show: labelShow, fontSize: labelFontSize, color: labelColor, margin: labelMargin, format: labelFormat } = seriesLabel;
     let { length1, length2, lineWidth, lineDotRadius } = labelLine;
     let lineRadius = radiusMax + length1;
     let lastOrigin = null;
+    let { show: titleShow, text, textStyle, subtext, subtextStyle, itemGap, backgroundColor, borderColor, borderWidth } = title;
+    let { fontSize: textFontSize, color: textColor, lineHeight: textLineHeight } = textStyle;
+    let { fontSize: subtextFontSize, color: subtextColor, lineHeight: subtextLineHeight } = subtextStyle;
 
     // globalLabel 权重大于 seriesLabel
     labelShow = globalLabel && typeof globalLabel.show == 'boolean' ? globalLabel.show : labelShow;
@@ -8043,6 +9089,49 @@ function drawChartPie$1(process) {
         context.fillText(text, textStartPosition.x, textStartPosition.y);
       });
     }
+
+    if (titleShow) {
+      const textStrArr = text.split('\n').filter(item => !!item);
+      const subtextStrArr = subtext.split('\n').filter(item => !!item);
+
+      let titleY = centerY;
+      let titleHeight = textLineHeight * textStrArr.length + subtextLineHeight * subtextStrArr.length;
+
+      if (subtext) {
+        titleHeight += itemGap;
+      }
+      titleY -= titleHeight / 2;
+
+      context.save();
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+
+      if (text) {
+        titleY += textLineHeight / 2;
+        context.font = `${textFontSize}px`;
+        context.fillStyle = textColor;
+        textStrArr.forEach((text, index, arr) => {
+          context.fillText(text, centerX, titleY);
+          if (index + 1 == arr.length) {
+            titleY += textLineHeight / 2;
+          } else {
+            titleY += textLineHeight;
+          }
+        });
+        titleY += itemGap;
+      }
+
+      if (subtext) {
+        titleY += subtextLineHeight / 2;
+        context.font = `${subtextFontSize}px`;
+        context.fillStyle = subtextColor;
+        subtextStrArr.forEach(text => {
+          context.fillText(text, centerX, titleY);
+          titleY += subtextLineHeight;
+        });
+      }
+      context.restore();
+    }
   }
 
   console.log('complete drawChartPie', process);
@@ -8053,7 +9142,7 @@ function drawChartRadar(process) {
   let { label: globalLabel } = opts;
   let { center } = chartData.radarAxis;
 
-  lodash_clonedeep(chartData.chartRadar).forEach(radarItem => {
+  chartData.chartRadar.forEach(radarItem => {
     let { dataPosition, itemStyle, area, line, symbol, label } = radarItem;
     let { show: areaShow, color: areaColor, opacity: areaOpactiy } = area;
     let { show: lineShow, lineWidht, color: lineColor, opacity: lineOpacity } = line;
@@ -8063,10 +9152,8 @@ function drawChartRadar(process) {
     context.beginPath();
     dataPosition.forEach((dataItem, dataIndex) => {
       let point = dataItem.point;
-      point.x = point.x * process;
-      point.y = point.y * process;
-
-      let position = convertCoordinateOrigin(point, center);
+      let _point = { x: point.x * process, y: point.y * process };
+      let position = convertCoordinateOrigin(_point, center);
       let { x: positionX, y: positionY } = position;
       dataItem.position = position;
 
@@ -8345,20 +9432,24 @@ function drawChartCandlestick(process) {
     }
 
     if (barShow) {
-      bar.forEach(barItem => {
-        let { color, x, y, width, height, lineStartX, lineStartY, lineEndX, lineEndY } = barItem;
+      const { lineStartX, lineStartY, lineEndX, lineEndY, data } = bar;
+
+      context.save();
+      context.lineWidth = barLineWidth;
+      context.strokeStyle = barLineColor;
+      context.moveTo(lineStartX, lineStartY);
+      context.lineTo(lineEndX, lineEndY);
+      context.stroke();
+      context.restore();
+
+      data.forEach(barItem => {
+        let { color, x, y, width, height } = barItem;
 
         context.save();
         context.beginPath();
         context.fillStyle = barColor == 'auto' ? color : barColor;
         context.globalAlpha = barOpacity;
         context.fillRect(x, y, width, -height);
-
-        context.lineWidth = barLineWidth;
-        context.strokeStyle = barLineColor;
-        context.moveTo(lineStartX, lineStartY);
-        context.lineTo(lineEndX, lineEndY);
-        context.stroke();
         context.restore();
       });
     }
@@ -8507,53 +9598,7 @@ function drawChartTagCloud(process) {
 }
 
 function drawCharts() {
-  // 计算数据
-  calSeriesMap.call(this);
-  calSeriesColor.call(this);
-  calLegendData.call(this);
-  // 有相同xy轴的图表，只计算一次
-  if (this.seriesMap.line || this.seriesMap.bar || this.seriesMap.scatter || this.seriesMap.candlestick || this.seriesMap.heatmap) {
-    calAxisData.call(this);
-  }
-  Object.keys(this.seriesMap).forEach(type => {
-    if (this.seriesMap[type]) {
-      switch (type) {
-        case 'bar':
-          calChartBarData.call(this);
-          break
-        case 'line':
-          calChartLineData.call(this);
-          break
-        case 'pie':
-          calChartPieData.call(this);
-          break
-        case 'radar':
-          calAxisRadarData.call(this);
-          calChartRadarData.call(this);
-          break
-        case 'scatter':
-          calChartScatterData.call(this);
-          break
-        case 'funnel':
-          calChartPieData$1.call(this);
-          break
-        case 'candlestick':
-          calChartCandlestick.call(this);
-          break
-        case 'heatmap':
-          calChartHeatmapData.call(this);
-          break
-        case 'treemap':
-          calChartTreemapData.call(this);
-          break
-        case 'tagCloud':
-          calChartTagCloudData.call(this);
-          break
-      }
-    }
-  });
-
-  let { animation, animationDuration, animationTiming } = this.opts;
+  const { animation, animationDuration, animationTiming } = this.opts;
   this.animationInstance && this.animationInstance.stop();
 
   this.animationInstance = new Animation({
@@ -8562,10 +9607,10 @@ function drawCharts() {
     animationTiming,
     onProcess: process => {
       // 绘制图表
-      drawBackground.call(this);
-      // 有相同xy轴的图表，只绘制一次
+
+      drawBackground.call(this); // 绘制背景
       if (this.seriesMap.line || this.seriesMap.bar || this.seriesMap.scatter || this.seriesMap.candlestick || this.seriesMap.heatmap) {
-        drawAxis.call(this);
+        drawAxis.call(this); // 有相同xy轴的图表，只绘制一次
       }
 
       Object.keys(this.seriesMap).forEach(type => {
@@ -8605,7 +9650,8 @@ function drawCharts() {
       });
 
       if (process == 1) {
-        drawLegend.call(this);
+        drawLegend.call(this); // 绘制图例
+        drawTooltip.call(this); // 绘制tooltip
       }
     },
     onAnimationFinish: () => {
@@ -8619,6 +9665,12 @@ class Charts {
     this.config = Object.assign({}, Config);
     this.opts = Object.assign({}, opts);
     this.context = this.opts.element.getContext('2d');
+    this.tooltipData = {
+      tooltipTitle: '',
+      data: [],
+      maxTextWidth: 0,
+      offset: {},
+    };
     this.legendData = {};
     this.seriesMap = {};
     this.chartData = {};
@@ -8627,8 +9679,8 @@ class Charts {
     this.event = new Event();
     this.event.addEventListener('renderComplete', opts.onRenderComplete);
 
-    // 将opts的数据补充完整
-    calOptions.call(this);
+    // 计算图表数据
+    calChartsData.call(this);
 
     // 绘制图表
     drawCharts.call(this);
@@ -8646,7 +9698,119 @@ class Charts {
 
     console.log('complete updateData', this);
 
+    // 计算图表数据
+    calChartsData.call(this);
+
+    // 绘制图表
     drawCharts.call(this);
+  }
+
+  showTooltip(e) {
+    const { animation, tooltip } = this.opts;
+    const animationCache = animation;
+
+    if (!tooltip.show) return
+
+    const { currentData, offset } = this.getCurrentIndex(e);
+
+    this.tooltipData = {
+      tooltipTitle: '',
+      data: [],
+      maxTextWidth: 0,
+      offset,
+    };
+
+    Object.keys(currentData).forEach(type => {
+      const currentIndex = currentData[type];
+      switch (type) {
+        case 'bar':
+          calBarChartTooltipData.call(this, currentIndex);
+          break
+        case 'line':
+          calLineChartTooltipData.call(this, currentIndex);
+          break
+        case 'pie':
+          calPieChartTooltipData.call(this, currentIndex);
+          break
+        case 'radar':
+          calRadarChartTooltipData.call(this, currentIndex);
+          break
+        case 'candlestick':
+        case 'k':
+          calCandlestickChartTooltipData.call(this, currentIndex);
+          break
+      }
+    });
+
+    Object.keys(currentData).forEach(type => {
+      switch (type) {
+        case 'bar':
+        case 'line':
+        case 'candlestick':
+        case 'k':
+          if (!this.tooltipData.axisPointerData) {
+            calAxisPointerData.call(this, currentData[type]);
+          }
+          break
+      }
+    });
+
+    calTooltipContainerData.call(this);
+
+    console.log('complete showTooltip', this.tooltipData);
+
+    this.opts.animation = false;
+    drawCharts.call(this);
+    this.opts.animation = animationCache;
+  }
+
+  hideTooltip() {
+    const { opts, tooltipData } = this;
+    const { animation } = opts;
+    const animationCache = animation;
+
+    this.tooltipData = {
+      tooltipTitle: '',
+      data: [],
+      maxTextWidth: 0,
+      offset: {},
+    };
+
+    console.log('complete hideTooltip', tooltipData);
+
+    this.opts.animation = false;
+    drawCharts.call(this);
+    this.opts.animation = animationCache;
+  }
+
+  getCurrentIndex(e) {
+    const touches = e.touches && e.touches.length ? e.touches : e.changedTouches;
+    const offset = { x: touches[0].offsetX || 0, y: touches[0].offsetY || 0 };
+    let currentData = {};
+
+    Object.keys(this.seriesMap).forEach(type => {
+      switch (type) {
+        case 'bar':
+        case 'line':
+        case 'candlestick':
+        case 'k':
+          currentData[type] = getAxisChartCurrentIndex.call(this, offset);
+          break
+        case 'pie':
+          currentData[type] = getPieChartCurrentIndex.call(this, offset);
+          break
+        case 'radar':
+          currentData[type] = getRadarChartCurrentIndex.call(this, offset);
+          break
+      }
+    });
+
+    console.log('complete getCurrentIndex', currentData);
+
+    return {
+      currentData,
+      offset,
+    }
   }
 }
 
