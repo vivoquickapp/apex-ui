@@ -8034,18 +8034,35 @@ function drawTooltip() {
 }
 
 function drawRadiusRect(context, x, y, width, height, radius, backgroundColor = '#000000', opacity = 0.7) {
+  // context.save()
+  // context.fillStyle = backgroundColor
+  // context.globalAlpha = opacity
+  // context.beginPath()
+  // context.moveTo(x + radius, y)
+  // context.arcTo(x + width, y, x + width, y + height, radius)
+  // context.lineTo(x + width, y + height - radius)
+  // context.arcTo(x + width, y + height, x, y + height, radius)
+  // context.lineTo(x + radius, y + height)
+  // context.arcTo(x, y + height, x, y, radius)
+  // context.lineTo(x, y + radius)
+  // context.arcTo(x, y, x + radius, y, radius)
+  // context.fill()
+  // context.restore()
+
+  // 兼容华为引擎
   context.save();
   context.fillStyle = backgroundColor;
   context.globalAlpha = opacity;
   context.beginPath();
   context.moveTo(x + radius, y);
-  context.arcTo(x + width, y, x + width, y + height, radius);
+  context.lineTo(x + width - radius, y);
+  context.arc(x + width - radius - 0.5, y + radius + 0.5, radius, -Math.PI / 2, 0);
   context.lineTo(x + width, y + height - radius);
-  context.arcTo(x + width, y + height, x, y + height, radius);
+  context.arc(x + width - radius - 0.5, y + height - radius - 0.5, radius, 0, Math.PI / 2);
   context.lineTo(x + radius, y + height);
-  context.arcTo(x, y + height, x, y, radius);
+  context.arc(x + radius + 0.5, y + height - radius - 0.5, radius, Math.PI / 2, Math.PI);
   context.lineTo(x, y + radius);
-  context.arcTo(x, y, x + radius, y, radius);
+  context.arc(x + radius + 0.5, y + radius + 0.5, radius, Math.PI, (Math.PI * 3) / 2);
   context.fill();
   context.restore();
 }
