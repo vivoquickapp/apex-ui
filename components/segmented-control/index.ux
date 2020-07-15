@@ -137,6 +137,12 @@ export default {
   },
   onInit() {
     this.currentp = this.current;
+    this.$watch('current', 'currentHandler');
+  },
+  currentHandler(newValue, oldValue) {
+    if (newValue !== oldValue) {
+      this.currentp = newValue;
+    }
   },
   change(index) {
     if (!this.disabled) {
