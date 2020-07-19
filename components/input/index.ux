@@ -13,6 +13,7 @@
       if="{{disabled !== 'true'}}"
       onchange="handleInputChange"
       onfocus="handleInputFocus"
+      onenterkeyclick ="handleEnterKeyClick"
     />
     <text
       class="apex-input-content {{right === 'true' ? 'apex-input-right': ''}}"
@@ -112,6 +113,10 @@ export default {
 
   handleInputFocus(event) {
     this.$emit("focus", event);
+  },
+
+  handleEnterKeyClick(event) {
+    this.$emit("enterkeyclick", event)
   },
 
   handleInputBlur(event) {
