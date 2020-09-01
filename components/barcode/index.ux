@@ -1,61 +1,114 @@
 <template>
-  <canvas
-    id="canvasId"
-    style="height: {{height}}px;width: {{width}}px;"
-  ></canvas>
+  <canvas style="height: {{height}}px;width: {{width}}px;" id="canvasId"></canvas>
 </template>
-<style lang="less"></style>
+
 <script>
-import barcode from "./barcode";
-
-const defalutOptions = {
-  number: true,
-  prefix: true,
-  color: "black",
-  debug: false,
-  onValid() {
-    console.log("onValid");
-  },
-  onInvalid() {
-    console.log("onInValid");
-  },
-  onSuccess() {
-    console.log("onSuccess");
-  },
-  onError() {
-    console.log("onError");
+  const JsBarcode = require('./barcode/JsBarcode.js');
+  export default {
+      props: {
+          value: {
+              default: 'barcode'
+          },
+          displayValue: {
+              default: true
+          },
+          format: {
+              default: 'CODE128'
+          },
+          height: {
+              default: 100
+          },
+          width: {
+              default: 240
+          },
+          fontSize: {
+              default: 20
+          },
+          fontOptions: {
+              default: ''
+          },
+          font: {
+              default: ''
+          },
+          text: {
+              default: ''
+          },
+          textAlign: {
+              default: 'center'
+          },
+          textPosition: {
+              default: 'bottom'
+          },
+          textMargin: {
+              default: 2
+          },
+          background: {
+              default: '#ffffff'
+          },
+          lineColor: {
+              default: ''
+          },
+          margin: {
+              default: 10
+          },
+          marginTop: {
+              default: ''
+          },
+          marginBottom: {
+              default: ''
+          },
+          marginLeft: {
+              default: ''
+          },
+          marginRight: {
+              default: ''
+          },
+          options: {
+              default: {}
+          }
+      },
+      onInit() {
+          this.$watch('value', 'draw');
+          this.$watch('format', 'draw');
+          setTimeout(() => {
+              this.draw();
+          }, 0);
+      },
+      draw() {
+          const canvas = this.$element('canvasId');
+          try {
+              JsBarcode(canvas, this.value, {
+                  text: this.text,
+                  textAlign: this.textAlign,
+                  textMargin: this.textMargin,
+                  textPosition: this.textPosition,
+                  displayValue: this.displayValue,
+                  format: this.format,
+                  height: this.height,
+                  width: this.width,
+                  font: this.font,
+                  fontSize: this.fontSize,
+                  fontOptions: this.fontOptions,
+                  lineColor: this.lineColor,
+                  background: this.background,
+                  margin: this.margin,
+                  marginTop: this.marginTop,
+                  marginBottom: this.marginBottom,
+                  marginLeft: this.marginLeft,
+                  marginRight: this.marginRight,
+                  ...this.options,
+                  valid: (valid) => {
+                      this.$emit('valid', valid)
+                  }
+              });
+          } catch (error) {
+              console.error(error);
+          }
+      },
   }
-};
-
-export default {
-  props: {
-    number: {
-      default: "6901028193856"
-    },
-    width: {
-      default: 400
-    },
-    height: {
-      default: 150
-    },
-    options: {
-      default: defalutOptions
-    }
-  },
-  onInit() {
-    this.$watch("number", "draw");
-    setTimeout(() => {
-      this.draw();
-    }, 0);
-  },
-  draw() {
-    const canvas = this.$element("canvasId");
-    const ctx = canvas.getContext("2d");
-    const options = Object.assign(
-      { width: this.width, height: this.height },
-      this.options
-    );
-    new barcode(this.number.toString(), options, ctx);
-  }
-};
 </script>
+<style>
+  #canvasId {
+      align-self: center;
+  }
+</style>
