@@ -710,6 +710,25 @@ function isArray(data) {
   return Object.prototype.toString.call(data) === '[object Array]'
 }
 
+/**
+ * 计算触摸滑动距离
+ * @param {*} distance
+ * @param {*} chartData
+ * @param {*} config
+ * @param {*} opts
+ */
+function calValidDistance(distance, chartData, config, opts) {
+  let dataChartAreaWidth = opts.width - config.padding[0] - chartData.axisData.xAxisLabelPoint[0].x;
+  let dataChartWidth = chartData.axisData.xEachSpacing * opts.xAxis.data.length;
+  let validDistance = distance;
+  if (distance >= 0) {
+    validDistance = 0;
+  } else if (Math.abs(distance) >= dataChartWidth - dataChartAreaWidth) {
+    validDistance = dataChartAreaWidth - dataChartWidth - chartData.axisData.xEachSpacing / 2;
+  }
+  return validDistance
+}
+
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
@@ -2597,7 +2616,7 @@ function getAxisChartCurrentIndex(offset) {
     // 点击有效范围
     if (xAxis.type == 'category' && yAxis.type == 'value') {
       xAxisLabelPoint.forEach((item, index) => {
-        if (x > item.x) {
+        if (x + (Math.abs(opts._scrollDistance_) || 0) > item.x) {
           currentIndex = index;
         }
       });
@@ -2618,7 +2637,7 @@ function getAxisChartCurrentIndex(offset) {
     } else if (xAxis.type == 'value' && yAxis.type == 'value') ;
   }
 
-  console.log('complete getAxisChartCurrentIndex');
+  console.log('complete getAxisChartCurrentIndex', offset);
 
   return currentIndex
 }
@@ -2777,7 +2796,7 @@ function calTooltipContainerData() {
     tooltipHeight,
     tooltipTitle,
   };
-  console.log('complete calTooltipContainerData');
+  console.log('complete calTooltipContainerData', this.tooltipData);
 }
 
 /**
@@ -3946,6 +3965,7 @@ function calAxisData() {
   } else {
     xSpacingNumber = xAxisLabelDataArr.length - 1;
   }
+  xSpacingNumber = opts.enableScroll ? Math.min(5, xSpacingNumber) : xSpacingNumber;
 
   let ySpacingNumber = 0;
   if (yAxisType == 'category') {
@@ -7790,23 +7810,57 @@ function drawTooltip() {
     lineDash: crossLineDash,
     lineColor: crossLineColor,
     lineOpacity: crossLineOpacity,
-    backgroundColor: crossBakcgroundColor,
+    backgroundColor: crossBackgroundColor,
     backgroundOpacity: crossBackgroundOpacity,
     fontColor: crossFontColor,
     fontPadding: crossFontPadding,
   } = axisPointerCross;
 
   if (!show || data.length == 0) return
+  // draw axisPointer
+  if (axisPointerData) {
+    const { crossPointer } = axisPointerData;
+    const { yAxisLabel, yAxisLabelWidth, yAxisLabelHeight, yAxisLabelX, yAxisLabelY, yAxisLineX0, yAxisLineY0, yAxisLineX1, yAxisLineY1 } = crossPointer;
 
+    if (crossShow) {
+      const yAxisLabelFontSize = yAxis.axisLabel.textStyle.fontSize;
+
+      // draw cross lineY
+      context.save();
+      context.lineWidth = crossLineWidth;
+      context.setLineDash(crossLineDash);
+      context.strokeStyle = crossLineColor;
+      context.globalAlpha = crossLineOpacity;
+      context.beginPath();
+      context.moveTo(yAxisLineX0, yAxisLineY0);
+      context.lineTo(yAxisLineX1, yAxisLineY1);
+      context.stroke();
+      context.restore();
+
+      // draw cross backgroundY
+      context.save();
+      context.fillStyle = crossBackgroundColor;
+      context.globalAlpha = crossBackgroundOpacity;
+      context.fillRect(yAxisLabelX + crossFontPadding, yAxisLabelY - yAxisLabelFontSize / 2 - crossFontPadding, -yAxisLabelWidth, yAxisLabelHeight);
+      context.restore();
+
+      // draw cross labelY
+      context.save();
+      context.fillStyle = crossFontColor;
+      context.font = `${yAxisLabelFontSize}px`;
+      context.textBaseline = 'middle';
+      context.textAlign = 'right';
+      context.fillText(yAxisLabel, yAxisLabelX, yAxisLabelY);
+      context.restore();
+    }
+  }
+  if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
+    context.translate(opts._scrollDistance_, 0);
+  }
   // draw axisPointer
   if (axisPointerData) {
     const { xAxisPointer, yAxisPointer, crossPointer } = axisPointerData;
     const {
-      yAxisLabel,
-      yAxisLabelWidth,
-      yAxisLabelHeight,
-      yAxisLabelX,
-      yAxisLabelY,
       yAxisLineX0,
       yAxisLineY0,
       yAxisLineX1,
@@ -7823,7 +7877,6 @@ function drawTooltip() {
     } = crossPointer;
 
     if (crossShow) {
-      const yAxisLabelFontSize = yAxis.axisLabel.textStyle.fontSize;
       const xAxisLabelFontSize = xAxis.axisLabel.textStyle.fontSize;
 
       // draw cross lineY
@@ -7850,27 +7903,11 @@ function drawTooltip() {
       context.stroke();
       context.restore();
 
-      // draw cross backgroundY
-      context.save();
-      context.fillStyle = crossBakcgroundColor;
-      context.globalAlpha = crossBackgroundOpacity;
-      context.fillRect(yAxisLabelX + crossFontPadding, yAxisLabelY - yAxisLabelFontSize / 2 - crossFontPadding, -yAxisLabelWidth, yAxisLabelHeight);
-      context.restore();
-
       // draw cross backgroundX
       context.save();
-      context.fillStyle = crossBakcgroundColor;
+      context.fillStyle = crossBackgroundColor;
       context.globalAlpha = crossBackgroundOpacity;
       context.fillRect(xAxisLabelX - xAxisLabelWidth / 2, xAxisLabelY - crossFontPadding, xAxisLabelWidth, xAxisLabelHeight);
-      context.restore();
-
-      // draw cross labelY
-      context.save();
-      context.fillStyle = crossFontColor;
-      context.font = `${yAxisLabelFontSize}px`;
-      context.textBaseline = 'middle';
-      context.textAlign = 'right';
-      context.fillText(yAxisLabel, yAxisLabelX, yAxisLabelY);
       context.restore();
 
       // draw cross labelX
@@ -7882,7 +7919,6 @@ function drawTooltip() {
       context.fillText(xAxisLabel, xAxisLabelX, xAxisLabelY);
       context.restore();
     }
-
     if (axisPointerType == 'line') {
       if (xAxisPointer) {
         const { x0, y0, x1, y1 } = xAxisPointer;
@@ -8084,10 +8120,10 @@ function drawBackground(startX = 0, startY = 0, endX = this.opts.width, endY = t
  */
 
 function drawLegend() {
-  if (!this.opts.legend.show) return
-
   let { context, opts, legendData } = this;
   let { width, height, legend, padding } = opts;
+  if (!legend.show) return
+
   let { shapeWidth, shapeHeight, shapeRadius, itemGap, marginTop, textStyle } = legend;
   let { fontSize, color, padding: textPadding } = textStyle;
   let { legendList, legendWidth, legendHeight } = legendData;
@@ -8176,112 +8212,32 @@ function drawLegend() {
 }
 
 /**
- * 绘制Y轴, 包括 axisName(名称), axisLabel(标签), axisTick(刻度线), axisLine(轴线)
+ * 绘制X轴, 包括 axisName(名称), axisLabel(标签), axisTick(刻度线), axisLine(轴线)
  */
-function drawAxis() {
+function drawXAxis() {
   let { context, opts, chartData } = this;
-  let { xAxis, yAxis } = opts;
+  let { xAxis } = opts;
 
-  let {
-    show: xAxisShow,
-    type: xAxisType,
-    axisName: xAxisName,
-    axisLabel: xAxisLabel,
-    axisTick: xAxisTick,
-    axisLine: xAxisLine,
-    axisSplitLine: xAxisSplitLine,
-  } = xAxis;
-  let {
-    show: yAxisShow,
-    type: yAxisType,
-    axisName: yAxisName,
-    axisLabel: yAxisLabel,
-    axisTick: yAxisTick,
-    axisLine: yAxisLine,
-    axisSplitLine: yAxisSplitLine,
-  } = yAxis;
+  let { show: xAxisShow, type: xAxisType, axisName: xAxisName, axisLabel: xAxisLabel, axisTick: xAxisTick, axisLine: xAxisLine } = xAxis;
 
   let { show: xAxisNameShow, textStyle: xAxisNameTextStyle } = xAxisName;
   let { show: xAxisLabelShow, textStyle: xAxisLabelTextStyle, rotate: xAxisLabelRotate } = xAxisLabel;
   let { show: xAxisTickShow, lineStyle: xAxisTickStyle } = xAxisTick;
   let { show: xAxisLineShow, lineStyle: xAxisLineStyle } = xAxisLine;
-  let { show: xAxisSplitLineShow, lineStyle: xAxisSplitLineStyle } = xAxisSplitLine;
-
-  let { show: yAxisNameShow, textStyle: yAxisNameTextStyle } = yAxisName;
-  let { show: yAxisLabelShow, textStyle: yAxisLabelTextStyle } = yAxisLabel;
-  let { show: yAxisTickShow, lineStyle: yAxisTickStyle } = yAxisTick;
-  let { show: yAxisLineShow, lineStyle: yAxisLineStyle } = yAxisLine;
-  let { show: yAxisSplitLineShow, lineStyle: yAxisSplitLineStyle } = yAxisSplitLine;
 
   let { color: xAxisNameColor, fontSize: xAxisNameFontSize } = xAxisNameTextStyle;
   let { color: xAxisLabelColor, fontSize: xAxisLabelFontSize } = xAxisLabelTextStyle;
   let { color: xAxisTickLineColor, lineWidth: xAxisTickLineWidth } = xAxisTickStyle;
   let { color: xAxisLineColor, lineWidth: xAxisLineWidth } = xAxisLineStyle;
-  let { color: xAxisSplitLineColor, lineWidth: xAxisSplitLineWidth } = xAxisSplitLineStyle;
 
-  let { color: yAxisNameColor, fontSize: yAxisNameFontSize } = yAxisNameTextStyle;
-  let { color: yAxisLabelColor, fontSize: yAxisLabelFontSize } = yAxisLabelTextStyle;
-  let { color: yAxisTickLineColor, lineWidth: yAxisTickLineWidth } = yAxisTickStyle;
-  let { color: yAxisLineColor, lineWidth: yAxisLineWidth } = yAxisLineStyle;
-  let { color: yAxisSplitLineColor, lineWidth: yAxisSplitLineWidth } = yAxisSplitLineStyle;
-
-  let {
-    xAxisLabelPoint,
-    xAxisTickPoint,
-    xAxisLinePoint,
-    xAxisSplitLinePoint,
-    xAxisNamePoint,
-    yAxisLabelPoint,
-    yAxisTickPoint,
-    yAxisLinePoint,
-    yAxisSplitLinePoint,
-    yAxisNamePoint,
-  } = chartData.axisData;
-
-  if (yAxisShow) {
-    if (yAxisLabelShow) {
-      context.save();
-      context.font = `${yAxisLabelFontSize}px`;
-      context.fillStyle = yAxisLabelColor;
-      context.textAlign = 'right';
-      context.textBaseline = 'middle';
-      yAxisLabelPoint.forEach(item => {
-        if (yAxisType == 'value' || item.show) {
-          context.fillText(item.text, item.x, item.y);
-        }
-      });
-      context.restore();
-    }
-
-    if (yAxisSplitLineShow) {
-      context.lineWidth = yAxisSplitLineWidth;
-      context.strokeStyle = yAxisSplitLineColor;
-
-      yAxisSplitLinePoint.forEach((item, index) => {
-        if (yAxisType == 'value' || item.show) {
-          context.beginPath();
-          context.moveTo(item.startX, item.startY);
-          context.lineTo(item.endX, item.endY);
-          context.closePath();
-          context.stroke();
-        }
-      });
-    }
-
-    if (yAxisNameShow) {
-      context.save();
-      context.font = `${yAxisNameFontSize}px`;
-      context.fillStyle = yAxisNameColor;
-      context.textAlign = 'center';
-      context.textBaseline = 'bottom';
-      context.fillText(yAxisNamePoint.text, yAxisNamePoint.x, yAxisNamePoint.y);
-      context.restore();
-    }
-  }
+  let { xAxisLabelPoint, xAxisTickPoint, xAxisLinePoint, xAxisNamePoint } = chartData.axisData;
 
   if (xAxisShow) {
     if (xAxisLabelShow) {
       context.save();
+      if (opts._scrollDistance_ && opts._scrollDistance_ !== 0) {
+        context.translate(opts._scrollDistance_, 0);
+      }
       context.font = `${xAxisLabelFontSize}px`;
       context.fillStyle = xAxisLabelColor;
       context.textBaseline = 'top';
@@ -8311,11 +8267,15 @@ function drawAxis() {
       context.restore();
     }
 
-    if (xAxisSplitLineShow) {
-      context.lineWidth = xAxisSplitLineWidth;
-      context.strokeStyle = xAxisSplitLineColor;
+    if (xAxisTickShow) {
+      context.save();
+      if (opts._scrollDistance_ && opts._scrollDistance_ !== 0) {
+        context.translate(opts._scrollDistance_, 0);
+      }
+      context.lineWidth = xAxisTickLineWidth;
+      context.strokeStyle = xAxisTickLineColor;
 
-      xAxisSplitLinePoint.forEach((item, index) => {
+      xAxisTickPoint.forEach(item => {
         if (xAxisType == 'value' || item.show) {
           context.beginPath();
           context.moveTo(item.startX, item.startY);
@@ -8324,6 +8284,29 @@ function drawAxis() {
           context.stroke();
         }
       });
+      context.restore();
+    }
+
+    if (xAxisLineShow) {
+      context.beginPath();
+      context.moveTo(xAxisLinePoint.startX, xAxisLinePoint.startY);
+      context.lineTo(xAxisLinePoint.endX, xAxisLinePoint.endY);
+      context.closePath();
+
+      context.lineWidth = xAxisLineWidth;
+      context.strokeStyle = xAxisLineColor;
+      context.stroke();
+    }
+
+    if (opts.enableScroll) {
+      // 遮盖滑出去的图
+      context.save();
+      context.fillStyle = opts.backgroundColor || '#ffffff';
+      if (opts._scrollDistance_ < 0) {
+        context.fillRect(0, 0, Math.ceil(chartData.axisData.xStart), opts.height);
+      }
+      context.fillRect(Math.ceil(chartData.axisData.xEnd), 0, opts.width - Math.ceil(chartData.axisData.xEnd), opts.height);
+      context.restore();
     }
 
     if (xAxisNameShow) {
@@ -8337,8 +8320,92 @@ function drawAxis() {
     }
   }
 
+  console.log('complete drawXAxis');
+}
+
+function drawXAxisGrid() {
+  let { context, opts, chartData } = this;
+  let { xAxis } = opts;
+
+  let { show: xAxisShow, type: xAxisType, axisSplitLine: xAxisSplitLine } = xAxis;
+
+  let { show: xAxisSplitLineShow, lineStyle: xAxisSplitLineStyle } = xAxisSplitLine;
+
+  let { color: xAxisSplitLineColor, lineWidth: xAxisSplitLineWidth } = xAxisSplitLineStyle;
+
+  let { xAxisSplitLinePoint } = chartData.axisData;
+
+  if (xAxisShow) {
+    if (xAxisSplitLineShow) {
+      context.save();
+      if (opts._scrollDistance_ && opts._scrollDistance_ !== 0) {
+        context.translate(opts._scrollDistance_, 0);
+      }
+      context.lineWidth = xAxisSplitLineWidth;
+      context.strokeStyle = xAxisSplitLineColor;
+
+      xAxisSplitLinePoint.forEach((item, index) => {
+        if (xAxisType == 'value' || item.show) {
+          context.beginPath();
+          context.moveTo(item.startX, item.startY);
+          context.lineTo(item.endX, item.endY);
+          context.closePath();
+          context.stroke();
+        }
+      });
+      context.restore();
+    }
+    console.log('complete drawXAxisGrid');
+  }
+}
+
+/**
+ * 绘制Y轴, 包括 axisName(名称), axisLabel(标签), axisTick(刻度线), axisLine(轴线)
+ */
+function drawYAxis() {
+  let { context, opts, chartData } = this;
+  let { yAxis } = opts;
+
+  let { show: yAxisShow, type: yAxisType, axisName: yAxisName, axisLabel: yAxisLabel, axisTick: yAxisTick, axisLine: yAxisLine } = yAxis;
+
+  let { show: yAxisNameShow, textStyle: yAxisNameTextStyle } = yAxisName;
+  let { show: yAxisLabelShow, textStyle: yAxisLabelTextStyle } = yAxisLabel;
+  let { show: yAxisTickShow, lineStyle: yAxisTickStyle } = yAxisTick;
+  let { show: yAxisLineShow, lineStyle: yAxisLineStyle } = yAxisLine;
+
+  let { color: yAxisNameColor, fontSize: yAxisNameFontSize } = yAxisNameTextStyle;
+  let { color: yAxisLabelColor, fontSize: yAxisLabelFontSize } = yAxisLabelTextStyle;
+  let { color: yAxisTickLineColor, lineWidth: yAxisTickLineWidth } = yAxisTickStyle;
+  let { color: yAxisLineColor, lineWidth: yAxisLineWidth } = yAxisLineStyle;
+
+  let { yAxisLabelPoint, yAxisTickPoint, yAxisLinePoint, yAxisNamePoint } = chartData.axisData;
+
   // 防止轴线被网格线覆盖, 最后绘制
   if (yAxisShow) {
+    if (yAxisLabelShow) {
+      context.save();
+      context.font = `${yAxisLabelFontSize}px`;
+      context.fillStyle = yAxisLabelColor;
+      context.textAlign = 'right';
+      context.textBaseline = 'middle';
+      yAxisLabelPoint.forEach(item => {
+        if (yAxisType == 'value' || item.show) {
+          context.fillText(item.text, item.x, item.y);
+        }
+      });
+      context.restore();
+    }
+
+    if (yAxisNameShow) {
+      context.save();
+      context.font = `${yAxisNameFontSize}px`;
+      context.fillStyle = yAxisNameColor;
+      context.textAlign = 'center';
+      context.textBaseline = 'bottom';
+      context.fillText(yAxisNamePoint.text, yAxisNamePoint.x, yAxisNamePoint.y);
+      context.restore();
+    }
+
     if (yAxisTickShow) {
       context.lineWidth = yAxisTickLineWidth;
       context.strokeStyle = yAxisTickLineColor;
@@ -8366,13 +8433,29 @@ function drawAxis() {
     }
   }
 
-  if (xAxisShow) {
-    if (xAxisTickShow) {
-      context.lineWidth = xAxisTickLineWidth;
-      context.strokeStyle = xAxisTickLineColor;
+  console.log('complete drawYAxis');
+}
 
-      xAxisTickPoint.forEach(item => {
-        if (xAxisType == 'value' || item.show) {
+function drawYAxisGrid() {
+  let { context, opts, chartData } = this;
+  let { yAxis } = opts;
+
+  let { show: yAxisShow, type: yAxisType, axisSplitLine: yAxisSplitLine } = yAxis;
+
+  let { show: yAxisSplitLineShow, lineStyle: yAxisSplitLineStyle } = yAxisSplitLine;
+
+  let { color: yAxisSplitLineColor, lineWidth: yAxisSplitLineWidth } = yAxisSplitLineStyle;
+
+  let { yAxisSplitLinePoint } = chartData.axisData;
+
+  // 防止轴线被网格线覆盖, 最后绘制
+  if (yAxisShow) {
+    if (yAxisSplitLineShow) {
+      context.lineWidth = yAxisSplitLineWidth;
+      context.strokeStyle = yAxisSplitLineColor;
+
+      yAxisSplitLinePoint.forEach((item, index) => {
+        if (yAxisType == 'value' || item.show) {
           context.beginPath();
           context.moveTo(item.startX, item.startY);
           context.lineTo(item.endX, item.endY);
@@ -8381,20 +8464,9 @@ function drawAxis() {
         }
       });
     }
-
-    if (xAxisLineShow) {
-      context.beginPath();
-      context.moveTo(xAxisLinePoint.startX, xAxisLinePoint.startY);
-      context.lineTo(xAxisLinePoint.endX, xAxisLinePoint.endY);
-      context.closePath();
-
-      context.lineWidth = xAxisLineWidth;
-      context.strokeStyle = xAxisLineColor;
-      context.stroke();
-    }
   }
 
-  console.log('complete drawAxis');
+  console.log('complete drawYAxis');
 }
 
 function drawAxisRadar() {
@@ -8545,7 +8617,7 @@ function drawAxisRadar() {
   console.log('complete drawAxisRadar');
 }
 
-function drawChartPie(process) {
+function drawChartBar(process) {
   let { context, opts, chartData } = this;
   let { label: globalLabel, xAxis } = opts;
 
@@ -8562,6 +8634,9 @@ function drawChartPie(process) {
           let { color: barItemColor } = itemStyle;
 
           context.save();
+          if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
+            context.translate(opts._scrollDistance_, 0);
+          }
           context.fillStyle = getColor(barItemColor, context, x - barWidth / 2, y - barHeight, x + barWidth, y);
           if (data >= 0) {
             context.fillRect(x - barWidth / 2, y, barWidth, -barHeight * process);
@@ -8591,6 +8666,9 @@ function drawChartPie(process) {
 
             if (labelShow && barItemShow) {
               context.save();
+              if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
+                context.translate(opts._scrollDistance_, 0);
+              }
               context.font = `${labelFontSize}px`;
               context.strokeStyle = labelColor == 'auto' ? barItemColor : labelColor;
               context.fillStyle = '#ffffff';
@@ -8674,7 +8752,6 @@ function drawChartPie(process) {
 function drawChartLine(process) {
   let { context, opts, chartData } = this;
   let { label: globalLabel, xAxis } = opts;
-
   let { xStart, xEnd, yStart, yEnd, yZero, xZero, yMaxData, yMinData, xMaxData, xMinData } = chartData.axisData;
 
   let maxData = xAxis.type == 'value' ? xMaxData : yMaxData;
@@ -8694,6 +8771,9 @@ function drawChartLine(process) {
 
     if (lineShow) {
       context.save();
+      if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
+        context.translate(opts._scrollDistance_, 0);
+      }
       context.lineJoin = 'round';
       context.globalAlpha = lineOpacity;
       context.lineWidth = lineWidth;
@@ -8733,6 +8813,9 @@ function drawChartLine(process) {
       }
       context.closePath();
       context.save();
+      if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
+        context.translate(opts._scrollDistance_, 0);
+      }
       context.globalAlpha = areaOpacity;
       context.fillStyle = getColor(areaColor == 'auto' ? lineItemColor : areaColor, context, xStart, yEnd, xEnd, yStart);
       context.fill();
@@ -8908,6 +8991,9 @@ function drawChartLine(process) {
     if (process == 1) {
       if (symbolShow) {
         context.save();
+        if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
+          context.translate(opts._scrollDistance_, 0);
+        }
         lineItem.data.forEach(dataItem => {
           let { x, y, data } = dataItem;
 
@@ -8938,6 +9024,9 @@ function drawChartLine(process) {
 
       if (labelShow) {
         context.save();
+        if (opts._scrollDistance_ && opts._scrollDistance_ !== 0 && opts.enableScroll === true) {
+          context.translate(opts._scrollDistance_, 0);
+        }
         context.font = `${labelFontSize}px`;
         context.fillStyle = labelColor == 'auto' ? lineItemColor : labelColor;
         context.textAlign = 'center';
@@ -8976,10 +9065,10 @@ function drawChartLine(process) {
     }
   });
 
-  console.log('complete drawChartLine', process);
+  console.log('complete drawChartLine', process, context);
 }
 
-function drawChartPie$1(process) {
+function drawChartPie(process) {
   let { context, opts, chartData } = this;
   let { backgroundColor, label: globalLabel } = opts;
   let { data, center, radius, offsetAngle, disablePieStroke, valueSum, maxData, roseType } = chartData.chartPie;
@@ -9305,7 +9394,7 @@ function drawChartScatter(process) {
   console.log('complete drawChartScatter', process);
 }
 
-function drawChartPie$2(process) {
+function drawChartPie$1(process) {
   let { context, opts, chartData } = this;
   let { data, funnelAlign, itemStyle, label: seriesLabel } = chartData.chartFunnel;
   let { borderColor, borderWidth } = itemStyle;
@@ -9624,22 +9713,23 @@ function drawCharts() {
     animationTiming,
     onProcess: process => {
       // 绘制图表
+      console.log('dadong process:', process);
 
       drawBackground.call(this); // 绘制背景
       if (this.seriesMap.line || this.seriesMap.bar || this.seriesMap.scatter || this.seriesMap.candlestick || this.seriesMap.heatmap) {
-        drawAxis.call(this); // 有相同xy轴的图表，只绘制一次
+        drawXAxisGrid.call(this); // 有相同xy轴的图表，只绘制一次
+        drawYAxisGrid.call(this); // 有相同xy轴的图表，只绘制一次
       }
-
       Object.keys(this.seriesMap).forEach(type => {
         switch (type) {
           case 'bar':
-            drawChartPie.call(this, process);
+            drawChartBar.call(this, process);
             break
           case 'line':
             drawChartLine.call(this, process);
             break
           case 'pie':
-            drawChartPie$1.call(this, process);
+            drawChartPie.call(this, process);
             break
           case 'radar':
             drawAxisRadar.call(this);
@@ -9649,7 +9739,7 @@ function drawCharts() {
             drawChartScatter.call(this, process);
             break
           case 'funnel':
-            drawChartPie$2.call(this, process);
+            drawChartPie$1.call(this, process);
             break
           case 'candlestick':
             drawChartCandlestick.call(this, process);
@@ -9665,8 +9755,11 @@ function drawCharts() {
             break
         }
       });
-
-      if (process == 1) {
+      if (this.seriesMap.line || this.seriesMap.bar || this.seriesMap.scatter || this.seriesMap.candlestick || this.seriesMap.heatmap) {
+        drawXAxis.call(this); // 有相同xy轴的图表，只绘制一次
+        drawYAxis.call(this); // 有相同xy轴的图表，只绘制一次
+      }
+      if (process === 1) {
         drawLegend.call(this); // 绘制图例
         drawTooltip.call(this); // 绘制tooltip
       }
@@ -9696,6 +9789,11 @@ class Charts {
     this.event = new Event();
     this.event.addEventListener('renderComplete', opts.onRenderComplete);
 
+    this.scrollOption = {
+      currentOffset: 0,
+      startTouchX: 0,
+      distance: 0,
+    };
     // 计算图表数据
     calChartsData.call(this);
 
@@ -9774,8 +9872,7 @@ class Charts {
 
     calTooltipContainerData.call(this);
 
-    console.log('complete showTooltip', this.tooltipData);
-
+    console.log('complete showTooltip', this.opts, currentData, offset);
     this.opts.animation = false;
     drawCharts.call(this);
     this.opts.animation = animationCache;
@@ -9803,6 +9900,7 @@ class Charts {
   getCurrentIndex(e) {
     const touches = e.touches && e.touches.length ? e.touches : e.changedTouches;
     const offset = { x: touches[0].offsetX || 0, y: touches[0].offsetY || 0 };
+
     let currentData = {};
 
     Object.keys(this.seriesMap).forEach(type => {
@@ -9822,11 +9920,43 @@ class Charts {
       }
     });
 
-    console.log('complete getCurrentIndex', currentData);
+    console.log('complete getCurrentIndex', currentData, this.chartData);
 
     return {
       currentData,
       offset,
+    }
+  }
+
+  scrollStart(e) {
+    if (e.touches[0] && this.opts.enableScroll === true) {
+      this.scrollOption.startTouchX = e.touches[0].clientX;
+    }
+  }
+
+  scroll(e) {
+    // TODO throtting...
+    if (e.touches[0] && this.opts.enableScroll === true) {
+      let _distance = e.touches[0].clientX - this.scrollOption.startTouchX;
+      let { currentOffset } = this.scrollOption;
+      let validDistance = calValidDistance(currentOffset + _distance, this.chartData, this.opts, this.opts);
+
+      this.scrollOption.distance = _distance = validDistance - currentOffset;
+      let opts = Object.assign({}, this.opts, {
+        _scrollDistance_: currentOffset + _distance,
+        animation: false,
+      });
+      this.opts = opts;
+      console.log('dadong scroll:', opts._scrollDistance_);
+      drawCharts.call(this);
+    }
+  }
+
+  scrollEnd(e) {
+    if (this.opts.enableScroll === true) {
+      let { currentOffset, distance } = this.scrollOption;
+      this.scrollOption.currentOffset = currentOffset + distance;
+      this.scrollOption.distance = 0;
     }
   }
 }
