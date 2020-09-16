@@ -93,10 +93,12 @@ export default {
     }
   },
   changePage(e) {
-    console.log(e.target.dataset);
-    router.replace({
-      uri: e.target.dataset.path
-    });
+    router.push({
+      uri: e.target.dataset.path,
+      params: {
+          ___PARAM_LAUNCH_FLAG___: 'clearTask'
+      }
+    })
   }
 };
 </script>
