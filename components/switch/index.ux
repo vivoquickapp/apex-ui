@@ -84,17 +84,19 @@ stack {
   width: 100%;
 }
 
-.circel-checked {
+.circle-checked {
   animation-name: checked;
   animation-duration: 100ms;
   animation-iteration-count: 1;
+  animation-fill-mode: forwards;
   transform: translateX(@SwitchCircleTranslateX);
 }
 
-.circel-dischecked {
+.circle-dischecked {
   animation-name: dischecked;
   animation-duration: 100ms;
   animation-iteration-count: 1;
+  animation-fill-mode: forwards;
   transform: translateX(0);
 }
 
@@ -128,8 +130,8 @@ stack {
 export default {
   data() {
     return {
-      activeClass: "circel-checked",
-      bgColor: "circel-checked",
+      activeClass: "circle-checked",
+      bgColor: "circle-checked",
       checked: this.value
     };
   },
@@ -174,18 +176,18 @@ export default {
   isChecked() {
     if (this.disabled) {
       if (this.checked) {
-        this.activeClass = "circel-checked";
+        this.activeClass = "circle-checked";
         this.bgColor = "switch-disabled-on";
       } else {
-        this.activeClass = "circel-dischecked";
+        this.activeClass = "circle-dischecked";
         this.bgColor = "switch-disabled-off";
       }
     } else {
       if (this.checked) {
-        this.activeClass = "circel-checked";
+        this.activeClass = "circle-checked";
         this.bgColor = "switch-on";
       } else {
-        this.activeClass = "circel-dischecked";
+        this.activeClass = "circle-dischecked";
         this.bgColor = "switch-off";
       }
     }
