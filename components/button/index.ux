@@ -117,11 +117,11 @@ export default {
   }
 
   &-primary {
-    .btn-primary;
+    .btn-primary();
   }
 
   &-ghost {
-    .btn-ghost;
+    .btn-ghost();
   }
 
   &-success {
