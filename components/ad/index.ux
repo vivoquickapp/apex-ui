@@ -1,0 +1,290 @@
+<import name="icon" src="../icon/index"></import>
+<template>
+  <div>
+    <div class="ad-wrap" if="visible">
+      <div class="header {{type}}">
+        <stack style="flex-direction: row-reverse">
+          <image
+            class="cover"
+            onclick="reportAdClick(adList[0].adId)"
+            oncomplete="reportAdShow(adList[0].adId)"
+            src="{{adList[0].imgUrlList[0]}}"
+          ></image>
+          <div class="cover-close" if="type==='pure-pic'">
+            <icon type="close" size="60" color="#999999" onclick="close"></icon>
+          </div>
+        </stack>
+        <div class="title" if="type!=='pure-pic'">
+          <text class="content">{{ adList[0].title }}</text>
+          <div
+            class="close"
+            if="!(type === 'left-pic-right-text' || type === 'left-text-right-pic')"
+          >
+            <icon type="close" size="60" color="#999999" onclick="close"></icon>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="ad">
+          <text class="tag">广告</text>
+          <text>{{ brand }}流量联盟</text>
+        </div>
+        <div class="btn">
+          <text onclick="reportAdClick(adList[0].adId)">点击安装</text>
+          <div
+            class="close"
+            if="type === 'left-pic-right-text' || type === 'left-text-right-pic'"
+          >
+            <icon type="close" size="60" color="#999999" onclick="close"></icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import device from "@system.device";
+import ads from "@service.ad";
+
+export default {
+  props: {
+    type: {
+      default: "top-pic-bottom-text" // 'top-text-bottom-pic' 'top-pic-bottom-text' 'left-pic-right-text' 'left-text-right-pic' 'pure-pic'
+    },
+    adUnitId: {
+      default: ""
+    }
+  },
+  data() {
+    return {
+      visible: false,
+      ad: null,
+      adList: [{ adId: 0, title: "", desc: "", imgUrlList: [] }],
+      adEvent: {}
+    };
+  },
+  onInit() {
+    this.initAd();
+  },
+  async initAd() {
+    if (this.ad) {
+      console.log("ad-log", "已存在一个广告实例");
+      return;
+    }
+
+    try {
+      const res = await device.getInfo();
+      this.brand = res.data.brand;
+
+      if (
+        res.data.engine_host !== "vivo_browser" &&
+        res.data.platformVersionCode < 1052
+      ) {
+        console.log(
+          "ad-log",
+          `engine_host !== vivo_browser && platformVersionCode < 1052`
+        );
+        return;
+      }
+
+      this.ad = await ads.createNativeAd({
+        adUnitId: this.adUnitId
+      });
+      if (!this.ad || typeof this.ad !== "object") {
+        console.log("ad-log", `创建 原生广告 对象失败，请稍后重试`);
+        return;
+      }
+
+      this.onEvent("Error");
+      this.onEvent("Load");
+
+      this.loadAd();
+    } catch (e) {
+      console.log("ad-log", `捕获异常 ${err}`);
+    }
+  },
+  destroyAd() {
+    if (!this.ad) {
+      return;
+    }
+    this.ad.destroy();
+    console.log("ad-log", `nativeAd.destroy 成功`);
+    this.ad = null;
+    this.adEvent = {};
+  },
+  loadAd() {
+    if (!this.ad) {
+      console.log("ad-log", "请先创建一个广告实例");
+      return;
+    }
+    this.ad.load();
+  },
+  reportAdClick(adId) {
+    this.ad.reportAdClick({ adId });
+    console.log("ad-log", `nativeAd.reportAdClick 上报广告点击 adId: ${adId}`);
+  },
+  reportAdShow(adId) {
+    if (this.adList.length === 0) return;
+    this.ad.reportAdShow({ adId });
+  },
+  onEvent(event) {
+    if (!this.ad) {
+      console.log("ad-log", "请先创建一个广告实例");
+      return;
+    }
+
+    if (!this.adEvent[event]) {
+      this.adEvent[event] = [];
+    }
+
+    let fn = null;
+    let fnIndex = this.adEvent[event].length;
+
+    if (event === "Load") {
+      fn = res => {
+        console.log("ad-log", "nativeAd.load 成功");
+
+        this.adList = res.adList;
+        this.visible = true;
+        this.$emit("load", res);
+        console.log(
+          "ad-log",
+          `触发 ${event} 事件${fnIndex + 1}, res = ${
+            res ? JSON.stringify(res) : ""
+          }`
+        );
+      };
+    } else {
+      fn = res => {
+        this.$emit("error", res);
+        console.log(
+          "ad-log",
+          `触发 ${event} 事件${fnIndex + 1}, res = ${
+            res ? JSON.stringify(res) : ""
+          }`
+        );
+      };
+    }
+
+    this.ad[`on${event}`](fn);
+    this.adEvent[event].push(fn);
+    console.log("ad-log", `监听 ${event} 事件${fnIndex + 1}`);
+  },
+  close(e) {
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+    this.visible = false;
+    this.destroyAd();
+    this.$emit("close");
+  }
+};
+</script>
+<style lang="less">
+@import "../styles/base.less";
+
+.ad-wrap {
+  padding: 10px * @ratio 30px * @ratio 20px * @ratio 30px * @ratio;
+  width: 100%;
+  background-color: #ffffff;
+  flex-direction: column;
+
+  .header {
+    flex-direction: column;
+    justify-content: space-between;
+
+    .cover-close {
+      align-self: flex-start;
+      padding-top: 40px * @ratio;
+      padding-right: 20px * @ratio;
+    }
+
+    .cover {
+      width: 100%;
+      border-radius: 10px * @ratio;
+      margin: 20px * @ratio 0;
+    }
+
+    .title {
+      justify-content: space-between;
+
+      .content {
+        color: #333333;
+        font-size: 34px * @ratio;
+        padding-right: 20px * @ratio;
+      }
+
+      .close {
+        padding-top: 8px * @ratio;
+        flex-direction: column;
+      }
+    }
+  }
+
+  .footer {
+    margin-top: 20px * @ratio;
+    justify-content: space-between;
+
+    .ad {
+      text {
+        font-size: 28px * @ratio;
+      }
+
+      .tag {
+        background-color: #f5f5f5;
+        padding: 0 20px * @ratio;
+        border-radius: 10px * @ratio;
+        color: #999999;
+        font-size: 28px * @ratio;
+        margin-right: 20px * @ratio;
+      }
+    }
+    .btn {
+      text {
+        color: #415fff;
+      }
+      .close {
+        margin-left: 36px * @ratio;
+      }
+    }
+  }
+
+  text {
+    font-size: 32px * @ratio;
+  }
+
+  .top-text-bottom-pic {
+    flex-direction: column-reverse;
+  }
+
+  .left-pic-right-text {
+    flex-direction: row;
+
+    .cover {
+      width: 300px * @ratio;
+    }
+
+    .title {
+      padding: 20px * @ratio 0;
+      flex-direction: column;
+    }
+
+    .content {
+      padding-left: 20px * @ratio;
+    }
+  }
+
+  .left-text-right-pic {
+    flex-direction: row-reverse;
+
+    .cover {
+      width: 300px * @ratio;
+    }
+
+    .title {
+      padding: 20px * @ratio 0;
+      flex-direction: column;
+    }
+  }
+}
+</style>

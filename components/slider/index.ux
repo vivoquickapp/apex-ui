@@ -212,20 +212,20 @@ export default {
     }
   },
   touchstartOfSlider(e) {
-    if(!!e["_touches"]){ 
+    if (!!e["_touches"]) {
       // 联盟规范
       this.tipsTop = e["_touches"][0]["clientY"];
       this.tipsLeft = e["_touches"][0]["clientX"];
-    }else if(!!e["touches"]){
+    } else if (!!e["touches"]) {
       // 华为规范
       this.tipsTop = e["touches"][0]["clientY"];
       this.tipsLeft = e["touches"][0]["clientX"];
     }
   },
   touchmoveOfSlider(e) {
-    if(!!e["_touches"]){ 
+    if (!!e["_touches"]) {
       this.tipsLeft = e["_touches"][0]["clientX"];
-    }else if(!!e["touches"]){
+    } else if (!!e["touches"]) {
       this.tipsLeft = e["touches"][0]["clientX"];
     }
     this.toggleTips("show");

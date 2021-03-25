@@ -96,9 +96,9 @@ export default {
     router.push({
       uri: e.target.dataset.path,
       params: {
-          ___PARAM_LAUNCH_FLAG___: 'clearTask'
+        ___PARAM_LAUNCH_FLAG___: "clearTask"
       }
-    })
+    });
   }
 };
 </script>

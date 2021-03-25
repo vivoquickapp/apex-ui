@@ -3,7 +3,12 @@
 <import name="my-icon" src="../icon/index"></import>
 
 <template>
-  <my-popup id="popup" background="transparent" position="bottom" onclose="cancel">
+  <my-popup
+    id="popup"
+    background="transparent"
+    position="bottom"
+    onclose="cancel"
+  >
     <div class="{{theme}}-sheet">
       <div class="{{theme}}-sheet-options-wrap">
         <text class="{{theme}}-sheet-title-text">{{ titleText }}</text>

@@ -2,7 +2,10 @@
 <import name="my-icon" src="../icon/index"></import>
 
 <template>
-  <div class="wrap {{isAnimationEnd?'hide':'show'}}" style="z-index: {{zIndex}}">
+  <div
+    class="wrap {{isAnimationEnd?'hide':'show'}}"
+    style="z-index: {{zIndex}}"
+  >
     <my-mask id="mask" z-index="{{zIndex}}" onclick="handleClickMask"></my-mask>
 
     <div

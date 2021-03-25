@@ -171,7 +171,9 @@ export default {
       ctx.clearRect(0, 0, 0x7fffffff, 0x7fffffff);
       drawBackground();
       drawCircle(tempEndAngle);
-      _this.startAngle =  anticlockwise ? 2 * Math.PI - tempEndAngle : tempEndAngle;
+      _this.startAngle = anticlockwise
+        ? 2 * Math.PI - tempEndAngle
+        : tempEndAngle;
       if (count >= 100) return;
       count++;
       _this.timer = setTimeout(() => {
