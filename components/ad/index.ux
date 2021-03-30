@@ -44,7 +44,6 @@
 </template>
 <script>
 import device from "@system.device";
-import ads from "@service.ad";
 
 export default {
   props: {
@@ -68,7 +67,6 @@ export default {
   },
   async initAd() {
     if (this.ad) {
-      console.log("ad-log", "已存在一个广告实例");
       return;
     }
 
@@ -76,22 +74,10 @@ export default {
       const res = await device.getInfo();
       this.brand = res.data.brand;
 
-      if (
-        res.data.engine_host !== "vivo_browser" &&
-        res.data.platformVersionCode < 1052
-      ) {
-        console.log(
-          "ad-log",
-          `engine_host !== vivo_browser && platformVersionCode < 1052`
-        );
-        return;
-      }
-
-      this.ad = await ads.createNativeAd({
+      this.ad = await require("@service.ad").createNativeAd({
         adUnitId: this.adUnitId
       });
       if (!this.ad || typeof this.ad !== "object") {
-        console.log("ad-log", `创建 原生广告 对象失败，请稍后重试`);
         return;
       }
 
@@ -108,20 +94,17 @@ export default {
       return;
     }
     this.ad.destroy();
-    console.log("ad-log", `nativeAd.destroy 成功`);
     this.ad = null;
     this.adEvent = {};
   },
   loadAd() {
     if (!this.ad) {
-      console.log("ad-log", "请先创建一个广告实例");
       return;
     }
     this.ad.load();
   },
   reportAdClick(adId) {
     this.ad.reportAdClick({ adId });
-    console.log("ad-log", `nativeAd.reportAdClick 上报广告点击 adId: ${adId}`);
   },
   reportAdShow(adId) {
     if (this.adList.length === 0) return;
@@ -129,7 +112,6 @@ export default {
   },
   onEvent(event) {
     if (!this.ad) {
-      console.log("ad-log", "请先创建一个广告实例");
       return;
     }
 
@@ -138,37 +120,21 @@ export default {
     }
 
     let fn = null;
-    let fnIndex = this.adEvent[event].length;
 
     if (event === "Load") {
       fn = res => {
-        console.log("ad-log", "nativeAd.load 成功");
-
         this.adList = res.adList;
         this.visible = true;
         this.$emit("load", res);
-        console.log(
-          "ad-log",
-          `触发 ${event} 事件${fnIndex + 1}, res = ${
-            res ? JSON.stringify(res) : ""
-          }`
-        );
       };
     } else {
       fn = res => {
         this.$emit("error", res);
-        console.log(
-          "ad-log",
-          `触发 ${event} 事件${fnIndex + 1}, res = ${
-            res ? JSON.stringify(res) : ""
-          }`
-        );
       };
     }
 
     this.ad[`on${event}`](fn);
     this.adEvent[event].push(fn);
-    console.log("ad-log", `监听 ${event} 事件${fnIndex + 1}`);
   },
   close(e) {
     if (e.stopPropagation) {
