@@ -1,0 +1,107 @@
+<template>
+  <div class="apex-checkbox" onclick="clickHandler">
+    <div
+      class="apex-checkbox-checked {{my_checked?'apex-checkbox-active':''}}"
+      style="background-color: {{(my_checked||disabled)?my_color:''}}"
+    >
+      <text class="{{(my_checked||disabled)?'active-text':''}}">{{ value }}</text>
+    </div>
+  </div>
+</template>
+
+<style lang="less">
+@import "../styles/base.less";
+
+.apex-checkbox {
+  background-color: #ffffff;
+  height: 86px * @ratio;
+
+  &-checked {
+    justify-content: center;
+    border-radius: 5px * @ratio;
+    border: 2px * @ratio solid @border-color-base;
+    padding: 20px * @ratio;
+  }
+
+  &-active {
+    border-color: transparent;
+
+    text {
+      color: #fff;
+    }
+  }
+
+  &-disabled {
+    border-color: @border-color-base;
+  }
+
+  text {
+    font-size: @text-size;
+  }
+}
+</style>
+
+<script>
+export default {
+  data() {
+    return {
+      my_checked: this.checked,
+      my_position: this.position,
+      my_color: this.color
+    };
+  },
+  props: {
+    checked: {
+      default: false
+    },
+    disabled: {
+      default: false
+    },
+    shape: {
+      default: "circle" // circle square
+    },
+    position: {
+      default: "left" // left right
+    },
+    value: {
+      default: ""
+    },
+    color: {
+      default: "#2d8cf0"
+    },
+    group: {
+      default: ""
+    }
+  },
+  onInit() {
+    this.$watch("disabled", "handleDisabled");
+    this.$watch("checked", "changeChecked");
+    if (this.group) {
+      const parent = this.$parent().$child(this.group);
+      const temp = parent.checkboxes;
+      const checkboxes = temp ? [...temp, this] : [this];
+      parent.checkboxes = checkboxes;
+      parent.flexDirection = 'row';
+    }
+  },
+  changeChecked() {
+    this.my_checked = this.checked;
+  },
+  changeCurrent(current) {
+    this.my_checked = current;
+  },
+  clickHandler() {
+    if (this.disabled) return;
+    const item = { current: !this.checked, value: this.value };
+    const parent = this.$parent().$child(this.group);
+    parent ? parent.emitEvent(item) : this.$emit("change", item);
+  },
+  handleDisabled(e) {
+    if (e) {
+      this.my_color = "#bbbec4";
+    } else {
+      this.my_color = this.color;
+    }
+  }
+};
+</script>
