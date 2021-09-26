@@ -1,6 +1,6 @@
 <template>
   <stack style="{{style}}">
-    <canvas id="{{id}}"></canvas>
+    <canvas id="{{id}}" class="canvas"></canvas>
     <div class="slot">
       <slot></slot>
     </div>
@@ -200,5 +200,9 @@ export default {
   height: 100%;
   justify-content: center;
   align-items: center;
+}
+.canvas {
+  width: 100%;
+  height: 100%;
 }
 </style>
