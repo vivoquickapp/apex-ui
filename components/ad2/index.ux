@@ -1,0 +1,390 @@
+<import name="icon" src="apex-ui/components/icon/index"></import>
+
+<template>
+  <div>
+    <div class="ad-container" if="{{hasAdList}}">
+      <ad
+          adId="{{adList.adId}}"
+          class="ad-native"
+          show="{{!!adList.adId}}"
+          @error="error"
+          @adclick="adClick"
+      >
+        <div class="container">
+          <block if="{{ adList.creativeType===2}}">
+            <!-- 大图 上图下文-->
+            <div class="vertical-content big-img">
+              <ad-clickable-area type="click" class="ad-image">
+                <image src="{{adList.imgUrlList[0]}}"></image>
+              </ad-clickable-area>
+              <div class="ad-text">
+                <ad-clickable-area type="click">
+                  <text>{{ adList.desc || defaultAd.desc }}</text>
+                </ad-clickable-area>
+                <div class="close-box" @click="close">
+                  <icon type="close" size="60"></icon>
+                </div>
+              </div>
+            </div>
+          </block>
+          <block if="{{adList.creativeType===4 }}">
+            <!-- 视频 -->
+            <div class="vertical-content big-img">
+              <div class="ad-text">
+                <ad-clickable-area class="content" type="click">
+                  <text>{{ adList.desc || defaultAd.desc }}</text>
+                </ad-clickable-area>
+                <div class="close-box" @click="close">
+                  <icon type="close" size="60"></icon>
+                </div>
+              </div>
+              <ad-clickable-area
+                  type="video-click"
+                  class="ad-video"
+              ></ad-clickable-area>
+            </div>
+          </block>
+          <block if="{{adList.creativeType===1}}">
+            <ad-clickable-area type="click" class="horizontal-content">
+              <text class="ad-text">{{ adList.desc || defaultAd.desc }}</text>
+              <image class="ad-image" src="{{adList.imgUrlList[0]}}"></image>
+            </ad-clickable-area>
+          </block>
+          <block if="{{adList.creativeType===3}}">
+            <div type="click" class="vertical-content three-img">
+              <div class="ad-text">
+                <ad-clickable-area class="content" type="click">
+                  <text>{{ adList.desc || defaultAd.desc }}</text>
+                </ad-clickable-area>
+                <div class="close-box" @click="close">
+                  <icon type="close" size="60"></icon>
+                </div>
+              </div>
+              <ad-clickable-area type="click" class="ad-image">
+                <!-- 组图最多渲染三张 -->
+                <block for="{{(index,ele) in adList.imgUrlList.slice(0,3)}}">
+                  <image
+                      class="{{adList.imgUrlList.length < 3
+                      ? adList.imgUrlList.length === 2
+                      ? 'two'
+                      : 'one'
+                      : 'three'}}"
+                      src="{{ele}}"
+                  ></image>
+                </block>
+              </ad-clickable-area>
+            </div>
+          </block>
+          <block if="{{ adList.creativeType===0 }}">
+            <ad-clickable-area type="click" class="vertical-content no-pic">
+              <text>{{ adList.desc || defaultAd.desc }}</text>
+            </ad-clickable-area>
+          </block>
+          <div class="footer">
+            <ad-clickable-area type="click" class="footer-info">
+              <text class="tag">{{ defaultAd.icon }}</text>
+              <text class="title">{{ adList.title || defaultAd.title }}</text>
+            </ad-clickable-area>
+            <div class="click-item">
+              <ad-clickable-area
+                  type="button"
+                  class="click-txt"
+                  value="{{btnTxt || adList.clickBtnTxt || defaultAd.clickBtnTxt}}"
+              >
+              </ad-clickable-area>
+              <icon
+                  type="close"
+                  size="60"
+                  if="{{adList.creativeType===1 || adList.creativeType===0}}"
+                  @click="close"
+              ></icon>
+            </div>
+          </div>
+        </div>
+      </ad>
+    </div>
+  </div>
+</template>
+
+<script>
+    import prompt from '@system.prompt'
+
+    export default {
+        data() {
+            return {
+                adList: {},
+                hasAdList: false,
+                defaultAd: {
+                    desc: 'vivo流量联盟，提供最优质的商业化解决方案。流量联盟广告联盟。',
+                    title: 'vivo流量联盟',
+                    icon: '广告',
+                    clickBtnTxt: '点击安装'
+                },
+                btnTxt: '',
+            }
+        },
+        props: {
+            adUnitId: {
+                default: ''
+            },
+            debug: {
+                default: false
+            }
+        },
+        onInit() {
+            this.preloadAd()
+        },
+        preloadAd() {
+            try {
+                require('@service.ad').preloadAd({
+                    adUnitId: this.adUnitId, // 原生信息流广告广告位id
+                    type: 'native', // 原生信息流广告
+                    success: (data) => {
+                        this.adList = data.adList[0];
+                        this.hasAdList = true;
+                        if (this.debug) {
+                            prompt.showToast({
+                                message: `ad load success`
+                            })
+                        }
+                    },
+                    fail: (data, code) => {
+                        console.log(data, code);
+                        if (code === 205) {
+                            this.hasAdList = true;
+                            this.adList = data.adList[0]
+                        } else {
+                            if (this.debug) {
+                                prompt.showToast({
+                                    message: `ad load fail!data= ${JSON.stringify(data)},code= ${code}`
+                                })
+                            }
+                        }
+                    }
+                })
+            } catch (e) {
+                console.log(e, e.message);
+                this.$emit('error', e);
+            }
+        },
+        error(errCode, errMsg) {
+            if (this.debug) {
+                prompt.showToast({
+                    message: `ad load error: errCode = ${errCode}, errMsg = ${errMsg}`
+                });
+            }
+            this.$emit('error', {errCode, errMsg});
+        },
+        adClick() {
+            this.$emit('adclick');
+        },
+        close() {
+            this.hasAdList = false;
+            this.$emit('close');
+        }
+    }
+</script>
+
+<style lang="less">
+  @import "../styles/base.less";
+
+  .ad-container {
+    align-self: center;
+    flex-direction: column;
+    padding: 0 10px * @ratio;
+    .ad-native {
+      width: 100%;
+      flex-direction: column;
+      .container {
+        width: 100%;
+        flex-direction: column;
+        padding: 20px * @ratio 0;
+        .ad-video {
+          width: 100%;
+          height: 500px;
+        }
+        .vertical-content {
+          width: 100%;
+          .ad-close {
+            width: 50px * @ratio;
+            height: 50px * @ratio;
+          }
+        }
+        .big-img {
+          flex-direction: column;
+          align-items: center;
+          .content {
+            align-items: flex-start;
+            text {
+              font-size: 34px * @ratio;
+            }
+          }
+          .close-box {
+            height: 100%;
+            width: 100px * @ratio;
+            align-items: center;
+            justify-content: flex-end;
+          }
+          .ad-image {
+            height: 411px * @ratio;
+            width: 100%;
+            flex-shrink: 0;
+            image {
+              width: 100%;
+              border-radius: 20px * @ratio;
+            }
+          }
+          .ad-text {
+            width: 100%;
+            height: 30%;
+            align-items: center;
+            justify-content: space-between;
+            .content {
+              justify-content: space-between;
+              width: 100%;
+            }
+          }
+        }
+        .only-img {
+          width: 100%;
+          .ad-image {
+            width: 100%;
+            border-radius: 20px * @ratio;
+            object-fit: cover;
+          }
+          .ad-close-box {
+            width: 100%;
+            justify-content: flex-end;
+            padding: 10px * @ratio 20px * @ratio;
+            .ad-close {
+              align-self: flex-start;
+              background-color: rgba(0, 0, 0, 0.4);
+              border-radius: 50px * @ratio;
+            }
+          }
+        }
+        .horizontal-content {
+          width: 100%;
+          height: 200px * @ratio;
+          justify-content: space-between;
+          .ad-image {
+            height: 100%;
+            border-radius: 20px * @ratio;
+            object-fit: cover;
+          }
+          .ad-text {
+            lines: 3;
+            font-size: 34px * @ratio;
+            text-overflow: ellipsis;
+            align-self: flex-start;
+            justify-content: space-between;
+          }
+        }
+        .three-img {
+          flex-direction: column;
+          height: 400px * @ratio;
+          align-items: center;
+          .close-box {
+            width: 100px * @ratio;
+            height: 100%;
+            align-items: center;
+            justify-content: flex-end;
+          }
+          .ad-image {
+            height: 70%;
+            width: 100%;
+            flex: 1;
+            justify-content: space-between;
+            padding: 20px * @ratio 0;
+            image {
+              height: 100%;
+              object-fit: cover;
+              border-radius: 20px * @ratio;
+            }
+            .three {
+              width: 32%;
+            }
+            .two {
+              width: 49%;
+            }
+            .one {
+              width: 100%;
+            }
+          }
+          .ad-text {
+            width: 100%;
+            height: 30%;
+            align-items: center;
+            justify-content: space-between;
+            .content {
+              align-items: flex-start;
+              text {
+                font-size: 34px * @ratio;
+                lines: 1;
+                text-overflow: ellipsis;
+              }
+            }
+          }
+        }
+        .no-pic {
+          width: 100%;
+          height: 300px;
+          text {
+            font-size: 50px * @ratio;
+            color: black;
+            padding: 20px * @ratio;
+          }
+        }
+        .footer {
+          height: 72px * @ratio;
+          width: 100%;
+          margin-top: 10px * @ratio;
+          align-items: center;
+          .tag {
+            background-color: rgba(0, 0, 0, 0.06);
+            color: #999999;
+            padding: 0 10px * @ratio;
+            height: 56px * @ratio;
+            width: 120px * @ratio;
+            text-align: center;
+            border-radius: 4px * @ratio;
+          }
+          .title {
+            margin-left: 16px * @ratio;
+          }
+          .ad-icon {
+            width: 50px * @ratio;
+            height: 50px * @ratio;
+            border-radius: 4px * @ratio;
+            border: 1px * @ratio solid #cdcdcd;
+          }
+          .click-item {
+            flex: 1;
+            flex-shrink: 0;
+            min-width: 250px * @ratio;
+            align-items: center;
+            justify-content: flex-end;
+            align-self: flex-end;
+            .title {
+              color: #999999;
+            }
+            .click-txt {
+              border-radius: 10px * @ratio;
+              font-size: 34px * @ratio;
+              padding: 10px * @ratio 20px * @ratio;
+              color: #fff;
+              text-align: right;
+              background-color: #415fff;
+            }
+            .ad-close {
+              align-self: center;
+              margin-left: 10px * @ratio;
+              width: 50px * @ratio;
+              height: 50px * @ratio;
+            }
+          }
+        }
+      }
+    }
+  }
+</style>
