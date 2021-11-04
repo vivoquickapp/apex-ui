@@ -1,4 +1,5 @@
 <import name="my-icon" src="../icon/index"></import>
+<import name="my-divider" src="../divider/index"></import>
 <template>
   <div class="apex-search-bar">
     <div class="{{pixClass}}">
@@ -30,6 +31,16 @@
       <text class="cancel" if="{{cancel}}" onclick="bindCancel">{{
         cancelText
       }}</text>
+    </div>
+    <div class="apex-search-list" if="{{options.length}}">
+      <block for="{{options}}">
+        <div class="apex-search-item">
+          <my-icon type="search" size="36" color="#afafaf"></my-icon>
+          <label target="searchItem{{$item.key ? $item.key : $idx}}">{{$item.label ? $item.label : $item.value}}</label>
+          <input id="searchItem{{$item.key ? $item.key : $idx}}" type="checkbox" value="{{$item.value ? $item.value : $item.label}}" onchange="focusItem"></input>
+        </div>
+        <my-divider height={{4}} if="{{$idx < options.length - 1}}"></my-divider>
+      </block>
     </div>
   </div>
 </template>
@@ -95,6 +106,12 @@ export default {
     enterkeytype: {
       type: String,
       default: "defualt"
+    },
+    options: {
+      type: Array,
+      default: function() {
+        return []
+      }
     }
   },
   onInit() {
@@ -153,10 +170,16 @@ export default {
     this.bindBlur();
   },
   enterEvent(evt) {
+    if (!evt.value) {
+      evt.value = evt.detail.value
+    }
     this.$emit("enterkeyclick", { event: evt });
   },
   bindSelectionchange(evt) {
     this.$emit("selectionchange", { event: evt });
+  },
+  focusItem(evt) {
+    this.$emitElement('enterkeyclick', { value: evt.value ? evt.value : evt.target.value }, 'input')
   }
 };
 </script>
@@ -195,5 +218,30 @@ export default {
   color: #2dc250;
   margin-left: 20px * @ratio;
   font-size: @text-size;
+}
+.apex-search {
+  &-bar {
+    flex-direction: column;
+  }
+
+  &-list {
+    flex-direction: column;
+    background-color: #fff;
+    padding: 0px 20px * @ratio;
+  }
+  &-item {
+    width: 100%;
+    height: 80px * @ratio;
+    margin-left: 10px * @ratio;
+
+    label {
+      width: 100%;
+      margin-left: 10px * @ratio;
+      font-size: 28px * @ratio;
+    }
+    input {
+      width: 0px;
+    }
+  }
 }
 </style>
